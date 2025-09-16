@@ -1,19 +1,15 @@
-import { Redirect, Route } from 'react-router-dom';
+import { Redirect, Route, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import {
   IonApp,
-  IonIcon,
-  IonLabel,
   IonRouterOutlet,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { ellipse, square, triangle } from 'ionicons/icons';
-import Tab1 from './pages/Tab1';
-import Tab2 from './pages/Tab2';
-import Tab3 from './pages/Tab3';
+import Home from './pages/Home';
+import HospitalBooking from './pages/HospitalBooking';
+import MedicationManagement from './pages/MedicationManagement';
+import UserInfo from './components/UserInfo';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -47,41 +43,105 @@ import './theme/variables.css';
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonTabs>
-        <IonRouterOutlet>
-          <Route exact path="/tab1">
-            <Tab1 />
-          </Route>
-          <Route exact path="/tab2">
-            <Tab2 />
-          </Route>
-          <Route path="/tab3">
-            <Tab3 />
-          </Route>
-          <Route exact path="/">
-            <Redirect to="/tab1" />
-          </Route>
-        </IonRouterOutlet>
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="tab1" href="/tab1">
-            <IonIcon aria-hidden="true" icon={triangle} />
-            <IonLabel>Tab 1</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="tab2" href="/tab2">
-            <IonIcon aria-hidden="true" icon={ellipse} />
-            <IonLabel>Tab 2</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="tab3" href="/tab3">
-            <IonIcon aria-hidden="true" icon={square} />
-            <IonLabel>Tab 3</IonLabel>
-          </IonTabButton>
-        </IonTabBar>
-      </IonTabs>
-    </IonReactRouter>
-  </IonApp>
-);
+interface UserData {
+  name: string;
+  birthDate: string;
+  gender: string;
+  시도: string;
+  시군구: string;
+}
+
+const AppContent: React.FC = () => {
+  const location = useLocation();
+  const [backgroundColor, setBackgroundColor] = useState('transparent');
+  const [userInfo, setUserInfo] = useState<UserData | null>(null);
+  const [showUserInfo, setShowUserInfo] = useState(false);
+
+  useEffect(() => {
+    // 로컬 스토리지에서 사용자 정보 확인
+    const savedUserInfo = localStorage.getItem('userInfo');
+    if (savedUserInfo) {
+      setUserInfo(JSON.parse(savedUserInfo));
+      setShowUserInfo(false);
+    } else {
+      setShowUserInfo(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    const path = location.pathname;
+    
+    switch (path) {
+      case '/hospital':
+        setBackgroundColor('transparent');
+        break;
+      case '/medication':
+        setBackgroundColor('transparent');
+        break;
+      case '/home':
+      default:
+        setBackgroundColor('transparent');
+        break;
+    }
+  }, [location.pathname]);
+
+  const handleUserInfoSave = (userData: UserData) => {
+    localStorage.setItem('userInfo', JSON.stringify(userData));
+    setUserInfo(userData);
+    setShowUserInfo(false);
+  };
+
+  // 사용자 정보가 없으면 UserInfo 컴포넌트 표시
+  if (showUserInfo) {
+    return (
+      <div 
+        className="app-background" 
+        style={{ 
+          background: backgroundColor,
+          minHeight: '100vh',
+          transition: 'background 0.8s ease-in-out'
+        }}
+      >
+        <UserInfo onSave={handleUserInfoSave} />
+      </div>
+    );
+  }
+
+  return (
+    <div 
+      className="app-background" 
+      style={{ 
+        background: backgroundColor,
+        minHeight: '100vh',
+        transition: 'background 0.8s ease-in-out'
+      }}
+    >
+          <IonRouterOutlet>
+            <Route exact path="/hospital">
+              <HospitalBooking />
+            </Route>
+            <Route exact path="/home">
+              <Home />
+            </Route>
+            <Route exact path="/medication">
+              <MedicationManagement />
+            </Route>
+            <Route exact path="/">
+              <Redirect to="/home" />
+            </Route>
+          </IonRouterOutlet>
+        </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <IonApp>
+      <IonReactRouter>
+        <AppContent />
+      </IonReactRouter>
+    </IonApp>
+  );
+};
 
 export default App;

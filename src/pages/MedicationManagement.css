@@ -1,0 +1,134 @@
+/* 뒤로가기 버튼 */
+.back-button-container {
+  margin-bottom: 1rem;
+}
+
+.back-button {
+  --color: rgba(255, 255, 255, 0.9);
+  --background: rgba(255, 255, 255, 0.1);
+  --border-radius: 12px;
+  --padding-start: 12px;
+  --padding-end: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.back-button:hover {
+  --background: rgba(255, 255, 255, 0.2);
+}
+
+.back-button ion-icon {
+  font-size: 20px;
+  margin-right: 8px;
+}
+
+/* 카드 스타일 */
+ion-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.add-button {
+  margin-top: 1rem;
+  --font-size: 18px;
+  --height: 50px;
+  --background: #f59e0b;
+  --color: white;
+  --border-radius: 12px;
+}
+
+.add-button ion-icon {
+  margin-right: 0.5rem;
+}
+
+.no-data {
+  text-align: center;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 2rem;
+}
+
+ion-item {
+  --min-height: 60px;
+  --background: rgba(255, 255, 255, 0.7);
+  --border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+ion-label h2 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #1f2937;
+}
+
+ion-label h3 {
+  font-size: 18px;
+  color: #f59e0b;
+  margin-bottom: 0.5rem;
+}
+
+.medication-times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.time-button {
+  --font-size: 16px;
+  --height: 40px;
+  --background: #f59e0b;
+  --color: white;
+  --border-radius: 8px;
+}
+
+.time-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.time-chips ion-chip {
+  --font-size: 16px;
+  cursor: pointer;
+  --background: rgba(245, 158, 11, 0.1);
+  --color: #f59e0b;
+}
+
+.notes {
+  font-size: 16px;
+  color: #374151;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+ion-select,
+ion-input {
+  font-size: 18px;
+  --background: rgba(255, 255, 255, 0.8);
+  --border-radius: 8px;
+}
+
+ion-datetime {
+  font-size: 18px;
+}
+
+/* 복용 완료 버튼 */
+.taken-button {
+  --color: #10b981;
+  --background: rgba(16, 185, 129, 0.1);
+  --border-radius: 8px;
+}
+
+/* 삭제 버튼 */
+.delete-button {
+  --color: #ef4444;
+  --background: rgba(239, 68, 68, 0.1);
+  --border-radius: 8px;
+}

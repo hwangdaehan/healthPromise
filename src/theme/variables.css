@@ -1,2 +1,102 @@
 /* For information on how to create your own theme, please see:
 http://ionicframework.com/docs/theming/ */
+
+/* 접근성을 위한 전역 스타일 */
+ion-content {
+  --background: transparent;
+}
+
+ion-card {
+  margin: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+ion-card-header {
+  padding: 20px 20px 10px 20px;
+}
+
+ion-card-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #333;
+}
+
+ion-card-content {
+  padding: 10px 20px 20px 20px;
+}
+
+ion-item {
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 8px;
+}
+
+ion-label {
+  font-size: 18px;
+  color: #333;
+}
+
+ion-button {
+  --border-radius: 8px;
+  font-weight: 500;
+}
+
+/* 상단 탭바 개선 */
+ion-tab-bar {
+  --background: #ffffff;
+  --border: 1px solid #e9ecef;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+ion-tab-button {
+  --color: #6c757d;
+  --color-selected: #007bff;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  min-height: 60px;
+}
+
+ion-tab-button ion-icon {
+  font-size: 28px;
+  margin-bottom: 4px;
+}
+
+ion-tab-button ion-label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* 헤더 개선 */
+ion-header ion-toolbar {
+  --background: #ffffff;
+  --color: #333;
+  --border-color: #e9ecef;
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+ion-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* 카드 스타일 개선 */
+ion-card {
+  margin: 0;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+ion-card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+ion-card-content {
+  padding: 1.5rem;
+}

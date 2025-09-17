@@ -6,14 +6,14 @@ ion-app {
   --ion-safe-area-right: env(safe-area-inset-right);
 }
 
-/* 헤더 스타일 - 모던한 그라데이션 */
+/* 헤더 스타일 - 깔끔한 화이트 테마 */
 ion-header {
-  box-shadow: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
 }
 
 ion-header ion-toolbar {
-  --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --color: white;
+  --background: #ffffff;
+  --color: #1e293b;
   --border-color: transparent;
   --padding-top: env(safe-area-inset-top);
   box-shadow: none !important;
@@ -28,224 +28,402 @@ ion-header ion-toolbar::before {
 }
 
 ion-header ion-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #667eea !important;
+  font-size: 28px;
+  font-weight: 800;
+  color: #2563eb !important;
+  letter-spacing: -1px;
 }
 
-.header-logout-button {
-  --color: white;
-  --background: rgba(255, 255, 255, 0.2);
+.header-notification-button {
+  --color: #64748b;
+  --background: transparent;
   --border-radius: 12px;
   --padding-start: 12px;
   --padding-end: 12px;
   --padding-top: 8px;
   --padding-bottom: 8px;
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
+  border: none !important;
+  position: relative;
+  margin-right: 8px;
+}
+
+.header-notification-button:hover {
+  --color: #2563eb;
+  --background: rgba(37, 99, 235, 0.1);
+  border: none !important;
+  transform: scale(1.05);
+}
+
+.header-notification-button ion-icon {
+  font-size: 20px;
+}
+
+.notification-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+.header-logout-button {
+  --color: #64748b;
+  --background: transparent;
+  --border-radius: 12px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  transition: all 0.3s ease;
+  border: none !important;
 }
 
 .header-logout-button:hover {
-  --color: #ff6b6b;
-  --background: rgba(255, 107, 107, 0.2);
+  --color: #2563eb;
+  --background: rgba(37, 99, 235, 0.1);
+  border: none !important;
   transform: scale(1.05);
 }
 
 .header-logout-button ion-icon {
-  font-size: 22px;
+  font-size: 20px;
 }
 
-/* 메인 컨테이너 - 매력적인 그라데이션 배경 */
+/* 메인 컨테이너 - 깔끔한 화이트 배경 */
 .main-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  padding: 1.5rem 1rem;
+  gap: 20px;
+  padding: 20px 16px;
   max-width: 400px;
   margin: 0 auto;
   min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   position: relative;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: #f8fafc;
 }
 
-.main-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1) 0%, transparent 50%);
-  pointer-events: none;
-}
-
-/* 사용자 정보 카드 관련 스타일 제거됨 */
-
-/* 건강 일정 제목 - 매력적인 스타일 */
-.health-schedule-title {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  position: relative;
-  z-index: 1;
-}
-
-.health-schedule-title h2 {
-  font-size: 26px;
-  font-weight: 800;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0;
-  letter-spacing: -0.5px;
-}
-
-/* 피처 카드 가로 배치 */
-.feature-cards-row {
-  display: flex;
-  flex-direction: row;
-  gap: 0.75rem;
-  width: 100%;
-}
-
-@media (max-width: 768px) {
-  .feature-cards-row {
-    flex-direction: column;
-  }
-}
-
-/* 피처 카드 - 매력적인 스타일 */
-.feature-card {
-  flex: 1;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.95);
+/* 프로모션 배너 */
+.promotion-banner {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   border: none;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  min-height: 140px;
-  text-align: center;
-  position: relative;
-  z-index: 1;
-  overflow: hidden;
-}
-
-.feature-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
-  border-radius: 16px 16px 0 0;
-}
-
-.feature-card:hover {
-  transform: translateY(-6px) scale(1.02);
-}
-
-/* 심플한 카드 스타일 - 복잡한 효과 제거 */
-
-.feature-card ion-card-content {
-  padding: 1.5rem 1rem;
-  text-align: center;
-}
-
-.card-icon {
-  width: 60px;
-  height: 60px;
-  margin: 0 auto 1.2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(30, 41, 59, 0.2);
+}
+
+.promotion-banner ion-card-content {
+  padding: 20px;
+}
+
+.banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.banner-text {
+  flex: 1;
+}
+
+.banner-title {
+  font-size: 20px !important;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.3px;
+}
+
+.banner-subtitle {
+  font-size: 14px !important;
+  color: #cbd5e1;
+  margin: 0;
+  font-weight: 400;
+}
+
+.banner-icon {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
 }
 
-.card-icon ion-icon {
-  font-size: 1.8rem;
-  color: white;
+.banner-icon ion-icon {
+  font-size: 24px;
+  color: #10b981;
 }
 
-.hospital-card .card-icon {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+/* 메인 제목 섹션 */
+.main-title-section {
+  margin-bottom: 20px;
 }
 
-.medication-card .card-icon {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-}
-
-.card-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.5rem;
+.main-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+  letter-spacing: -0.5px;
   line-height: 1.3;
 }
 
-.card-description {
-  font-size: 13px;
-  color: #6b7280;
-  line-height: 1.4;
-  margin: 0;
+/* 서비스 카드 - 이미지 참고 스타일 */
+.service-card {
+  background: #ffffff;
+  border: none;
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+  cursor: pointer;
+  height: 140px;
 }
 
-/* 캘린더 카드 - 매력적인 스타일 */
-.calendar-card {
-  background: rgba(255, 255, 255, 0.95);
+.service-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.service-card ion-card-content {
+  padding: 20px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.service-card-content {
+  display: grid;
+  grid-template-columns: 1fr 60px;
+  column-gap: 16px;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.service-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: center;
+}
+
+.service-title {
+  font-size: 22px !important;
+  font-weight: 500 !important;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hospital-title {
+  color: #2563eb !important;
+}
+
+.medication-title {
+  color : #f97316 !important;
+}
+
+
+.chevron-icon {
+  font-size: 16px;
+  color: #64748b;
+}
+
+.service-subtitle {
+  font-size: 16px !important;
+  color: #64748b;
+  margin: 0;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.service-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  justify-self: end;
+}
+
+.service-icon ion-icon {
+  font-size: 28px;
+  color: #64748b;
+}
+
+/* 병원 예약 카드 - 파란색 테두리 */
+.hospital-card {
+  border: 2px solid #2563eb !important;
+}
+
+.hospital-card .service-icon {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+}
+
+.hospital-card .service-icon ion-icon {
+  color: #2563eb !important;
+}
+
+/* 복약 관리 카드 - 오렌지색 테두리 */
+.medication-card {
+  border: 2px solid #f97316 !important;
+}
+
+.medication-card .service-icon {
+  background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%) !important;
+}
+
+.medication-card .service-icon ion-icon {
+  color: #f97316 !important;
+}
+
+/* 추가 기능 카드들 */
+.additional-cards-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.additional-card {
+  background: #ffffff;
   border: none;
-  border-radius: 20px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.additional-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.additional-card ion-card-content {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.card-icon-small {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.card-icon-small ion-icon {
+  font-size: 20px;
+  color: #64748b;
+}
+
+.card-content {
+  flex: 1;
+}
+
+.card-title-small {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+  letter-spacing: -0.2px;
+}
+
+.card-description-small {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.arrow-icon {
+  font-size: 18px;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+
+/* 캘린더 카드 - 깔끔한 화이트 테마 */
+.calendar-card {
+  background: #ffffff;
+  border: none;
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   order: -1;
-  margin: 0 0 2rem 0;
+  margin: 0 0 20px 0;
   position: relative;
   z-index: 1;
   overflow: hidden;
-}
-
-.calendar-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
-  border-radius: 20px 20px 0 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .calendar-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .calendar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1rem;
-  padding: 0 1rem;
+  margin-bottom: 20px;
+  padding: 0 20px;
 }
 
 .nav-button {
-  --color: #6366f1;
-  --font-size: 18px;
-  --padding-start: 6px;
-  --padding-end: 6px;
+  --color: #64748b;
+  --background: transparent;
+  --border-radius: 8px;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  border: none !important;
+  transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+  --color: #2563eb;
+  --background: rgba(37, 99, 235, 0.1);
+  border: none !important;
+  transform: scale(1.05);
 }
 
 .nav-button ion-icon {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .month-year {
   font-size: 18px;
-  font-weight: 600;
-  color: #1f2937;
+  font-weight: 700;
+  color: #1e293b;
   margin: 0;
+  letter-spacing: -0.3px;
 }
 
 .calendar-grid {
@@ -253,26 +431,27 @@ ion-header ion-title {
 }
 
 .day-names {
-  margin-bottom: 0.5rem;
+  margin-bottom: 12px;
 }
 
 .day-name {
   text-align: center;
-  font-size: 14px;
-  font-weight: 500;
-  color: #6b7280;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #f3f4f6;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  padding: 12px 0;
+  border-bottom: 1px solid #e2e8f0;
+  letter-spacing: 0.3px;
 }
 
 .calendar-week {
-  margin-bottom: 0.25rem;
+  margin-bottom: 8px;
 }
 
 .calendar-day {
   text-align: center;
-  padding: 0.5rem 0;
-  min-height: 50px;
+  padding: 8px 0;
+  min-height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -286,36 +465,44 @@ ion-header ion-title {
   justify-content: center;
   border-radius: 50%;
   font-size: 14px;
-  font-weight: 500;
-  color: #374151;
-  transition: all 0.2s ease;
+  font-weight: 600;
+  color: #64748b;
+  transition: all 0.3s ease;
   cursor: pointer;
+  border: 1px solid transparent;
 }
 
 .day-number:hover {
-  background-color: #f3f4f6;
+  background-color: rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.3);
+  color: #2563eb;
+  transform: scale(1.1);
 }
 
 .day-number.today {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
   color: white;
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .day-number.today:hover {
-  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
-  transform: scale(1.05);
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  transform: scale(1.15);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
 }
 
 .day-number.selected {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .day-number.selected:hover {
   background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  transform: scale(1.05);
+  transform: scale(1.15);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
 }
 
 /* 애니메이션 */

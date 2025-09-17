@@ -15,8 +15,11 @@ import {
   IonSelect,
   IonSelectOption,
   IonIcon,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
 } from '@ionic/react';
-import { person, save } from 'ionicons/icons';
+import { person, save, checkmarkCircle } from 'ionicons/icons';
 import { RegionService, RegionCode } from '../services/regionService';
 import './UserInfo.css';
 
@@ -104,23 +107,42 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
 
   return (
     <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>건강 약속</IonTitle>
+        </IonToolbar>
+      </IonHeader>
       <IonContent className="ion-padding">
         <div className="user-info-container">
-          <IonCard className="user-info-card">
-                <IonCardHeader>
-                  <IonCardTitle>
-                    <IonIcon icon={person} />
+          {/* 환영 배너 */}
+          <IonCard className="welcome-banner">
+            <IonCardContent>
+              <div className="banner-content">
+                <div className="banner-text">
+                  <h2 className="banner-title">환영합니다! 👋</h2>
+                  <h3 className="banner-form-title">
                     기본 정보를 입력해주세요!
-                  </IonCardTitle>
-                </IonCardHeader>
-                <IonCardContent>
-              
+                  </h3>
+                  <p className="banner-subtitle">
+                    건강한 하루를 위한 첫 걸음을 시작해보세요
+                  </p>
+                </div>
+                <div className="banner-icon">
+                  <IonIcon icon={person} />
+                </div>
+              </div>
+            </IonCardContent>
+          </IonCard>
+
+          {/* 입력 폼 카드 */}
+          <IonCard className="form-card">
+            <IonCardContent>
               <div className="input-group">
                 <IonLabel className="input-label">이름 *</IonLabel>
                 <IonItem>
                   <IonInput
                     value={userInfo.name}
-                    onIonInput={(e) => updateUserInfo('name', e.detail.value!)}
+                    onIonInput={e => updateUserInfo('name', e.detail.value!)}
                     placeholder="이름을 입력하세요"
                     clearInput={true}
                   />
@@ -128,29 +150,35 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
               </div>
 
               <div className="input-group">
-                <IonLabel className="input-label">생년월일을 알려주세요 *</IonLabel>
+                <IonLabel className="input-label">
+                  생년월일을 알려주세요 *
+                </IonLabel>
                 <IonItem>
                   <IonInput
                     type="date"
                     value={userInfo.birthDate}
-                    onIonInput={(e) => updateUserInfo('birthDate', e.detail.value!)}
+                    onIonInput={e =>
+                      updateUserInfo('birthDate', e.detail.value!)
+                    }
                     placeholder="생년월일을 선택하세요"
                   />
                 </IonItem>
               </div>
 
               <div className="input-group">
-                <IonLabel className="input-label">성별을 선택해주세요 *</IonLabel>
-                <IonRadioGroup 
-                  value={userInfo.gender} 
-                  onIonChange={(e) => updateUserInfo('gender', e.detail.value)}
+                <IonLabel className="input-label">
+                  성별을 선택해주세요 *
+                </IonLabel>
+                <IonRadioGroup
+                  value={userInfo.gender}
+                  onIonChange={e => updateUserInfo('gender', e.detail.value)}
                   className="gender-radio-group"
                 >
-                  <IonItem className="radio-item">
+                  <IonItem className="radio-item" button>
                     <IonLabel>남성</IonLabel>
                     <IonRadio slot="end" value="male" />
                   </IonItem>
-                  <IonItem className="radio-item">
+                  <IonItem className="radio-item" button>
                     <IonLabel>여성</IonLabel>
                     <IonRadio slot="end" value="female" />
                   </IonItem>
@@ -158,19 +186,24 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
               </div>
 
               <div className="input-group">
-                <IonLabel className="input-label">거주 지역을 선택해주세요 *</IonLabel>
-                
+                <IonLabel className="input-label">
+                  거주 지역을 선택해주세요 *
+                </IonLabel>
+
                 <div className="region-select-container">
                   <IonItem className="region-select-item">
                     <IonLabel position="stacked">시/도</IonLabel>
                     <IonSelect
                       value={userInfo.시도}
-                      onIonChange={(e) => updateUserInfo('시도', e.detail.value)}
+                      onIonChange={e => updateUserInfo('시도', e.detail.value)}
                       placeholder="시/도를 선택하세요"
                       disabled={isLoadingRegions}
                     >
-                      {시도목록.map((시도) => (
-                        <IonSelectOption key={시도.코드} value={시도.코드.toString()}>
+                      {시도목록.map(시도 => (
+                        <IonSelectOption
+                          key={시도.코드}
+                          value={시도.코드.toString()}
+                        >
                           {시도.코드명}
                         </IonSelectOption>
                       ))}
@@ -181,18 +214,23 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
                     <IonLabel position="stacked">시/군/구</IonLabel>
                     <IonSelect
                       value={userInfo.시군구}
-                      onIonChange={(e) => updateUserInfo('시군구', e.detail.value)}
+                      onIonChange={e =>
+                        updateUserInfo('시군구', e.detail.value)
+                      }
                       placeholder={
-                        !userInfo.시도 
-                          ? "먼저 시/도를 선택하세요" 
+                        !userInfo.시도
+                          ? '먼저 시/도를 선택하세요'
                           : isLoading시군구
-                            ? "시/군/구 목록을 불러오는 중..." 
-                            : "시/군/구를 선택하세요"
+                            ? '시/군/구 목록을 불러오는 중...'
+                            : '시/군/구를 선택하세요'
                       }
                       disabled={!userInfo.시도 || isLoading시군구}
                     >
-                      {시군구목록.map((시군구) => (
-                        <IonSelectOption key={시군구.코드} value={시군구.코드.toString()}>
+                      {시군구목록.map(시군구 => (
+                        <IonSelectOption
+                          key={시군구.코드}
+                          value={시군구.코드.toString()}
+                        >
                           {시군구.코드명}
                         </IonSelectOption>
                       ))}
@@ -201,16 +239,21 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
                 </div>
               </div>
 
-
-                  <IonButton
-                    expand="block"
-                    onClick={handleSave}
-                    className="save-button"
-                    disabled={!userInfo.name || !userInfo.birthDate || !userInfo.gender || !userInfo.시도 || !userInfo.시군구}
-                  >
-                    <IonIcon icon={save} slot="start" />
-                    시작하기! 🚀
-                  </IonButton>
+              <IonButton
+                expand="block"
+                onClick={handleSave}
+                className="save-button"
+                disabled={
+                  !userInfo.name ||
+                  !userInfo.birthDate ||
+                  !userInfo.gender ||
+                  !userInfo.시도 ||
+                  !userInfo.시군구
+                }
+              >
+                <IonIcon icon={checkmarkCircle} slot="start" />
+                시작하기! 🚀
+              </IonButton>
             </IonCardContent>
           </IonCard>
         </div>

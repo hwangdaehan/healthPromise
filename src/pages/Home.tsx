@@ -14,8 +14,9 @@ import {
   IonHeader,
   IonToolbar,
   IonTitle,
+  IonBadge,
 } from '@ionic/react';
-import { calendar, medical, heart, chevronBack, chevronForward, person, logOut } from 'ionicons/icons';
+import { calendar, medical, chevronBack, chevronForward, logOut, business, notifications } from 'ionicons/icons';
 import './Home.css';
 
 // 사용자 정보 인터페이스 제거됨
@@ -23,6 +24,20 @@ import './Home.css';
 const Home: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<number | null>(null);
+  
+  // 사용자 정보 가져오기
+  const [userName, setUserName] = useState<string>('사용자');
+  
+  // 알림 개수 상태 (예시로 15개 설정)
+  const [notificationCount, setNotificationCount] = useState<number>(15);
+  
+  useEffect(() => {
+    const savedUserInfo = localStorage.getItem('userInfo');
+    if (savedUserInfo) {
+      const userInfo = JSON.parse(savedUserInfo);
+      setUserName(userInfo.name || '사용자');
+    }
+  }, []);
 
   // 사용하지 않는 calculateAge 함수 제거됨
 
@@ -87,11 +102,37 @@ const Home: React.FC = () => {
     window.location.reload();
   };
 
+  // 알림 클릭 함수
+  const handleNotificationClick = () => {
+    // 알림 목록으로 이동하거나 알림 모달 열기
+    console.log('알림 클릭됨');
+  };
+
+  // 알림 개수 표시 함수
+  const getNotificationDisplay = (count: number) => {
+    if (count === 0) return '';
+    if (count > 10) return '10+';
+    return count.toString();
+  };
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
           <IonTitle>건강 약속</IonTitle>
+          <IonButton 
+            fill="clear" 
+            slot="end"
+            onClick={handleNotificationClick}
+            className="header-notification-button"
+          >
+            <IonIcon icon={notifications} />
+            {notificationCount > 0 && (
+              <IonBadge color="danger" className="notification-badge">
+                {getNotificationDisplay(notificationCount)}
+              </IonBadge>
+            )}
+          </IonButton>
           <IonButton 
             fill="clear" 
             slot="end"
@@ -104,6 +145,26 @@ const Home: React.FC = () => {
       </IonHeader>
       <IonContent className="ion-padding">
         <div className="main-container">
+          {/* 예약 알림 배너 */}
+          <IonCard className="promotion-banner">
+            <IonCardContent>
+              <div className="banner-content">
+                <div className="banner-text">
+                  <h2 className="banner-title">{userName}님!</h2>
+                  <p className="banner-subtitle">2025년 9월 19일에 서울 아산 병원<br />예약되었어요!</p>
+                </div>
+                <div className="banner-icon">
+                  <IonIcon icon={business} />
+                </div>
+              </div>
+            </IonCardContent>
+          </IonCard>
+
+          {/* 메인 콘텐츠 제목 */}
+          <div className="main-title-section">
+            <h1 className="main-title">건강 관리는 역시 건강 약속</h1>
+          </div>
+
           {/* 건강 캘린더 카드 */}
           <IonCard className="calendar-card">
             <IonCardContent>
@@ -148,30 +209,34 @@ const Home: React.FC = () => {
             </IonCardContent>
           </IonCard>
 
-          {/* 병원 예약과 복약 관리 - 가로 배치 */}
-          <div className="feature-cards-row">
-            {/* 병원 예약 카드 */}
-            <IonCard className="feature-card hospital-card" routerLink="/hospital">
-              <IonCardContent>
-                <div className="card-icon">
+          {/* 병원 예약 카드 */}
+          <IonCard className="service-card hospital-card" routerLink="/hospital">
+              <div className="service-card-content">
+                <div className="service-text">
+                  <h3 className="service-title hospital-title">병원 예약 <IonIcon icon={chevronForward} className="chevron-icon" /></h3>
+                  <p className="service-subtitle">병원 예약을 쉽고 간편하게<br />관리하세요</p>
+                </div>
+                <div className="service-icon">
                   <IonIcon icon={calendar} />
                 </div>
-                <h3 className="card-title">병원 예약</h3>
-                <p className="card-description">병원 예약을 쉽고 간편하게 관리하세요</p>
-              </IonCardContent>
-            </IonCard>
+              </div>
+          </IonCard>
 
-            {/* 복약 관리 카드 */}
-            <IonCard className="feature-card medication-card" routerLink="/medication">
-              <IonCardContent>
-                <div className="card-icon">
+          {/* 복약 관리 카드 */}
+          <IonCard className="service-card medication-card" routerLink="/medication">
+            <IonCardContent>
+              <div className="service-card-content">
+                <div className="service-text">
+                  <h3 className="service-title medication-title">복약 관리 <IonIcon icon={chevronForward} className="chevron-icon" /></h3>
+                  <p className="service-subtitle">약물 복용을 체계적으로<br />관리하세요</p>
+                </div>
+                <div className="service-icon">
                   <IonIcon icon={medical} />
                 </div>
-                <h3 className="card-title">복약 관리</h3>
-                <p className="card-description">약물 복용을 체계적으로 관리하세요</p>
-              </IonCardContent>
-            </IonCard>
-          </div>
+              </div>
+            </IonCardContent>
+          </IonCard>
+
         </div>
       </IonContent>
     </IonPage>

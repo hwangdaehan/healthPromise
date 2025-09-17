@@ -3,9 +3,15 @@ import { useEffect, useState } from 'react';
 import {
   IonApp,
   IonRouterOutlet,
+  IonTabs,
+  IonTabBar,
+  IonTabButton,
+  IonIcon,
+  IonLabel,
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
+import { home, calendar, medical, person, settings } from 'ionicons/icons';
 import Home from './pages/Home';
 import HospitalBooking from './pages/HospitalBooking';
 import MedicationManagement from './pages/MedicationManagement';
@@ -116,21 +122,38 @@ const AppContent: React.FC = () => {
         transition: 'background 0.8s ease-in-out'
       }}
     >
-          <IonRouterOutlet>
-            <Route exact path="/hospital">
-              <HospitalBooking />
-            </Route>
-            <Route exact path="/home">
-              <Home />
-            </Route>
-            <Route exact path="/medication">
-              <MedicationManagement />
-            </Route>
-            <Route exact path="/">
-              <Redirect to="/home" />
-            </Route>
-          </IonRouterOutlet>
-        </div>
+      <IonTabs>
+        <IonRouterOutlet>
+          <Route exact path="/home">
+            <Home />
+          </Route>
+          <Route exact path="/hospital">
+            <HospitalBooking />
+          </Route>
+          <Route exact path="/medication">
+            <MedicationManagement />
+          </Route>
+          <Route exact path="/">
+            <Redirect to="/home" />
+          </Route>
+        </IonRouterOutlet>
+        
+                    <IonTabBar slot="bottom" className="modern-tab-bar">
+                      <IonTabButton tab="home" href="/home">
+                        <IonIcon icon={home} />
+                        <IonLabel>홈</IonLabel>
+                      </IonTabButton>
+                      <IonTabButton tab="hospital" href="/hospital">
+                        <IonIcon icon={calendar} />
+                        <IonLabel>예약</IonLabel>
+                      </IonTabButton>
+                      <IonTabButton tab="medication" href="/medication">
+                        <IonIcon icon={medical} />
+                        <IonLabel>복약</IonLabel>
+                      </IonTabButton>
+                    </IonTabBar>
+      </IonTabs>
+    </div>
   );
 };
 

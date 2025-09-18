@@ -19,7 +19,10 @@ import {
 import { calendar, medical, chevronBack, chevronForward, logOut, business, notifications } from 'ionicons/icons';
 import { getCurrentUserSession, clearUserSession, hasUserPermission } from '../services/userService';
 import { getFavoriteHospitals, removeFavoriteHospital, FavoriteHospital } from '../services/favoriteHospitalService';
+import { addReservation } from '../services/reservationService';
 import HospitalDetailModal from '../components/HospitalDetailModal';
+import AppointmentModal, { AppointmentData } from '../components/AppointmentModal';
+import { App } from '@capacitor/app';
 import './Home.css';
 
 // 사용자 정보 인터페이스 제거됨
@@ -39,6 +42,9 @@ const Home: React.FC = () => {
   const [selectedHospital, setSelectedHospital] = useState<FavoriteHospital | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
+  // 예약 모달 관련 상태
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
+  
   useEffect(() => {
     // 세션에서 사용자 정보 가져오기
     const userSession = getCurrentUserSession();
@@ -54,6 +60,66 @@ const Home: React.FC = () => {
         setUserName(userInfo.name || '사용자');
       }
     }
+  }, []);
+
+  // 앱 상태 변화 감지 (전화걸기 후 복귀)
+  useEffect(() => {
+    const handleAppStateChange = () => {
+      // 전화걸기 후 앱으로 돌아왔을 때 예약 모달 표시
+      const lastCallTime = localStorage.getItem('lastCallTime');
+      
+      if (lastCallTime) {
+        setShowAppointmentModal(true);
+        localStorage.removeItem('lastCallTime');
+      }
+    };
+
+    // Capacitor App Plugin으로 앱 상태 변화 감지
+    const setupAppStateListener = async () => {
+      try {
+        // 앱 상태 변화 리스너 등록
+        const listener = await App.addListener('appStateChange', ({ isActive }) => {
+          console.log('앱 상태 변화:', isActive ? '활성화' : '비활성화');
+          
+          if (isActive) {
+            // 앱이 다시 활성화됨 (통화 종료 후 복귀)
+            setTimeout(() => {
+              handleAppStateChange();
+            }, 500); // 약간의 지연을 두어 안정성 확보
+          }
+        });
+
+        // 컴포넌트 마운트 시에도 체크
+        handleAppStateChange();
+
+        // 정리 함수에서 리스너 제거
+        return () => {
+          listener.remove();
+        };
+      } catch (error) {
+        console.error('앱 상태 리스너 설정 실패:', error);
+        
+        // 폴백: 기존 window focus 이벤트 사용
+        const handleFocus = () => {
+          handleAppStateChange();
+        };
+
+        window.addEventListener('focus', handleFocus);
+        handleAppStateChange();
+
+        return () => {
+          window.removeEventListener('focus', handleFocus);
+        };
+      }
+    };
+
+    const cleanup = setupAppStateListener();
+
+    return () => {
+      if (cleanup) {
+        cleanup.then(cleanupFn => cleanupFn && cleanupFn());
+      }
+    };
   }, []);
 
   // 즐겨찾기 병원 목록 로드
@@ -178,6 +244,48 @@ const Home: React.FC = () => {
     }
   };
 
+  // 예약 저장 핸들러
+  const handleSaveAppointment = async (appointmentData: AppointmentData) => {
+    try {
+      const date = appointmentData.appointmentDate;
+      const time = appointmentData.appointmentTime;
+      const combined = new Date(`${date}T${time}:00`);
+
+      const hospital = getLastCallHospital();
+
+      const id = await addReservation({
+        address: hospital.address,
+        hospitalName: hospital.name,
+        memo: appointmentData.notes || '',
+        reservationDate: combined,
+        telNo: hospital.phone,
+      });
+      console.log('예약 저장 완료 ID:', id);
+      alert('예약이 등록되었습니다!');
+    } catch (err) {
+      console.error('예약 저장 실패:', err);
+      alert('예약 저장에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  // 예약 모달 닫기 핸들러
+  const handleCloseAppointmentModal = () => {
+    setShowAppointmentModal(false);
+  };
+
+  // 저장된 병원 정보 가져오기
+  const getLastCallHospital = () => {
+    const hospitalData = localStorage.getItem('lastCallHospital');
+    if (hospitalData) {
+      return JSON.parse(hospitalData);
+    }
+    return {
+      name: '병원명',
+      phone: '전화번호',
+      address: '주소'
+    };
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -226,7 +334,7 @@ const Home: React.FC = () => {
 
                       {/* 즐겨찾기 병원 섹션 */}
                       <div className="favorite-hospitals-section">
-                        <h2 className="section-title">즐겨찾기 병원 ({favoriteHospitals.length}개)</h2>
+                        <h2 className="section-title">자주다니는 병원 ({favoriteHospitals.length}개)</h2>
                         {favoriteHospitals.length > 0 ? (
                           <div className="favorite-hospitals-list">
                             {favoriteHospitals.map((hospital) => (
@@ -238,7 +346,7 @@ const Home: React.FC = () => {
                                 <IonCardContent>
                                   <div className="favorite-hospital-content">
                                     <div className="hospital-info">
-                                      <h3 className="hospital-name">{hospital.name}</h3>
+                                      <h3 className="favorite-hospital-name">{hospital.name}</h3>
                                       <p className="hospital-address">{hospital.address.replace(/^[가-힣]+도\s+/, '')}</p>
                                     </div>
                                     <div className="hospital-arrow">
@@ -251,7 +359,7 @@ const Home: React.FC = () => {
                           </div>
                         ) : (
                           <div className="no-favorites-message">
-                            <p>즐겨찾기한 병원이 없습니다.</p>
+                            <p>자주다니는 병원이 없습니다.</p>
                             <p>병원 예약에서 즐겨찾기를 등록해보세요!</p>
                           </div>
                         )}
@@ -339,6 +447,16 @@ const Home: React.FC = () => {
                     hospital={selectedHospital}
                     onToggleFavorite={handleToggleFavorite}
                     isFavorite={true}
+                  />
+                  
+                  {/* 예약 등록 모달 */}
+                  <AppointmentModal
+                    isOpen={showAppointmentModal}
+                    onClose={handleCloseAppointmentModal}
+                    hospitalName={getLastCallHospital().name}
+                    hospitalPhone={getLastCallHospital().phone}
+                    hospitalAddress={getLastCallHospital().address}
+                    onSave={handleSaveAppointment}
                   />
                 </IonPage>
               );

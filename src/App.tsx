@@ -11,6 +11,7 @@ import {
   IonLabel,
   setupIonicReact
 } from '@ionic/react';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import { IonReactRouter } from '@ionic/react-router';
 import { home, calendar, medical, person, settings } from 'ionicons/icons';
 import Home from './pages/Home';
@@ -68,6 +69,18 @@ const AppContent: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+    // StatusBar 설정
+    const setupStatusBar = async () => {
+      try {
+        await StatusBar.setStyle({ style: Style.Default });
+        await StatusBar.setBackgroundColor({ color: '#ffffff' });
+      } catch (error) {
+        console.log('StatusBar 설정 실패:', error);
+      }
+    };
+    
+    setupStatusBar();
+
     // 세션에서 사용자 정보 확인
     const userSession = getCurrentUserSession();
     if (userSession) {

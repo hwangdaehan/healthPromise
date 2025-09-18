@@ -238,7 +238,7 @@ ion-header ion-title {
   min-width: 0;
 }
 
-.hospital-info .hospital-name {
+.hospital-info .favorite-hospital-name {
   font-size: 18px;
   font-weight: 600;
   color: #1e293b;

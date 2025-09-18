@@ -23,6 +23,7 @@ import { useHistory } from 'react-router-dom';
 import { App } from '@capacitor/app';
 import { HospitalService, HospitalInfo } from '../services/hospitalService';
 import { addFavoriteHospital, removeFavoriteHospital, isHospitalFavorite } from '../services/favoriteHospitalService';
+import AppointmentModal, { AppointmentData } from '../components/AppointmentModal';
 import './HospitalBooking.css';
 
 // 병원 카드 컴포넌트
@@ -34,6 +35,7 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
   const [isSelected, setIsSelected] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoadingFavorite, setIsLoadingFavorite] = useState(false);
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
 
   // 컴포넌트 마운트 시 즐겨찾기 상태 확인
   useEffect(() => {
@@ -46,6 +48,66 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
     checkFavoriteStatus();
   }, [hospital.ykiho]);
 
+  // 앱 상태 변화 감지 (전화걸기 후 복귀)
+  useEffect(() => {
+    const handleAppStateChange = () => {
+      // 전화걸기 후 앱으로 돌아왔을 때 예약 모달 표시
+      const lastCallTime = localStorage.getItem('lastCallTime');
+      
+      if (lastCallTime) {
+        setShowAppointmentModal(true);
+        localStorage.removeItem('lastCallTime');
+      }
+    };
+
+    // Capacitor App Plugin으로 앱 상태 변화 감지
+    const setupAppStateListener = async () => {
+      try {
+        // 앱 상태 변화 리스너 등록
+        const listener = await App.addListener('appStateChange', ({ isActive }) => {
+          console.log('앱 상태 변화:', isActive ? '활성화' : '비활성화');
+          
+          if (isActive) {
+            // 앱이 다시 활성화됨 (통화 종료 후 복귀)
+            setTimeout(() => {
+              handleAppStateChange();
+            }, 500); // 약간의 지연을 두어 안정성 확보
+          }
+        });
+
+        // 컴포넌트 마운트 시에도 체크
+        handleAppStateChange();
+
+        // 정리 함수에서 리스너 제거
+        return () => {
+          listener.remove();
+        };
+      } catch (error) {
+        console.error('앱 상태 리스너 설정 실패:', error);
+        
+        // 폴백: 기존 window focus 이벤트 사용
+        const handleFocus = () => {
+          handleAppStateChange();
+        };
+
+        window.addEventListener('focus', handleFocus);
+        handleAppStateChange();
+
+        return () => {
+          window.removeEventListener('focus', handleFocus);
+        };
+      }
+    };
+
+    const cleanup = setupAppStateListener();
+
+    return () => {
+      if (cleanup) {
+        cleanup.then(cleanupFn => cleanupFn && cleanupFn());
+      }
+    };
+  }, []);
+
   const handleCardClick = () => {
     setIsSelected(!isSelected);
   };
@@ -57,32 +119,16 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
       // 전화번호에서 숫자만 추출
       const phoneNumber = hospital.telno.replace(/[^0-9]/g, '');
       
+      // 전화걸기 시간과 병원 정보 저장
+      localStorage.setItem('lastCallTime', Date.now().toString());
+      localStorage.setItem('lastCallHospital', JSON.stringify({
+        name: hospital.yadmNm,
+        phone: hospital.telno,
+        address: hospital.addr
+      }));
+      
       // 전화 앱으로 연결
       window.location.href = `tel:${phoneNumber}`;
-      
-      // 전화 통화 종료 감지 (Capacitor App 플러그인 사용)
-      try {
-        // 앱이 백그라운드로 갔다가 다시 포그라운드로 돌아올 때 감지
-        const handleAppStateChange = () => {
-          console.log('전화 통화 종료됨:', hospital.yadmNm);
-          // 여기에 전화 통화 종료 후 실행할 로직 추가
-          // 예: 통화 기록 저장, 사용자 피드백 등
-        };
-
-        // 앱 상태 변화 리스너 등록
-        App.addListener('appStateChange', ({ isActive }) => {
-          if (isActive) {
-            // 앱이 다시 활성화되면 전화 통화가 종료된 것으로 간주
-            setTimeout(handleAppStateChange, 500);
-          }
-        });
-      } catch (error) {
-        console.log('전화 통화 종료 감지 실패:', error);
-        // 폴백: 단순 타이머 사용
-        setTimeout(() => {
-          console.log('전화 통화 종료됨 (폴백):', hospital.yadmNm);
-        }, 3000);
-      }
     }
   };
 
@@ -115,6 +161,31 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
     } finally {
       setIsLoadingFavorite(false);
     }
+  };
+
+  // 예약 저장 핸들러
+  const handleSaveAppointment = (appointmentData: AppointmentData) => {
+    console.log('예약 정보 저장:', appointmentData);
+    // TODO: Firebase에 예약 정보 저장
+    alert('예약이 등록되었습니다!');
+  };
+
+  // 예약 모달 닫기 핸들러
+  const handleCloseAppointmentModal = () => {
+    setShowAppointmentModal(false);
+  };
+
+  // 저장된 병원 정보 가져오기
+  const getLastCallHospital = () => {
+    const hospitalData = localStorage.getItem('lastCallHospital');
+    if (hospitalData) {
+      return JSON.parse(hospitalData);
+    }
+    return {
+      name: hospital.yadmNm,
+      phone: hospital.telno,
+      address: hospital.addr
+    };
   };
 
   return (
@@ -161,6 +232,16 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
           {isLoadingFavorite ? '처리중...' : (isFavorite ? '즐겨찾기' : '즐겨찾기')}
         </button>
       </div>
+      
+      {/* 예약 등록 모달 */}
+      <AppointmentModal
+        isOpen={showAppointmentModal}
+        onClose={handleCloseAppointmentModal}
+        hospitalName={getLastCallHospital().name}
+        hospitalPhone={getLastCallHospital().phone}
+        hospitalAddress={getLastCallHospital().address}
+        onSave={handleSaveAppointment}
+      />
     </div>
   );
 };

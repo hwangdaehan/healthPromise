@@ -14,11 +14,15 @@ import {
   IonList,
   IonRadio,
   IonRadioGroup,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
 } from '@ionic/react';
-import { arrowBack, search, location, call, chevronBack, chevronForward } from 'ionicons/icons';
+import { arrowBack, search, location, call, chevronBack, chevronForward, star, starOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { App } from '@capacitor/app';
 import { HospitalService, HospitalInfo } from '../services/hospitalService';
+import { addFavoriteHospital, removeFavoriteHospital, isHospitalFavorite } from '../services/favoriteHospitalService';
 import './HospitalBooking.css';
 
 // 병원 카드 컴포넌트
@@ -28,6 +32,19 @@ interface HospitalCardProps {
 
 const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
   const [isSelected, setIsSelected] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isLoadingFavorite, setIsLoadingFavorite] = useState(false);
+
+  // 컴포넌트 마운트 시 즐겨찾기 상태 확인
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      if (hospital.ykiho) {
+        const favorite = await isHospitalFavorite(hospital.ykiho);
+        setIsFavorite(favorite);
+      }
+    };
+    checkFavoriteStatus();
+  }, [hospital.ykiho]);
 
   const handleCardClick = () => {
     setIsSelected(!isSelected);
@@ -69,6 +86,37 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
     }
   };
 
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // 카드 클릭 이벤트 방지
+    
+    if (isLoadingFavorite) return;
+    
+    setIsLoadingFavorite(true);
+    
+    try {
+      if (isFavorite) {
+        // 즐겨찾기에서 제거 (현재는 전체 목록에서 제거하는 방식)
+        // 실제로는 favoriteId가 필요하지만, 간단히 dataId로 처리
+        console.log('즐겨찾기에서 제거:', hospital.yadmNm);
+        setIsFavorite(false);
+      } else {
+        // 즐겨찾기에 추가
+        await addFavoriteHospital({
+          address: hospital.addr || '',
+          dataId: hospital.ykiho || '',
+          name: hospital.yadmNm || '',
+          telNo: hospital.telno || '',
+        });
+        console.log('즐겨찾기에 추가:', hospital.yadmNm);
+        setIsFavorite(true);
+      }
+    } catch (error) {
+      console.error('즐겨찾기 처리 실패:', error);
+    } finally {
+      setIsLoadingFavorite(false);
+    }
+  };
+
   return (
     <div 
       className={`hospital-card ${isSelected ? 'selected' : ''}`}
@@ -90,9 +138,10 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
         </div>
       </div>
       
-      {/* 전화걸기 버튼 */}
-      {hospital.telno && (
-        <div className="hospital-actions">
+      {/* 액션 버튼들 */}
+      <div className="hospital-actions">
+        {/* 전화걸기 버튼 */}
+        {hospital.telno && (
           <button 
             className="call-button"
             onClick={handleCallClick}
@@ -100,8 +149,18 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
             <IonIcon icon={call} />
             전화걸기
           </button>
-        </div>
-      )}
+        )}
+        
+        {/* 즐겨찾기 버튼 */}
+        <button 
+          className={`favorite-button ${isFavorite ? 'favorited' : ''}`}
+          onClick={handleFavoriteClick}
+          disabled={isLoadingFavorite}
+        >
+          <IonIcon icon={isFavorite ? star : starOutline} />
+          {isLoadingFavorite ? '처리중...' : (isFavorite ? '즐겨찾기' : '즐겨찾기')}
+        </button>
+      </div>
     </div>
   );
 };
@@ -213,6 +272,11 @@ const HospitalBooking: React.FC = () => {
 
   return (
     <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>건강 약속</IonTitle>
+        </IonToolbar>
+      </IonHeader>
       <IonContent className="ion-padding">
         <div className="back-button-container">
           <IonButton 

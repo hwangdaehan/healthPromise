@@ -22,6 +22,7 @@ import {
 import { person, save, checkmarkCircle } from 'ionicons/icons';
 import { RegionService, RegionCode } from '../services/regionService';
 import './UserInfo.css';
+import { upsertUserProfile } from '../services/userService';
 
 interface UserInfo {
   name: string;
@@ -68,11 +69,36 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
     }
   };
 
-  const handleSave = () => {
-    if (userInfo.name && userInfo.birthDate && userInfo.gender && userInfo.시도 && userInfo.시군구) {
-      onSave(userInfo);
-    }
-  };
+              const handleSave = async () => {
+                console.log('handleSave 함수 실행됨!');
+                console.log('현재 userInfo:', userInfo);
+                console.log('모든 필드 체크:', {
+                  name: !!userInfo.name,
+                  birthDate: !!userInfo.birthDate,
+                  gender: !!userInfo.gender,
+                  시도: !!userInfo.시도,
+                  시군구: !!userInfo.시군구
+                });
+                
+                if (userInfo.name && userInfo.birthDate && userInfo.gender && userInfo.시도 && userInfo.시군구) {
+                  console.log('모든 필드가 채워짐! Firebase 저장 시작...');
+                  try {
+                    await upsertUserProfile({
+                      birthDate: userInfo.birthDate,
+                      gender: userInfo.gender,
+                      name: userInfo.name,
+                      sido: userInfo.시도,
+                      sigungu: userInfo.시군구,
+                    });
+                    console.log('Firebase 저장 완료!');
+                  } catch (e) {
+                    console.error('Firebase 저장 실패:', e);
+                  }
+                  onSave(userInfo);
+                } else {
+                  console.log('일부 필드가 비어있음. 저장하지 않음.');
+                }
+              };
 
   const updateUserInfo = (field: keyof UserInfo, value: string) => {
     if (field === '시도') {

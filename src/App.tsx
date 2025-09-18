@@ -1,5 +1,6 @@
 import { Redirect, Route, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { getCurrentUserSession } from './services/userService';
 import {
   IonApp,
   IonRouterOutlet,
@@ -16,6 +17,7 @@ import Home from './pages/Home';
 import HospitalBooking from './pages/HospitalBooking';
 import MedicationManagement from './pages/MedicationManagement';
 import UserInfo from './components/UserInfo';
+import Login from './components/Login';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -62,15 +64,37 @@ const AppContent: React.FC = () => {
   const [backgroundColor, setBackgroundColor] = useState('transparent');
   const [userInfo, setUserInfo] = useState<UserData | null>(null);
   const [showUserInfo, setShowUserInfo] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // 로컬 스토리지에서 사용자 정보 확인
-    const savedUserInfo = localStorage.getItem('userInfo');
-    if (savedUserInfo) {
-      setUserInfo(JSON.parse(savedUserInfo));
+    // 세션에서 사용자 정보 확인
+    const userSession = getCurrentUserSession();
+    if (userSession) {
+      setUserInfo({
+        name: userSession.name,
+        birthDate: userSession.birthDate,
+        gender: userSession.gender,
+        시도: userSession.sido,
+        시군구: userSession.sigungu
+      });
+      setIsAuthenticated(true);
       setShowUserInfo(false);
+      setShowLogin(false);
     } else {
-      setShowUserInfo(true);
+      // 기존 localStorage 방식도 지원 (하위 호환성)
+      const savedUserInfo = localStorage.getItem('userInfo');
+      if (savedUserInfo) {
+        setUserInfo(JSON.parse(savedUserInfo));
+        setIsAuthenticated(true);
+        setShowUserInfo(false);
+        setShowLogin(false);
+      } else {
+        // 로그인 화면 표시
+        setShowLogin(true);
+        setShowUserInfo(false);
+        setIsAuthenticated(false);
+      }
     }
   }, []);
 
@@ -95,9 +119,50 @@ const AppContent: React.FC = () => {
     localStorage.setItem('userInfo', JSON.stringify(userData));
     setUserInfo(userData);
     setShowUserInfo(false);
+    setIsAuthenticated(true);
   };
 
-  // 사용자 정보가 없으면 UserInfo 컴포넌트 표시
+  const handleLoginSuccess = () => {
+    // 세션에서 사용자 정보 다시 가져오기
+    const userSession = getCurrentUserSession();
+    if (userSession) {
+      setUserInfo({
+        name: userSession.name,
+        birthDate: userSession.birthDate,
+        gender: userSession.gender,
+        시도: userSession.sido,
+        시군구: userSession.sigungu
+      });
+      setIsAuthenticated(true);
+      setShowLogin(false);
+    }
+  };
+
+  const handleGoToRegister = () => {
+    setShowLogin(false);
+    setShowUserInfo(true);
+  };
+
+  // 로그인 화면 표시
+  if (showLogin) {
+    return (
+      <div 
+        className="app-background" 
+        style={{ 
+          background: backgroundColor,
+          minHeight: '100vh',
+          transition: 'background 0.8s ease-in-out'
+        }}
+      >
+        <Login 
+          onLoginSuccess={handleLoginSuccess}
+          onGoToRegister={handleGoToRegister}
+        />
+      </div>
+    );
+  }
+
+  // 사용자 정보 등록 화면 표시
   if (showUserInfo) {
     return (
       <div 

@@ -178,6 +178,120 @@ ion-header ion-title {
   line-height: 1.3;
 }
 
+/* 즐겨찾기 병원 섹션 */
+.favorite-hospitals-section {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0 0 16px 0;
+  padding-left: 4px;
+}
+
+.favorite-hospitals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.favorite-hospital-card {
+  background: #ffffff;
+  border: 2px solid #fbbf24;
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  height: 80px;
+}
+
+.favorite-hospital-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.favorite-hospital-card ion-card-content {
+  padding: 20px 20px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.favorite-hospital-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding-top: 20px;
+  padding-bottom: 10px;
+}
+
+.hospital-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.hospital-info .hospital-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hospital-info .hospital-address {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hospital-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: #94a3b8;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.hospital-arrow ion-icon {
+  font-size: 16px;
+}
+
+.no-favorites-message {
+  text-align: center;
+  padding: 32px 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 2px dashed #cbd5e1;
+}
+
+.no-favorites-message p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.no-favorites-message p:first-child {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
 /* 서비스 카드 - 이미지 참고 스타일 */
 .service-card {
   background: #ffffff;
@@ -375,7 +489,6 @@ ion-header ion-title {
   border-radius: 16px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   order: -1;
-  margin: 0 0 20px 0;
   position: relative;
   z-index: 1;
   overflow: hidden;

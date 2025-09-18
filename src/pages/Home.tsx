@@ -17,6 +17,9 @@ import {
   IonBadge,
 } from '@ionic/react';
 import { calendar, medical, chevronBack, chevronForward, logOut, business, notifications } from 'ionicons/icons';
+import { getCurrentUserSession, clearUserSession, hasUserPermission } from '../services/userService';
+import { getFavoriteHospitals, removeFavoriteHospital, FavoriteHospital } from '../services/favoriteHospitalService';
+import HospitalDetailModal from '../components/HospitalDetailModal';
 import './Home.css';
 
 // 사용자 정보 인터페이스 제거됨
@@ -31,13 +34,39 @@ const Home: React.FC = () => {
   // 알림 개수 상태 (예시로 15개 설정)
   const [notificationCount, setNotificationCount] = useState<number>(15);
   
+  // 즐겨찾기 병원 관련 상태
+  const [favoriteHospitals, setFavoriteHospitals] = useState<FavoriteHospital[]>([]);
+  const [selectedHospital, setSelectedHospital] = useState<FavoriteHospital | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
   useEffect(() => {
-    const savedUserInfo = localStorage.getItem('userInfo');
-    if (savedUserInfo) {
-      const userInfo = JSON.parse(savedUserInfo);
-      setUserName(userInfo.name || '사용자');
+    // 세션에서 사용자 정보 가져오기
+    const userSession = getCurrentUserSession();
+    if (userSession) {
+      setUserName(userSession.name || '사용자');
+      // 즐겨찾기 병원 목록 가져오기
+      loadFavoriteHospitals();
+    } else {
+      // 기존 localStorage 방식도 지원 (하위 호환성)
+      const savedUserInfo = localStorage.getItem('userInfo');
+      if (savedUserInfo) {
+        const userInfo = JSON.parse(savedUserInfo);
+        setUserName(userInfo.name || '사용자');
+      }
     }
   }, []);
+
+  // 즐겨찾기 병원 목록 로드
+  const loadFavoriteHospitals = async () => {
+    try {
+      console.log('즐겨찾기 병원 목록 로드 시작...');
+      const favorites = await getFavoriteHospitals();
+      console.log('즐겨찾기 병원 목록:', favorites);
+      setFavoriteHospitals(favorites);
+    } catch (error) {
+      console.error('즐겨찾기 병원 목록 로드 실패:', error);
+    }
+  };
 
   // 사용하지 않는 calculateAge 함수 제거됨
 
@@ -96,7 +125,9 @@ const Home: React.FC = () => {
 
   // 로그아웃 함수
   const handleLogout = () => {
-    // 로컬 스토리지에서 사용자 정보 삭제
+    // 세션에서 사용자 정보 삭제
+    clearUserSession();
+    // 기존 localStorage도 삭제 (하위 호환성)
     localStorage.removeItem('userInfo');
     // 페이지 새로고침하여 UserInfo 컴포넌트로 이동
     window.location.reload();
@@ -104,8 +135,13 @@ const Home: React.FC = () => {
 
   // 알림 클릭 함수
   const handleNotificationClick = () => {
-    // 알림 목록으로 이동하거나 알림 모달 열기
-    console.log('알림 클릭됨');
+    // 권한 확인 후 알림 기능 실행
+    if (hasUserPermission('read')) {
+      console.log('알림 클릭됨 - 권한 있음');
+      // 알림 목록으로 이동하거나 알림 모달 열기
+    } else {
+      console.log('알림 접근 권한 없음');
+    }
   };
 
   // 알림 개수 표시 함수
@@ -113,6 +149,33 @@ const Home: React.FC = () => {
     if (count === 0) return '';
     if (count > 10) return '10+';
     return count.toString();
+  };
+
+  // 즐겨찾기 병원 카드 클릭 핸들러
+  const handleFavoriteHospitalClick = (hospital: FavoriteHospital) => {
+    setSelectedHospital(hospital);
+    setIsModalOpen(true);
+  };
+
+  // 모달 닫기 핸들러
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedHospital(null);
+  };
+
+  // 즐겨찾기 토글 핸들러
+  const handleToggleFavorite = async (hospital: FavoriteHospital) => {
+    try {
+      if (hospital.id) {
+        await removeFavoriteHospital(hospital.id);
+        // 목록에서 제거
+        setFavoriteHospitals(prev => prev.filter(h => h.id !== hospital.id));
+        // 모달 닫기
+        handleModalClose();
+      }
+    } catch (error) {
+      console.error('즐겨찾기 해제 실패:', error);
+    }
   };
 
   return (
@@ -160,10 +223,39 @@ const Home: React.FC = () => {
             </IonCardContent>
           </IonCard>
 
-          {/* 메인 콘텐츠 제목 */}
-          <div className="main-title-section">
-            <h1 className="main-title">건강 관리는 역시 건강 약속</h1>
-          </div>
+
+                      {/* 즐겨찾기 병원 섹션 */}
+                      <div className="favorite-hospitals-section">
+                        <h2 className="section-title">즐겨찾기 병원 ({favoriteHospitals.length}개)</h2>
+                        {favoriteHospitals.length > 0 ? (
+                          <div className="favorite-hospitals-list">
+                            {favoriteHospitals.map((hospital) => (
+                              <IonCard 
+                                key={hospital.id} 
+                                className="favorite-hospital-card"
+                                onClick={() => handleFavoriteHospitalClick(hospital)}
+                              >
+                                <IonCardContent>
+                                  <div className="favorite-hospital-content">
+                                    <div className="hospital-info">
+                                      <h3 className="hospital-name">{hospital.name}</h3>
+                                      <p className="hospital-address">{hospital.address.replace(/^[가-힣]+도\s+/, '')}</p>
+                                    </div>
+                                    <div className="hospital-arrow">
+                                      <IonIcon icon={chevronForward} />
+                                    </div>
+                                  </div>
+                                </IonCardContent>
+                              </IonCard>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="no-favorites-message">
+                            <p>즐겨찾기한 병원이 없습니다.</p>
+                            <p>병원 예약에서 즐겨찾기를 등록해보세요!</p>
+                          </div>
+                        )}
+                      </div>
 
           {/* 건강 캘린더 카드 */}
           <IonCard className="calendar-card">
@@ -235,12 +327,21 @@ const Home: React.FC = () => {
                 </div>
               </div>
             </IonCardContent>
-          </IonCard>
+                      </IonCard>
 
-        </div>
-      </IonContent>
-    </IonPage>
-  );
-};
+                    </div>
+                  </IonContent>
+                  
+                  {/* 병원 상세 정보 모달 */}
+                  <HospitalDetailModal
+                    isOpen={isModalOpen}
+                    onClose={handleModalClose}
+                    hospital={selectedHospital}
+                    onToggleFavorite={handleToggleFavorite}
+                    isFavorite={true}
+                  />
+                </IonPage>
+              );
+            };
 
-export default Home;
+            export default Home;

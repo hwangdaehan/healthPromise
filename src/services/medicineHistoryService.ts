@@ -10,7 +10,7 @@ export interface MedicineHistory {
   userId: string;
 }
 
-export const getMedicineHistory = async (userId?: string): Promise<MedicineHistory[]> => {
+export const getMedicineHistory = async (userId?: string, year?: number, month?: number): Promise<MedicineHistory[]> => {
   try {
     let targetUserId = userId;
     
@@ -34,14 +34,30 @@ export const getMedicineHistory = async (userId?: string): Promise<MedicineHisto
     }
 
     const medicineHistoryRef = collection(db, 'medicine-history');
-    const q = query(
-      medicineHistoryRef, 
-      where('userId', '==', targetUserId),
-      orderBy('eatDate', 'desc')
-    );
-    const querySnapshot = await getDocs(q);
+    let q;
     
-    console.log('복약 기록:', querySnapshot.size);
+    if (year !== undefined && month !== undefined) {
+      // 특정 월의 시작일과 종료일 계산
+      const startDate = new Date(year, month, 1);
+      const endDate = new Date(year, month + 1, 0, 23, 59, 59, 999);
+      
+      q = query(
+        medicineHistoryRef, 
+        where('userId', '==', targetUserId),
+        where('eatDate', '>=', startDate),
+        where('eatDate', '<=', endDate),
+        orderBy('eatDate', 'desc')
+      );
+    } else {
+      // 전체 데이터 조회
+      q = query(
+        medicineHistoryRef, 
+        where('userId', '==', targetUserId),
+        orderBy('eatDate', 'desc')
+      );
+    }
+    
+    const querySnapshot = await getDocs(q);
     
     const history = querySnapshot.docs.map(doc => {
       const data = doc.data();

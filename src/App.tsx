@@ -7,13 +7,11 @@ import {
   IonTabs,
   IonTabBar,
   IonTabButton,
-  IonIcon,
   IonLabel,
   setupIonicReact
 } from '@ionic/react';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { IonReactRouter } from '@ionic/react-router';
-import { home, business, medical } from 'ionicons/icons';
 import Home from './pages/Home';
 import HospitalBooking from './pages/HospitalBooking';
 import MedicationManagement from './pages/MedicationManagement';

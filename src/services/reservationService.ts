@@ -66,7 +66,7 @@ export const addReservation = async (reservationData: Omit<Reservation, 'id' | '
   }
 };
 
-export const getReservations = async (): Promise<Reservation[]> => {
+export const getReservations = async (year?: number, month?: number): Promise<Reservation[]> => {
   try {
     // localStorage에서 사용자 정보 가져오기
     const savedUserInfo = localStorage.getItem('userInfo');
@@ -86,14 +86,30 @@ export const getReservations = async (): Promise<Reservation[]> => {
     }
 
     const reservationsRef = collection(db, 'reservation');
-    const q = query(
-      reservationsRef, 
-      where('userId', '==', userId),
-      orderBy('reservationDate', 'desc')
-    );
-    const querySnapshot = await getDocs(q);
+    let q;
     
-    console.log('예약한 병원목록:', querySnapshot.size);
+    if (year !== undefined && month !== undefined) {
+      // 특정 월의 시작일과 종료일 계산
+      const startDate = new Date(year, month, 1);
+      const endDate = new Date(year, month + 1, 0, 23, 59, 59, 999);
+      
+      q = query(
+        reservationsRef, 
+        where('userId', '==', userId),
+        where('reservationDate', '>=', startDate),
+        where('reservationDate', '<=', endDate),
+        orderBy('reservationDate', 'desc')
+      );
+    } else {
+      // 전체 데이터 조회
+      q = query(
+        reservationsRef, 
+        where('userId', '==', userId),
+        orderBy('reservationDate', 'desc')
+      );
+    }
+    
+    const querySnapshot = await getDocs(q);
     
     const reservations = querySnapshot.docs.map(doc => {
       const data = doc.data();

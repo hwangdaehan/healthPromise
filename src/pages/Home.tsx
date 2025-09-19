@@ -201,17 +201,21 @@ const Home: React.FC = () => {
     }
   };
 
-  // 예약한 병원 목록 로드
+  // 예약한 병원 목록 로드 (현재 월)
   const loadReservations = async () => {
     try {
-      const reservations = await getReservations();
+      // 현재 보고 있는 월의 예약만 Firebase에서 직접 조회
+      const currentMonthReservations = await getReservations(currentDate.getFullYear(), currentDate.getMonth());
       
-      // 모든 예약 데이터 설정
-      setAllReservations(reservations);
+      // 현재 월의 예약 데이터 설정
+      setAllReservations(currentMonthReservations);
+      
+      // 현재 월 예약 개수 로그
+      console.log(`${currentDate.getFullYear()}년 ${currentDate.getMonth() + 1}월 예약한 병원목록:`, currentMonthReservations.length);
       
       // 가장 최근 예약 데이터 설정
-      if (reservations.length > 0) {
-        setLatestReservation(reservations[0]);
+      if (currentMonthReservations.length > 0) {
+        setLatestReservation(currentMonthReservations[0]);
       } else {
         setLatestReservation(null);
       }
@@ -220,7 +224,30 @@ const Home: React.FC = () => {
     }
   };
 
-  // 복약 기록 로드
+  // 예약한 병원 목록 로드 (특정 월)
+  const loadReservationsForMonth = async (year: number, month: number) => {
+    try {
+      // 특정 월의 예약만 Firebase에서 직접 조회
+      const monthReservations = await getReservations(year, month);
+      
+      // 해당 월의 예약 데이터 설정
+      setAllReservations(monthReservations);
+      
+      // 해당 월 예약 개수 로그
+      console.log(`${year}년 ${month + 1}월 예약한 병원목록:`, monthReservations.length);
+      
+      // 가장 최근 예약 데이터 설정
+      if (monthReservations.length > 0) {
+        setLatestReservation(monthReservations[0]);
+      } else {
+        setLatestReservation(null);
+      }
+    } catch (error) {
+      console.error('예약한 병원 목록 로드 실패:', error);
+    }
+  };
+
+  // 복약 기록 로드 (현재 월)
   const loadMedicineHistory = async () => {
     try {
       // localStorage에서 사용자 정보 가져오기
@@ -236,8 +263,41 @@ const Home: React.FC = () => {
         }
       }
       
-      const history = await getMedicineHistory(userId);
-      setMedicineHistory(history);
+      // 현재 보고 있는 월의 복약 기록만 Firebase에서 직접 조회
+      const currentMonthHistory = await getMedicineHistory(userId, currentDate.getFullYear(), currentDate.getMonth());
+      
+      setMedicineHistory(currentMonthHistory);
+      
+      // 현재 월 복약 기록 개수 로그
+      console.log(`${currentDate.getFullYear()}년 ${currentDate.getMonth() + 1}월 복약 기록:`, currentMonthHistory.length);
+    } catch (error) {
+      console.error('복약 기록 로드 실패:', error);
+    }
+  };
+
+  // 복약 기록 로드 (특정 월)
+  const loadMedicineHistoryForMonth = async (year: number, month: number) => {
+    try {
+      // localStorage에서 사용자 정보 가져오기
+      const savedUserInfo = localStorage.getItem('userInfo');
+      let userId = null;
+      
+      if (savedUserInfo) {
+        try {
+          const userInfo = JSON.parse(savedUserInfo);
+          userId = userInfo.uid;
+        } catch (error) {
+          console.log('localStorage 사용자 정보 파싱 실패:', error);
+        }
+      }
+      
+      // 특정 월의 복약 기록만 Firebase에서 직접 조회
+      const monthHistory = await getMedicineHistory(userId, year, month);
+      
+      setMedicineHistory(monthHistory);
+      
+      // 해당 월 복약 기록 개수 로그
+      console.log(`${year}년 ${month + 1}월 복약 기록:`, monthHistory.length);
     } catch (error) {
       console.error('복약 기록 로드 실패:', error);
     }
@@ -276,11 +336,19 @@ const Home: React.FC = () => {
   };
 
   const goToPreviousMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+    const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+    setCurrentDate(newDate);
+    // 월이 변경되면 해당 월의 데이터 다시 조회 (새로운 년월 전달)
+    loadReservationsForMonth(newDate.getFullYear(), newDate.getMonth());
+    loadMedicineHistoryForMonth(newDate.getFullYear(), newDate.getMonth());
   };
 
   const goToNextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+    const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+    setCurrentDate(newDate);
+    // 월이 변경되면 해당 월의 데이터 다시 조회 (새로운 년월 전달)
+    loadReservationsForMonth(newDate.getFullYear(), newDate.getMonth());
+    loadMedicineHistoryForMonth(newDate.getFullYear(), newDate.getMonth());
   };
 
   const isToday = (day: number) => {

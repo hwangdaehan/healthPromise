@@ -6,57 +6,32 @@ ion-app {
   --ion-safe-area-right: env(safe-area-inset-right);
 }
 
-/* 헤더 스타일 - 깔끔한 화이트 테마 */
-ion-header {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
-}
-
-ion-header ion-toolbar {
-  --background: #ffffff;
-  --color: #1e293b;
-  --border-color: transparent;
-  --padding-top: env(safe-area-inset-top);
-  box-shadow: none !important;
-}
-
-ion-header ion-toolbar::after {
-  display: none !important;
-}
-
-ion-header ion-toolbar::before {
-  display: none !important;
-}
-
-ion-header ion-title {
-  font-size: 28px;
-  font-weight: 800;
-  color: #2563eb !important;
-  letter-spacing: -1px;
-}
+/* 헤더 스타일은 전역 variables.css에서 관리 */
 
 .header-notification-button {
-  --color: #64748b;
+  --color: white;
   --background: transparent;
-  --border-radius: 12px;
-  --padding-start: 12px;
-  --padding-end: 12px;
+  --border-radius: 8px;
+  --padding-start: 8px;
+  --padding-end: 8px;
   --padding-top: 8px;
   --padding-bottom: 8px;
   transition: all 0.3s ease;
   border: none !important;
   position: relative;
   margin-right: 8px;
+  height: 40px;
 }
 
 .header-notification-button:hover {
-  --color: #2563eb;
-  --background: rgba(37, 99, 235, 0.1);
+  --color: white;
+  --background: rgba(255, 255, 255, 0.1);
   border: none !important;
   transform: scale(1.05);
 }
 
 .header-notification-button ion-icon {
-  font-size: 20px;
+  font-size: 24px;
 }
 
 .notification-badge {
@@ -75,26 +50,27 @@ ion-header ion-title {
 }
 
 .header-logout-button {
-  --color: #64748b;
+  --color: white;
   --background: transparent;
-  --border-radius: 12px;
-  --padding-start: 12px;
-  --padding-end: 12px;
+  --border-radius: 8px;
+  --padding-start: 8px;
+  --padding-end: 8px;
   --padding-top: 8px;
   --padding-bottom: 8px;
   transition: all 0.3s ease;
   border: none !important;
+  height: 40px;
 }
 
 .header-logout-button:hover {
-  --color: #2563eb;
-  --background: rgba(37, 99, 235, 0.1);
+  --color: white;
+  --background: rgba(255, 255, 255, 0.1);
   border: none !important;
   transform: scale(1.05);
 }
 
 .header-logout-button ion-icon {
-  font-size: 20px;
+  font-size: 24px;
 }
 
 /* 메인 컨테이너 - 깔끔한 화이트 배경 */

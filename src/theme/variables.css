@@ -24,13 +24,41 @@ ion-app {
 
 /* 안드로이드 폰트 강제 적용 */
 * {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Noto Sans KR', 'Malgun Gothic', sans-serif !important;
+  font-family: 'Noto Sans KR', 'Malgun Gothic', 'Roboto', 'Arial', sans-serif !important;
 }
 
 /* 안드로이드 전용 폰트 설정 */
 @media screen and (max-width: 768px) {
-  ion-app, ion-content, ion-header, ion-toolbar, ion-title, ion-button, ion-card, ion-item, ion-label, ion-input, ion-textarea, ion-select {
-    font-family: 'Noto Sans KR', 'Malgun Gothic', 'Roboto', sans-serif !important;
+  ion-app, ion-content, ion-header, ion-toolbar, ion-title, ion-button, ion-card, ion-item, ion-label, ion-input, ion-textarea, ion-select, div, span, p, h1, h2, h3, h4, h5, h6 {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', 'Roboto', 'Arial', sans-serif !important;
+  }
+}
+
+/* 안드로이드 WebView 폰트 강제 적용 */
+body, html {
+  font-family: 'Noto Sans KR', 'Malgun Gothic', 'Roboto', 'Arial', sans-serif !important;
+}
+
+/* 모든 텍스트 요소에 폰트 강제 적용 */
+ion-app, ion-content, ion-header, ion-toolbar, ion-title, ion-button, ion-card, ion-item, ion-label, ion-input, ion-textarea, ion-select, ion-radio, ion-checkbox, ion-toggle, ion-range, ion-datetime, ion-picker, ion-alert, ion-action-sheet, ion-modal, ion-popover, ion-loading, ion-toast, ion-refresher, ion-infinite-scroll, ion-virtual-scroll, ion-list, ion-list-header, ion-note, ion-text, ion-badge, ion-chip, ion-fab, ion-fab-button, ion-fab-list, ion-segment, ion-segment-button, ion-slides, ion-slide, ion-tabs, ion-tab, ion-tab-bar, ion-tab-button, ion-router, ion-router-outlet, ion-route, ion-route-redirect, ion-nav, ion-nav-link, ion-back-button, ion-menu, ion-menu-button, ion-menu-toggle, ion-split-pane, ion-grid, ion-row, ion-col, ion-searchbar, ion-select-popover, ion-accordion, ion-accordion-group, ion-breadcrumb, ion-breadcrumbs, ion-item-group, ion-item-divider, ion-reorder, ion-reorder-group, ion-skeleton-text, ion-spinner, ion-thumbnail, ion-avatar, ion-img, ion-icon, ion-ripple-effect, ion-route-link, ion-router-link, ion-backdrop, ion-app, ion-page, ion-content, ion-header, ion-footer, ion-toolbar, ion-title, ion-buttons, ion-button, ion-back-button, ion-menu-button, ion-refresh-content, ion-infinite-scroll-content, ion-virtual-scroll-content, ion-slides, ion-slide, ion-tabs, ion-tab, ion-tab-bar, ion-tab-button, ion-router, ion-router-outlet, ion-route, ion-route-redirect, ion-nav, ion-nav-link, ion-back-button, ion-menu, ion-menu-button, ion-menu-toggle, ion-split-pane, ion-grid, ion-row, ion-col, ion-searchbar, ion-select-popover, ion-accordion, ion-accordion-group, ion-breadcrumb, ion-breadcrumbs, ion-item-group, ion-item-divider, ion-reorder, ion-reorder-group, ion-skeleton-text, ion-spinner, ion-thumbnail, ion-avatar, ion-img, ion-icon, ion-ripple-effect, ion-route-link, ion-router-link, ion-backdrop {
+  font-family: 'Noto Sans KR', 'Malgun Gothic', 'Roboto', 'Arial', sans-serif !important;
+}
+
+/* 안드로이드 WebView 특별 처리 */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  * {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', 'Roboto', 'Arial', sans-serif !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+  }
+}
+
+/* 안드로이드 특정 폰트 렌더링 개선 */
+@supports (-webkit-appearance: none) {
+  * {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', 'Roboto', 'Arial', sans-serif !important;
+    text-rendering: optimizeLegibility !important;
+    -webkit-font-smoothing: antialiased !important;
   }
 }
 
@@ -47,22 +75,63 @@ ion-content {
   --color: var(--text-dark);
 }
 
-/* 헤더 - 깔끔한 화이트 배경 */
+/* 헤더 - 통일된 파란색 배경 */
 ion-header ion-toolbar {
-  --background: var(--primary-white);
-  --color: var(--text-dark);
+  --background: #2563eb;
+  --color: white;
   --border-color: transparent;
   --padding-start: 20px;
   --padding-end: 20px;
   --padding-top: env(safe-area-inset-top, 0px);
-  box-shadow: 0 1px 3px var(--shadow-light);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
 }
 
 ion-title {
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--primary-blue);
-  letter-spacing: -1px;
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  text-align: left;
+  letter-spacing: -0.5px;
+}
+
+/* 헤더 버튼 통일 */
+ion-header ion-button {
+  --color: white;
+  --background: transparent;
+  --border-radius: 8px;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  height: 40px;
+}
+
+ion-header ion-button ion-icon {
+  font-size: 24px;
+}
+
+/* 뒤로가기 버튼 - 화살표만 표시 */
+.back-button {
+  --color: white;
+  --background: transparent;
+  --border-radius: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  font-size: 0;
+  font-weight: 0;
+  height: auto;
+  width: auto;
+  min-width: auto;
+  margin: 0;
+}
+
+.back-button ion-icon {
+  font-size: 24px;
+  margin: 0;
 }
 
 /* 카드 스타일 - 모던 화이트 테마 */

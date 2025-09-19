@@ -403,19 +403,17 @@ const HospitalBooking: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonTitle>건강 약속</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent className="ion-padding">
-        <div className="back-button-container">
           <IonButton 
             fill="clear" 
             onClick={() => history.goBack()}
             className="back-button"
+            slot="end"
           >
-            <IonIcon icon={arrowBack} slot="start" />
-            뒤로가기
+            <IonIcon icon={arrowBack} />
           </IonButton>
-        </div>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent className="ion-padding">
         
         <IonCard>
           <IonCardHeader>

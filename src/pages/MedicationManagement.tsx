@@ -16,6 +16,9 @@ import {
   IonList,
   IonIcon,
   IonChip,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
 } from '@ionic/react';
 import { medical, time, checkmarkCircle, closeCircle, arrowBack } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
@@ -30,6 +33,7 @@ interface Medication {
   startDate: string;
   endDate: string;
   notes: string;
+  notifications: boolean;
 }
 
 interface MedicationRecord {
@@ -53,6 +57,7 @@ const MedicationManagement: React.FC = () => {
     startDate: '',
     endDate: '',
     notes: '',
+    notifications: true, // 알림받기 여부 (기본값: true)
   });
 
   const frequencies = [
@@ -63,9 +68,9 @@ const MedicationManagement: React.FC = () => {
   ];
 
   const timeOptions = [
-    '08:00', '09:00', '10:00', '11:00', '12:00',
-    '13:00', '14:00', '15:00', '16:00', '17:00',
-    '18:00', '19:00', '20:00', '21:00', '22:00',
+    '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00',
+    '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', 
+    '20:00', '21:00', '22:00', '23:00', '00:00'
   ];
 
   const addMedication = () => {
@@ -130,64 +135,54 @@ const MedicationManagement: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent className="ion-padding">
-        <div className="back-button-container">
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>건강 약속</IonTitle>
           <IonButton 
             fill="clear" 
             onClick={() => history.goBack()}
             className="back-button"
+            slot="end"
           >
-            <IonIcon icon={arrowBack} slot="start" />
-            뒤로가기
+            <IonIcon icon={arrowBack} />
           </IonButton>
-        </div>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent className="ion-padding">
         
-        <IonCard>
+        <IonCard className="simple-medication-card">
           <IonCardHeader>
-            <IonCardTitle>새 약물 등록</IonCardTitle>
+            <IonCardTitle className="large-title">💊 약물 등록</IonCardTitle>
           </IonCardHeader>
           <IonCardContent>
-            <IonList>
-              <IonItem>
-                <IonLabel position="stacked">약물 이름</IonLabel>
+            <div className="simple-form">
+              <div className="form-group">
+                <label className="large-label">약물 이름</label>
                 <IonInput
-                  placeholder="약물 이름을 입력하세요"
+                  placeholder="예: 아스피린"
                   value={newMedication.name}
                   onIonInput={(e) => setNewMedication(prev => ({ ...prev, name: e.detail.value! }))}
+                  className="large-input"
                 />
-              </IonItem>
+              </div>
 
-              <IonItem>
-                <IonLabel position="stacked">복용량</IonLabel>
+              <div className="form-group">
+                <label className="large-label">복용량</label>
                 <IonInput
-                  placeholder="예: 1정, 2캡슐"
+                  placeholder="예: 1정"
                   value={newMedication.dosage}
                   onIonInput={(e) => setNewMedication(prev => ({ ...prev, dosage: e.detail.value! }))}
+                  className="large-input"
                 />
-              </IonItem>
+              </div>
 
-              <IonItem>
-                <IonLabel position="stacked">복용 횟수</IonLabel>
-                <IonSelect
-                  value={newMedication.frequency}
-                  placeholder="복용 횟수를 선택하세요"
-                  onIonChange={(e) => setNewMedication(prev => ({ ...prev, frequency: e.detail.value }))}
-                >
-                  {frequencies.map(freq => (
-                    <IonSelectOption key={freq.value} value={freq.value}>
-                      {freq.label}
-                    </IonSelectOption>
-                  ))}
-                </IonSelect>
-              </IonItem>
-
-              <IonItem>
-                <IonLabel position="stacked">복용 시간</IonLabel>
-                <div className="time-chips">
+              <div className="form-group">
+                <label className="large-label">복용 시간</label>
+                <div className="time-buttons">
                   {timeOptions.map(time => (
-                    <IonChip
+                    <button
                       key={time}
-                      color={newMedication.times.includes(time) ? 'primary' : 'medium'}
+                      className={`time-button ${newMedication.times.includes(time) ? 'selected' : ''}`}
                       onClick={() => {
                         const times = newMedication.times.includes(time)
                           ? newMedication.times.filter(t => t !== time)
@@ -196,101 +191,39 @@ const MedicationManagement: React.FC = () => {
                       }}
                     >
                       {time}
-                    </IonChip>
+                    </button>
                   ))}
                 </div>
-              </IonItem>
+              </div>
 
-              <IonItem>
-                <IonLabel position="stacked">복용 기간 (시작일)</IonLabel>
-                <IonDatetime
-                  presentation="date"
-                  value={newMedication.startDate}
-                  onIonChange={(e) => setNewMedication(prev => ({ ...prev, startDate: e.detail.value as string }))}
-                />
-              </IonItem>
-
-              <IonItem>
-                <IonLabel position="stacked">복용 기간 (종료일)</IonLabel>
-                <IonDatetime
-                  presentation="date"
-                  value={newMedication.endDate}
-                  onIonChange={(e) => setNewMedication(prev => ({ ...prev, endDate: e.detail.value as string }))}
-                />
-              </IonItem>
-
-              <IonItem>
-                <IonLabel position="stacked">메모 (선택사항)</IonLabel>
-                <IonInput
-                  placeholder="복용 시 주의사항 등"
-                  value={newMedication.notes}
-                  onIonInput={(e) => setNewMedication(prev => ({ ...prev, notes: e.detail.value! }))}
-                />
-              </IonItem>
-            </IonList>
+              <div className="form-group">
+                <div className="notification-checkbox">
+                  <input
+                    type="checkbox"
+                    id="notifications"
+                    checked={newMedication.notifications}
+                    onChange={(e) => setNewMedication(prev => ({ ...prev, notifications: e.target.checked }))}
+                    className="checkbox-input"
+                  />
+                  <label htmlFor="notifications" className="checkbox-label">
+                    🔔 복용 시간에 알림받기
+                  </label>
+                </div>
+              </div>
+            </div>
 
             <IonButton
               expand="block"
               onClick={addMedication}
-              disabled={!newMedication.name || !newMedication.dosage || !newMedication.frequency || newMedication.times.length === 0}
-              className="add-button"
+              disabled={!newMedication.name || !newMedication.dosage || newMedication.times.length === 0}
+              className="large-add-button"
             >
               <IonIcon icon={medical} slot="start" />
-              약물 등록
+              약물 등록하기
             </IonButton>
           </IonCardContent>
         </IonCard>
 
-        <IonCard>
-          <IonCardHeader>
-            <IonCardTitle>오늘의 복약</IonCardTitle>
-          </IonCardHeader>
-          <IonCardContent>
-            {medications.length === 0 ? (
-              <p className="no-data">등록된 약물이 없습니다.</p>
-            ) : (
-              <IonList>
-                {medications.map((medication) => (
-                  <IonItem key={medication.id}>
-                    <IonLabel>
-                      <h2>{medication.name}</h2>
-                      <h3>{medication.dosage}</h3>
-                      <div className="medication-times">
-                        {medication.times.map(time => (
-                          <IonButton
-                            key={time}
-                            fill={isMedicationTaken(medication.id, time) ? 'solid' : 'outline'}
-                            color={isMedicationTaken(medication.id, time) ? 'success' : 'primary'}
-                            size="small"
-                            onClick={() => toggleMedicationTaken(medication.id, time)}
-                            className="time-button"
-                          >
-                            <IonIcon 
-                              icon={isMedicationTaken(medication.id, time) ? checkmarkCircle : time} 
-                              slot="start" 
-                            />
-                            {time}
-                          </IonButton>
-                        ))}
-                      </div>
-                      {medication.notes && (
-                        <p className="notes">메모: {medication.notes}</p>
-                      )}
-                    </IonLabel>
-                    <IonButton
-                      slot="end"
-                      fill="clear"
-                      color="danger"
-                      onClick={() => deleteMedication(medication.id)}
-                    >
-                      삭제
-                    </IonButton>
-                  </IonItem>
-                ))}
-              </IonList>
-            )}
-          </IonCardContent>
-        </IonCard>
       </IonContent>
     </IonPage>
   );

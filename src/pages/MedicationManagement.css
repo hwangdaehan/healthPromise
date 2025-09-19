@@ -1,134 +1,282 @@
-/* 뒤로가기 버튼 */
-.back-button-container {
-  margin-bottom: 1rem;
-}
+/* 노년층 친화적인 복약 관리 페이지 스타일 */
 
-.back-button {
-  --color: rgba(255, 255, 255, 0.9);
-  --background: rgba(255, 255, 255, 0.1);
-  --border-radius: 12px;
-  --padding-start: 12px;
-  --padding-end: 16px;
-  font-size: 16px;
-  font-weight: 500;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.back-button:hover {
-  --background: rgba(255, 255, 255, 0.2);
-}
-
-.back-button ion-icon {
-  font-size: 20px;
-  margin-right: 8px;
-}
+/* 헤더 스타일은 전역 variables.css에서 관리 */
 
 /* 카드 스타일 */
 ion-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
 }
 
-.add-button {
-  margin-top: 1rem;
-  --font-size: 18px;
-  --height: 50px;
-  --background: #f59e0b;
+/* 큰 제목 */
+.large-title {
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  color: #1f2937 !important;
+  text-align: center;
+  margin: 0 !important;
+  padding: 20px 0 !important;
+}
+
+/* 간단한 폼 스타일 */
+.simple-form {
+  padding: 20px 0;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.large-label {
+  display: block;
+  font-size: 20px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+.large-input {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  font-size: 20px;
+  --background: #f9fafb;
+  --border-radius: 12px;
+  --border: 2px solid #e5e7eb;
+  --color: #1f2937;
+  height: 60px;
+}
+
+.large-input:focus {
+  --border-color: #3b82f6;
+  --background: white;
+}
+
+/* 시간 선택 버튼 */
+.time-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.time-button {
+  padding: 16px 24px;
+  border: 2px solid #e5e7eb;
+  background: white;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 80px;
+  text-align: center;
+}
+
+.time-button:hover {
+  border-color: #3b82f6;
+  background: #f0f9ff;
+}
+
+.time-button.selected {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+/* 알림 체크박스 */
+.notification-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.notification-checkbox:hover {
+  border-color: #3b82f6;
+  background: #f0f9ff;
+}
+
+.checkbox-input {
+  width: 24px;
+  height: 24px;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.checkbox-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  margin: 0;
+  flex: 1;
+}
+
+/* 큰 등록 버튼 */
+.large-add-button {
+  --background: #10b981;
   --color: white;
   --border-radius: 12px;
-}
-
-.add-button ion-icon {
-  margin-right: 0.5rem;
-}
-
-.no-data {
-  text-align: center;
-  font-size: 18px;
-  color: rgba(255, 255, 255, 0.8);
-  padding: 2rem;
-}
-
-ion-item {
-  --min-height: 60px;
-  --background: rgba(255, 255, 255, 0.7);
-  --border-radius: 12px;
-  margin-bottom: 8px;
-}
-
-ion-label h2 {
+  --padding-top: 20px;
+  --padding-bottom: 20px;
   font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-  color: #1f2937;
+  font-weight: 700;
+  height: 60px;
+  margin-top: 20px;
 }
 
-ion-label h3 {
-  font-size: 18px;
-  color: #f59e0b;
-  margin-bottom: 0.5rem;
+.large-add-button ion-icon {
+  font-size: 24px;
+  margin-right: 8px;
+}
+
+/* 복약 목록 */
+.medication-list {
+  padding: 20px 0;
+}
+
+.medication-item {
+  background: #f9fafb;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 2px solid #e5e7eb;
+}
+
+.medication-info {
+  margin-bottom: 16px;
+}
+
+.medication-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.medication-dosage {
+  font-size: 20px;
+  color: #6b7280;
+  margin: 0;
 }
 
 .medication-times {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 1rem 0;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
-.time-button {
-  --font-size: 16px;
-  --height: 40px;
-  --background: #f59e0b;
-  --color: white;
-  --border-radius: 8px;
-}
-
-.time-chips {
+.medication-time-button {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.time-chips ion-chip {
-  --font-size: 16px;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px;
+  border: 2px solid #e5e7eb;
+  background: white;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 600;
   cursor: pointer;
-  --background: rgba(245, 158, 11, 0.1);
-  --color: #f59e0b;
+  transition: all 0.3s ease;
+  min-width: 100px;
+  justify-content: center;
 }
 
-.notes {
-  font-size: 16px;
+.medication-time-button:hover {
+  border-color: #3b82f6;
+  background: #f0f9ff;
+}
+
+.medication-time-button.taken {
+  background: #10b981;
+  border-color: #10b981;
+  color: white;
+}
+
+.medication-time-button.not-taken {
   color: #374151;
-  margin-top: 0.5rem;
-  font-style: italic;
 }
 
-ion-select,
-ion-input {
-  font-size: 18px;
-  --background: rgba(255, 255, 255, 0.8);
-  --border-radius: 8px;
+.medication-time-button ion-icon {
+  font-size: 20px;
 }
 
-ion-datetime {
-  font-size: 18px;
-}
-
-/* 복용 완료 버튼 */
-.taken-button {
-  --color: #10b981;
-  --background: rgba(16, 185, 129, 0.1);
-  --border-radius: 8px;
-}
-
-/* 삭제 버튼 */
 .delete-button {
-  --color: #ef4444;
-  --background: rgba(239, 68, 68, 0.1);
-  --border-radius: 8px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.delete-button:hover {
+  background: #dc2626;
+}
+
+/* 데이터 없음 상태 */
+.no-medication {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.no-data-text {
+  font-size: 24px;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 8px 0;
+}
+
+.no-data-subtext {
+  font-size: 18px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .large-title {
+    font-size: 24px !important;
+  }
+  
+  .large-label {
+    font-size: 18px;
+  }
+  
+  .large-input {
+    font-size: 18px;
+    height: 56px;
+  }
+  
+  .time-button {
+    font-size: 16px;
+    padding: 14px 20px;
+  }
+  
+  .medication-name {
+    font-size: 20px;
+  }
+  
+  .medication-dosage {
+    font-size: 18px;
+  }
+  
+  .medication-time-button {
+    font-size: 16px;
+    padding: 14px 16px;
+    min-width: 90px;
+  }
 }

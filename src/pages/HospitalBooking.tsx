@@ -149,7 +149,11 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
       } else {
         // 즐겨찾기에 추가
         await addFavoriteHospital({
+          hospitalId: hospital.ykiho || '',
+          hospitalName: hospital.yadmNm || '',
           address: hospital.addr || '',
+          phoneNumber: hospital.telno || '',
+          specialties: [],
           dataId: hospital.ykiho || '',
           name: hospital.yadmNm || '',
           telNo: hospital.telno || '',

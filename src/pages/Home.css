@@ -619,6 +619,44 @@ ion-app {
   border: 1px solid #ffffff;
 }
 
+/* 복약 기록이 있는 날짜 스타일 */
+.day-number.has-medicine {
+  position: relative;
+}
+
+.medicine-dots {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+  max-width: 20px;
+}
+
+.medicine-dot {
+  width: 12px;
+  height: 12px;
+  background: #10b981;
+  border-radius: 50%;
+  border: 1px solid #ffffff;
+  flex-shrink: 0;
+}
+
+.medicine-dot.more {
+  width: 12px;
+  height: 12px;
+  background: #10b981;
+  border-radius: 50%;
+  border: 1px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: bold;
+  color: white;
+}
+
 /* 예약 상세 바텀 시트 스타일 */
 .reservation-modal-content {
   padding: 20px;

@@ -24,6 +24,7 @@ import { calendar, medical, chevronBack, chevronForward, logOut, business, notif
 import { getCurrentUserSession, clearUserSession, hasUserPermission } from '../services/userService';
 import { getFavoriteHospitals, removeFavoriteHospital, FavoriteHospital } from '../services/favoriteHospitalService';
 import { addReservation, getReservations } from '../services/reservationService';
+import { getMedicineHistory, MedicineHistory } from '../services/medicineHistoryService';
 import HospitalDetailModal from '../components/HospitalDetailModal';
 import AppointmentModal, { AppointmentData } from '../components/AppointmentModal';
 import { App } from '@capacitor/app';
@@ -53,32 +54,58 @@ const Home: React.FC = () => {
   const [latestReservation, setLatestReservation] = useState<any>(null);
   const [allReservations, setAllReservations] = useState<any[]>([]);
   
+  // 복약 기록 상태
+  const [medicineHistory, setMedicineHistory] = useState<MedicineHistory[]>([]);
+  
   // 예약 상세 모달 상태
   const [showReservationModal, setShowReservationModal] = useState(false);
   const [selectedDateReservations, setSelectedDateReservations] = useState<any[]>([]);
   const [selectedModalDate, setSelectedModalDate] = useState<Date | null>(null);
   
   useEffect(() => {
-    // 세션에서 사용자 정보 가져오기
-    const userSession = getCurrentUserSession();
-    if (userSession) {
-      setUserName(userSession.name || '사용자');
-      // 즐겨찾기 병원 목록 가져오기
-      loadFavoriteHospitals();
-    } else {
-      // 기존 localStorage 방식도 지원 (하위 호환성)
-      const savedUserInfo = localStorage.getItem('userInfo');
-      if (savedUserInfo) {
+    // 사용자 정보 가져오기
+    loadUserInfo();
+  }, []);
+
+  const loadUserInfo = async () => {
+    try {
+      // Firebase 세션에서 사용자 정보 가져오기
+      const userSession = await getCurrentUserSession();
+      if (userSession && userSession.isAuthenticated) {
+        setUserName(userSession.name || '사용자');
+        // 즐겨찾기 병원 목록 가져오기
+        loadFavoriteHospitals();
+        loadReservations();
+        loadMedicineHistory();
+        return;
+      }
+    } catch (error) {
+      console.log('Firebase 세션 확인 실패:', error);
+    }
+
+    // localStorage에서 사용자 정보 가져오기
+    const savedUserInfo = localStorage.getItem('userInfo');
+    if (savedUserInfo) {
+      try {
         const userInfo = JSON.parse(savedUserInfo);
-        setUserName(userInfo.name || '사용자');
+        if (userInfo.name) {
+          setUserName(userInfo.name);
+          // 즐겨찾기 병원 목록 가져오기
+          loadFavoriteHospitals();
+          loadReservations();
+          loadMedicineHistory();
+        }
+      } catch (error) {
+        console.log('localStorage 사용자 정보 파싱 실패:', error);
       }
     }
-  }, []);
+  };
 
   // 화면 진입 시 즐겨찾기 병원 갱신
   useIonViewWillEnter(() => {
     loadFavoriteHospitals();
     loadReservations();
+    loadMedicineHistory();
   });
 
   // 앱 상태 변화 감지 (전화걸기 후 복귀)
@@ -106,6 +133,8 @@ const Home: React.FC = () => {
               handleAppStateChange();
               // 즐겨찾기 병원 목록도 새로고침
               loadFavoriteHospitals();
+              loadReservations();
+              loadMedicineHistory();
             }, 500); // 약간의 지연을 두어 안정성 확보
           }
         });
@@ -146,9 +175,23 @@ const Home: React.FC = () => {
   // 즐겨찾기 병원 목록 로드
   const loadFavoriteHospitals = async () => {
     try {
-      console.log('즐겨찾기 병원 목록 로드 시작...');
-      const favorites = await getFavoriteHospitals();
-      console.log('즐겨찾기 병원 목록:', favorites);
+      // localStorage에서 사용자 정보 가져오기
+      const savedUserInfo = localStorage.getItem('userInfo');
+      let userId = null;
+      
+      if (savedUserInfo) {
+        try {
+          const userInfo = JSON.parse(savedUserInfo);
+          // Firebase user 컬렉션에서 찾은 사용자의 uid가 있다면 사용
+          if (userInfo.uid) {
+            userId = userInfo.uid;
+          }
+        } catch (error) {
+          console.log('localStorage 사용자 정보 파싱 실패:', error);
+        }
+      }
+      
+      const favorites = await getFavoriteHospitals(userId);
       setFavoriteHospitals(favorites);
     } catch (error) {
       console.error('즐겨찾기 병원 목록 로드 실패:', error);
@@ -158,9 +201,7 @@ const Home: React.FC = () => {
   // 예약한 병원 목록 로드
   const loadReservations = async () => {
     try {
-      console.log('예약한 병원 목록 로드 시작...');
       const reservations = await getReservations();
-      console.log('예약한 병원 목록:', reservations);
       
       // 모든 예약 데이터 설정
       setAllReservations(reservations);
@@ -173,6 +214,29 @@ const Home: React.FC = () => {
       }
     } catch (error) {
       console.error('예약한 병원 목록 로드 실패:', error);
+    }
+  };
+
+  // 복약 기록 로드
+  const loadMedicineHistory = async () => {
+    try {
+      // localStorage에서 사용자 정보 가져오기
+      const savedUserInfo = localStorage.getItem('userInfo');
+      let userId = null;
+      
+      if (savedUserInfo) {
+        try {
+          const userInfo = JSON.parse(savedUserInfo);
+          userId = userInfo.uid;
+        } catch (error) {
+          console.log('localStorage 사용자 정보 파싱 실패:', error);
+        }
+      }
+      
+      const history = await getMedicineHistory(userId);
+      setMedicineHistory(history);
+    } catch (error) {
+      console.error('복약 기록 로드 실패:', error);
     }
   };
 
@@ -231,13 +295,48 @@ const Home: React.FC = () => {
     const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
     
     return allReservations.some(reservation => {
-      const reservationDate = reservation.reservationDate.toDate();
+      // Firebase Timestamp인 경우와 Date 객체인 경우 모두 처리
+      const reservationDate = reservation.reservationDate.toDate ? reservation.reservationDate.toDate() : reservation.reservationDate;
       return (
         checkDate.getDate() === reservationDate.getDate() &&
         checkDate.getMonth() === reservationDate.getMonth() &&
         checkDate.getFullYear() === reservationDate.getFullYear()
       );
     });
+  };
+
+  // 복약 기록이 있는 날짜 확인
+  const hasMedicineHistory = (day: number) => {
+    if (!day) return false;
+    
+    const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    
+    return medicineHistory.some(history => {
+      // eatDate는 이미 Date 객체로 변환됨
+      const eatDate = history.eatDate;
+      return (
+        checkDate.getDate() === eatDate.getDate() &&
+        checkDate.getMonth() === eatDate.getMonth() &&
+        checkDate.getFullYear() === eatDate.getFullYear()
+      );
+    });
+  };
+
+  // 특정 날짜의 복약 기록 개수 확인
+  const getMedicineHistoryCount = (day: number) => {
+    if (!day) return 0;
+    
+    const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    
+    return medicineHistory.filter(history => {
+      // eatDate는 이미 Date 객체로 변환됨
+      const eatDate = history.eatDate;
+      return (
+        checkDate.getDate() === eatDate.getDate() &&
+        checkDate.getMonth() === eatDate.getMonth() &&
+        checkDate.getFullYear() === eatDate.getFullYear()
+      );
+    }).length;
   };
 
   const handleDateClick = (day: number) => {
@@ -247,7 +346,8 @@ const Home: React.FC = () => {
     if (hasReservation(day)) {
       const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
       const dayReservations = allReservations.filter(reservation => {
-        const reservationDate = reservation.reservationDate.toDate();
+        // Firebase Timestamp인 경우와 Date 객체인 경우 모두 처리
+        const reservationDate = reservation.reservationDate.toDate ? reservation.reservationDate.toDate() : reservation.reservationDate;
         return (
           checkDate.getDate() === reservationDate.getDate() &&
           checkDate.getMonth() === reservationDate.getMonth() &&
@@ -333,6 +433,16 @@ const Home: React.FC = () => {
         memo: appointmentData.notes || '',
         reservationDate: combined,
         telNo: hospital.phone,
+        // 기존 필드들 (호환성을 위해 유지)
+        hospitalId: 'temp-hospital-id',
+        department: '일반진료',
+        doctorName: '의사',
+        appointmentDate: combined,
+        appointmentTime: appointmentData.appointmentTime,
+        patientName: '환자',
+        patientPhone: hospital.phone,
+        symptoms: appointmentData.notes || '',
+        status: 'pending' as const,
       });
       console.log('예약 저장 완료 ID:', id);
       alert('예약이 등록되었습니다!');
@@ -363,7 +473,8 @@ const Home: React.FC = () => {
   // 예약 날짜 포맷팅
   const formatReservationDate = (timestamp: any) => {
     if (!timestamp) return '';
-    const date = timestamp.toDate();
+    // Firebase Timestamp인 경우와 Date 객체인 경우 모두 처리
+    const date = timestamp.toDate ? timestamp.toDate() : timestamp;
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();
@@ -373,7 +484,8 @@ const Home: React.FC = () => {
   // 예약 시간 포맷팅
   const formatReservationTime = (timestamp: any) => {
     if (!timestamp) return '';
-    const date = timestamp.toDate();
+    // Firebase Timestamp인 경우와 Date 객체인 경우 모두 처리
+    const date = timestamp.toDate ? timestamp.toDate() : timestamp;
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
@@ -502,11 +614,21 @@ const Home: React.FC = () => {
                       <IonCol key={dayIndex} className="calendar-day">
                         {day && (
                           <div 
-                            className={`day-number ${isToday(day) ? 'today' : ''} ${selectedDate === day ? 'selected' : ''} ${hasReservation(day) ? 'has-reservation' : ''}`}
+                            className={`day-number ${isToday(day) ? 'today' : ''} ${selectedDate === day ? 'selected' : ''} ${hasReservation(day) ? 'has-reservation' : ''} ${hasMedicineHistory(day) ? 'has-medicine' : ''}`}
                             onClick={() => handleDateClick(day)}
                           >
                             {day}
                             {hasReservation(day) && <div className="reservation-dot"></div>}
+                            {hasMedicineHistory(day) && (
+                              <div className="medicine-dots">
+                                {Array.from({ length: Math.min(getMedicineHistoryCount(day), 3) }, (_, index) => (
+                                  <div key={index} className="medicine-dot"></div>
+                                ))}
+                                {getMedicineHistoryCount(day) > 3 && (
+                                  <div className="medicine-dot more">+</div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         )}
                       </IonCol>

@@ -89,7 +89,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
                   try {
                     await upsertUserProfile({
                       birthDate: userInfo.birthDate,
-                      gender: userInfo.gender,
+                      gender: userInfo.gender as 'male' | 'female' | 'other',
                       name: userInfo.name,
                       sido: userInfo.시도,
                       sigungu: userInfo.시군구,

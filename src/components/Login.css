@@ -1,0 +1,83 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 60px 20px 20px 20px;
+  background: #f8fafc;
+}
+
+.login-card {
+  max-width: 400px;
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background: white;
+  margin: 0 auto;
+}
+
+.login-form {
+  margin-bottom: 30px;
+}
+
+.form-item {
+  margin-bottom: 20px;
+  border-radius: 12px;
+  --background: #f8f9fa;
+  --border-radius: 12px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+}
+
+.form-item ion-label {
+  font-weight: 600;
+  color: var(--ion-color-dark);
+  margin-bottom: 8px;
+}
+
+.form-item ion-input {
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+}
+
+.login-button {
+  margin-bottom: 15px;
+  --border-radius: 12px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.register-button {
+  --color: var(--ion-color-medium);
+  font-size: 0.9rem;
+}
+
+/* 아이콘 스타일 */
+.form-item ion-icon {
+  color: var(--ion-color-primary);
+  margin-right: 12px;
+}
+
+/* 버튼 비활성화 상태 */
+.login-button:disabled {
+  --opacity: 0.6;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 15px;
+  }
+  
+  .login-card {
+    max-width: 100%;
+  }
+  
+  ion-card-title {
+    font-size: 1.5rem;
+  }
+}

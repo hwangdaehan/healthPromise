@@ -68,11 +68,15 @@ const MedicationManagement: React.FC = () => {
   });
 
   // 사용자 ID 가져오기 (Home과 동일한 방식)
-  const getUserId = (): string => {
-    const userSession = getCurrentUserSession();
-    
-    if (userSession && userSession.uid) {
-      return userSession.uid;
+  const getUserId = async (): Promise<string> => {
+    try {
+      const userSession = await getCurrentUserSession();
+      
+      if (userSession && userSession.user) {
+        return userSession.user.uid;
+      }
+    } catch (error) {
+      console.log('사용자 세션 확인 실패:', error);
     }
     
     return '';
@@ -82,7 +86,7 @@ const MedicationManagement: React.FC = () => {
   useEffect(() => {
     const loadMedications = async () => {
       try {
-        const userId = getUserId();
+        const userId = await getUserId();
         
         if (!userId) {
           return;
@@ -133,7 +137,7 @@ const MedicationManagement: React.FC = () => {
     }
 
     try {
-      const userId = getUserId();
+      const userId = await getUserId();
       
       if (!userId) {
         alert('사용자 정보가 없습니다. 다시 로그인해주세요.');

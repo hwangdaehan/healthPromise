@@ -81,35 +81,60 @@ const AppContent: React.FC = () => {
     
     setupStatusBar();
 
-    // 세션에서 사용자 정보 확인
-    const userSession = getCurrentUserSession();
-    if (userSession) {
-      setUserInfo({
-        name: userSession.name,
-        birthDate: userSession.birthDate,
-        gender: userSession.gender,
-        시도: userSession.sido,
-        시군구: userSession.sigungu
-      });
-      setIsAuthenticated(true);
-      setShowUserInfo(false);
-      setShowLogin(false);
-    } else {
-      // 기존 localStorage 방식도 지원 (하위 호환성)
-      const savedUserInfo = localStorage.getItem('userInfo');
-      if (savedUserInfo) {
-        setUserInfo(JSON.parse(savedUserInfo));
+    // 사용자 정보 확인
+    checkUserAuthentication();
+  }, []);
+
+  const checkUserAuthentication = async () => {
+    try {
+      // Firebase 세션에서 사용자 정보 확인
+      const userSession = await getCurrentUserSession();
+      if (userSession && userSession.isAuthenticated) {
+        setUserInfo({
+          name: userSession.name || '',
+          birthDate: userSession.birthDate || '',
+          gender: userSession.gender || '',
+          시도: userSession.sido || '',
+          시군구: userSession.sigungu || ''
+        });
         setIsAuthenticated(true);
         setShowUserInfo(false);
         setShowLogin(false);
-      } else {
-        // 로그인 화면 표시
-        setShowLogin(true);
-        setShowUserInfo(false);
-        setIsAuthenticated(false);
+        return;
+      }
+    } catch (error) {
+      console.log('Firebase 세션 확인 실패:', error);
+    }
+
+    // localStorage에서 사용자 정보 확인
+    const savedUserInfo = localStorage.getItem('userInfo');
+    if (savedUserInfo) {
+      try {
+        const userData = JSON.parse(savedUserInfo);
+        if (userData.name && userData.birthDate) {
+          setUserInfo({
+            name: userData.name,
+            birthDate: userData.birthDate,
+            gender: userData.gender || '',
+            시도: userData.시도 || userData.sido || '',
+            시군구: userData.시군구 || userData.sigungu || ''
+          });
+          setIsAuthenticated(true);
+          setShowUserInfo(false);
+          setShowLogin(false);
+          return;
+        }
+      } catch (error) {
+        console.log('localStorage 사용자 정보 파싱 실패:', error);
+        localStorage.removeItem('userInfo'); // 잘못된 데이터 삭제
       }
     }
-  }, []);
+
+    // 사용자 정보가 없으면 로그인 화면 표시
+    setShowLogin(true);
+    setShowUserInfo(false);
+    setIsAuthenticated(false);
+  };
 
   useEffect(() => {
     const path = location.pathname;
@@ -135,20 +160,29 @@ const AppContent: React.FC = () => {
     setIsAuthenticated(true);
   };
 
-  const handleLoginSuccess = () => {
-    // 세션에서 사용자 정보 다시 가져오기
-    const userSession = getCurrentUserSession();
-    if (userSession) {
-      setUserInfo({
-        name: userSession.name,
-        birthDate: userSession.birthDate,
-        gender: userSession.gender,
-        시도: userSession.sido,
-        시군구: userSession.sigungu
-      });
-      setIsAuthenticated(true);
-      setShowLogin(false);
-    }
+  const handleLoginSuccess = (userData: { 
+    name: string; 
+    birthDate: string; 
+    gender?: string; 
+    sido?: string; 
+    sigungu?: string; 
+  }) => {
+    // 로그인 성공 시 사용자 정보 설정
+    setUserInfo({
+      name: userData.name,
+      birthDate: userData.birthDate,
+      gender: userData.gender || '',
+      시도: userData.sido || '',
+      시군구: userData.sigungu || ''
+    });
+    setIsAuthenticated(true);
+    setShowLogin(false);
+    setShowUserInfo(false);
+    
+    // 사용자 정보 다시 확인 (localStorage에서 최신 데이터 가져오기)
+    setTimeout(() => {
+      checkUserAuthentication();
+    }, 100);
   };
 
   const handleGoToRegister = () => {

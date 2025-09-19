@@ -237,52 +237,12 @@ ion-tab-button ion-label {
   color: #ffffff !important;
 }
 
-.modern-tab-bar ion-tab-button ion-icon {
-  color: #000000 !important;
-  --color: #000000 !important;
-  font-size: 28px !important;
-  margin-bottom: 6px !important;
-  transition: transform 0.3s ease !important;
-  fill: #000000 !important;
-  stroke: #000000 !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-.modern-tab-bar ion-tab-button ion-icon svg {
-  fill: #000000 !important;
-  stroke: #000000 !important;
-  color: #000000 !important;
-}
-
-.modern-tab-bar ion-tab-button ion-icon::before {
-  color: #000000 !important;
-}
-
-.modern-tab-bar ion-tab-button.tab-selected ion-icon {
-  color: #000000 !important;
-  --color: #000000 !important;
-  transform: scale(1.1) !important;
-  fill: #000000 !important;
-  stroke: #000000 !important;
-}
-
-.modern-tab-bar ion-tab-button.tab-selected ion-icon svg {
-  fill: #000000 !important;
-  stroke: #000000 !important;
-  color: #000000 !important;
-}
-
-.modern-tab-bar ion-tab-button.tab-selected ion-icon::before {
-  color: #000000 !important;
-}
-
 .modern-tab-bar ion-tab-button ion-label {
   color: #ffffff !important;
   --color: #ffffff !important;
   font-size: 13px !important;
   font-weight: 600 !important;
-  margin-top: 6px !important;
+  margin-top: 0px !important;
   letter-spacing: 0.2px !important;
   white-space: nowrap !important;
   overflow: visible !important;
@@ -298,4 +258,30 @@ ion-tab-button ion-label {
   color: #ffffff !important;
   --color: #ffffff !important;
   --background: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* SVG 아이콘 스타일 - 최강 우선순위 */
+ion-tabs ion-tab-bar.modern-tab-bar ion-tab-button svg {
+  width: 25px !important;
+  height: 25px !important;
+  margin-bottom: 3px !important;
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  display: block !important;
+  max-width: 25px !important;
+  max-height: 25px !important;
+  min-width: 25px !important;
+  min-height: 25px !important;
+}
+
+/* 더 강력한 선택자로 margin 강제 적용 */
+ion-tab-bar.modern-tab-bar ion-tab-button svg,
+ion-tabs ion-tab-bar.modern-tab-bar ion-tab-button svg[style*="display: block"] {
+  margin-bottom: 3px !important;
+}
+
+/* 더 구체적인 선택자로 강제 적용 */
+ion-tab-bar.modern-tab-bar ion-tab-button svg[width="40"][height="40"] {
+  width: 25px !important;
+  height: 25px !important;
 }

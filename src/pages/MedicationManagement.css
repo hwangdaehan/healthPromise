@@ -527,3 +527,114 @@ ion-card {
     min-width: 90px;
   }
 }
+
+/* 복용 기록 바텀 시트 스타일 */
+.record-form {
+  padding: 20px 0;
+}
+
+.selected-medication-info {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 2px solid #bae6fd;
+  text-align: center;
+}
+
+.selected-medication-info h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0c4a6e;
+  margin: 0 0 8px 0;
+}
+
+.selected-medication-info p {
+  font-size: 18px;
+  color: #0369a1;
+  margin: 0;
+  font-weight: 600;
+}
+
+.record-form ion-item {
+  --background: #f8fafc;
+  --border-radius: 12px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  margin-bottom: 16px;
+  border: 2px solid #e2e8f0;
+}
+
+.record-form ion-item:focus-within {
+  --border-color: #3b82f6;
+  --background: white;
+}
+
+.record-form ion-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.record-form ion-datetime-button {
+  --background: white;
+  --color: #1f2937;
+  --border-radius: 8px;
+  --border: 1px solid #d1d5db;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.record-form ion-textarea {
+  --background: white;
+  --color: #1f2937;
+  --border-radius: 8px;
+  --border: 1px solid #d1d5db;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  font-size: 16px;
+  min-height: 80px;
+}
+
+.record-form ion-textarea:focus-within {
+  --border-color: #3b82f6;
+}
+
+.record-form ion-button {
+  --background: #10b981;
+  --color: white;
+  --border-radius: 12px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  height: 56px;
+  margin-top: 20px;
+}
+
+.record-form ion-button:disabled {
+  --background: #9ca3af;
+  --color: #6b7280;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.loading-container ion-spinner {
+  --color: #3b82f6;
+  width: 32px;
+  height: 32px;
+}

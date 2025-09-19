@@ -25,6 +25,7 @@ import { getCurrentUserSession, clearUserSession, hasUserPermission } from '../s
 import { getFavoriteHospitals, removeFavoriteHospital, FavoriteHospital } from '../services/favoriteHospitalService';
 import { addReservation, getReservations } from '../services/reservationService';
 import { getMedicineHistory, MedicineHistory } from '../services/medicineHistoryService';
+import { FirestoreService } from '../services/firestoreService';
 import HospitalDetailModal from '../components/HospitalDetailModal';
 import AppointmentModal, { AppointmentData } from '../components/AppointmentModal';
 import { App } from '@capacitor/app';
@@ -60,7 +61,9 @@ const Home: React.FC = () => {
   // 예약 상세 모달 상태
   const [showReservationModal, setShowReservationModal] = useState(false);
   const [selectedDateReservations, setSelectedDateReservations] = useState<any[]>([]);
+  const [selectedDateMedicineHistory, setSelectedDateMedicineHistory] = useState<any[]>([]);
   const [selectedModalDate, setSelectedModalDate] = useState<Date | null>(null);
+  
   
   useEffect(() => {
     // 사용자 정보 가져오기
@@ -339,26 +342,47 @@ const Home: React.FC = () => {
     }).length;
   };
 
-  const handleDateClick = (day: number) => {
+  const handleDateClick = async (day: number) => {
     setSelectedDate(day);
     
+    const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    
     // 해당 날짜의 예약 정보 가져오기
-    if (hasReservation(day)) {
-      const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-      const dayReservations = allReservations.filter(reservation => {
-        // Firebase Timestamp인 경우와 Date 객체인 경우 모두 처리
-        const reservationDate = reservation.reservationDate.toDate ? reservation.reservationDate.toDate() : reservation.reservationDate;
-        return (
-          checkDate.getDate() === reservationDate.getDate() &&
-          checkDate.getMonth() === reservationDate.getMonth() &&
-          checkDate.getFullYear() === reservationDate.getFullYear()
-        );
-      });
-      
-      setSelectedDateReservations(dayReservations);
-      setSelectedModalDate(checkDate);
-      setShowReservationModal(true);
-    }
+    const dayReservations = allReservations.filter(reservation => {
+      // Firebase Timestamp인 경우와 Date 객체인 경우 모두 처리
+      const reservationDate = reservation.reservationDate.toDate ? reservation.reservationDate.toDate() : reservation.reservationDate;
+      return (
+        checkDate.getDate() === reservationDate.getDate() &&
+        checkDate.getMonth() === reservationDate.getMonth() &&
+        checkDate.getFullYear() === reservationDate.getFullYear()
+      );
+    });
+    
+    // 해당 날짜의 복약 기록 가져오기
+    const dayMedicineHistory = medicineHistory.filter(record => {
+      const eatDate = record.eatDate;
+      return (
+        checkDate.getDate() === eatDate.getDate() &&
+        checkDate.getMonth() === eatDate.getMonth() &&
+        checkDate.getFullYear() === eatDate.getFullYear()
+      );
+    });
+    
+    // 복약 기록에 약물 이름 추가
+    const medicineHistoryWithNames = await Promise.all(
+      dayMedicineHistory.map(async (record) => {
+        const medicine = await FirestoreService.getMedicineById(record.medicineDataId);
+        return {
+          ...record,
+          medicineName: medicine?.name || '알 수 없는 약물'
+        };
+      })
+    );
+    
+    setSelectedDateReservations(dayReservations);
+    setSelectedDateMedicineHistory(medicineHistoryWithNames);
+    setSelectedModalDate(checkDate);
+    setShowReservationModal(true);
   };
 
   const days = getDaysInMonth(currentDate);
@@ -390,6 +414,7 @@ const Home: React.FC = () => {
     if (count > 10) return '10+';
     return count.toString();
   };
+
 
   // 즐겨찾기 병원 카드 클릭 핸들러
   const handleFavoriteHospitalClick = (hospital: FavoriteHospital) => {
@@ -491,6 +516,17 @@ const Home: React.FC = () => {
     return `${hours}:${minutes}`;
   };
 
+  // 복약 기록 시간 포맷팅
+  const formatMedicineTime = (timestamp: any) => {
+    if (!timestamp) return '';
+    // Firebase Timestamp인 경우와 Date 객체인 경우 모두 처리
+    const date = timestamp.toDate ? timestamp.toDate() : timestamp;
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    return `${hours}시${minutes}분${seconds}초`;
+  };
+
   // 모달 날짜 포맷팅
   const formatModalDate = (date: Date) => {
     const year = date.getFullYear();
@@ -512,7 +548,7 @@ const Home: React.FC = () => {
           >
             <IonIcon icon={notifications} />
             {notificationCount > 0 && (
-              <IonBadge color="danger" className="notification-badge">
+              <IonBadge color="danger" className="home-notification-badge">
                 {getNotificationDisplay(notificationCount)}
               </IonBadge>
             )}
@@ -657,7 +693,7 @@ const Home: React.FC = () => {
             <IonCardContent>
               <div className="service-card-content">
                 <div className="service-text">
-                  <h3 className="service-title medication-title">복약 관리 <IonIcon icon={chevronForward} className="chevron-icon" /></h3>
+                  <h3 className="service-title medication-title">복약 관리</h3>
                   <p className="service-subtitle">약물 복용을 체계적으로<br />관리하세요</p>
                 </div>
                 <div className="service-icon">
@@ -665,7 +701,7 @@ const Home: React.FC = () => {
                 </div>
               </div>
             </IonCardContent>
-                      </IonCard>
+          </IonCard>
 
                     </div>
                   </IonContent>
@@ -747,9 +783,35 @@ const Home: React.FC = () => {
                             </IonCard>
                           ))}
                         </div>
+
+                        {/* 복약 기록 섹션 */}
+                        {selectedDateMedicineHistory.length > 0 && (
+                          <div className="medicine-history-section">
+                            <h3 className="section-title">
+                              <IonIcon icon={medical} />
+                              복약 기록
+                            </h3>
+                            <div className="medicine-history-list">
+                              {selectedDateMedicineHistory.map((record, index) => (
+                                <IonCard key={index} className="medicine-record-card">
+                                  <IonCardContent>
+                                    <div className="medicine-record-header">
+                                      <h4 className="medicine-name">{record.medicineName}</h4>
+                                      <div className="medicine-time">
+                                        <IonIcon icon={time} />
+                                        <span>{formatMedicineTime(record.eatDate)}</span>
+                                      </div>
+                                    </div>
+                                  </IonCardContent>
+                                </IonCard>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </IonContent>
                   </IonModal>
+
                 </IonPage>
               );
             };

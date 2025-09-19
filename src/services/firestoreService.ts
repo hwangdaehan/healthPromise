@@ -2,6 +2,7 @@ import {
   collection,
   addDoc,
   getDocs,
+  getDoc,
   doc,
   updateDoc,
   deleteDoc,
@@ -117,6 +118,26 @@ export class FirestoreService {
     } catch (error) {
       console.error('Error getting medicines:', error);
       throw error;
+    }
+  }
+
+  static async getMedicineById(medicineId: string): Promise<Medicine | null> {
+    try {
+      const docRef = doc(db, 'medicine', medicineId);
+      const docSnap = await getDoc(docRef);
+      
+      if (!docSnap.exists()) {
+        return null;
+      }
+      
+      const data = docSnap.data();
+      return {
+        dataId: docSnap.id,
+        ...data,
+      } as Medicine;
+    } catch (error) {
+      console.error('Error getting medicine by ID:', error);
+      return null;
     }
   }
 

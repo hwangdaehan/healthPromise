@@ -23,11 +23,16 @@ import {
   IonGrid,
   IonRow,
   IonCol,
+  IonDatetimeButton,
+  IonTextarea,
+  IonSpinner,
+  IonAlert,
 } from '@ionic/react';
-import { medical, time, checkmarkCircle, closeCircle, arrowBack, add, trash, notifications, notificationsOff } from 'ionicons/icons';
+import { medical, time, checkmarkCircle, closeCircle, arrowBack, add, trash, notifications, notificationsOff, save, close } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { FirestoreService, Medicine } from '../services/firestoreService';
 import { getCurrentUserSession } from '../services/userService';
+import { getMedicineHistory, addMedicineHistory } from '../services/medicineHistoryService';
 import './MedicationManagement.css';
 
 interface Medication {
@@ -56,6 +61,16 @@ const MedicationManagement: React.FC = () => {
   const [medications, setMedications] = useState<Medication[]>([]);
   const [records, setRecords] = useState<MedicationRecord[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showMedicineRecordModal, setShowMedicineRecordModal] = useState(false);
+  const [showRecordBottomSheet, setShowRecordBottomSheet] = useState(false);
+  const [selectedMedication, setSelectedMedication] = useState<Medication | null>(null);
+  const [recordData, setRecordData] = useState({
+    eatDate: new Date().toISOString().split('T')[0],
+    eatTime: new Date().toTimeString().split(' ')[0].substring(0, 5),
+    memo: '',
+  });
+  const [recordLoading, setRecordLoading] = useState(false);
+  const [recordError, setRecordError] = useState<string | null>(null);
   const [newMedication, setNewMedication] = useState({
     name: '',
     dosage: '',
@@ -231,6 +246,52 @@ const MedicationManagement: React.FC = () => {
     return record ? record.taken : false;
   };
 
+  // 복용 기록 바텀 시트 열기
+  const openRecordBottomSheet = (medication: Medication) => {
+    setSelectedMedication(medication);
+    setRecordData({
+      eatDate: new Date().toISOString().split('T')[0],
+      eatTime: new Date().toTimeString().split(' ')[0].substring(0, 5),
+      memo: '',
+    });
+    setRecordError(null);
+    setShowRecordBottomSheet(true);
+  };
+
+  // 복용 기록 저장
+  const saveRecord = async () => {
+    if (!selectedMedication) return;
+
+    setRecordLoading(true);
+    setRecordError(null);
+
+    try {
+      const userId = await getUserId();
+      if (!userId) {
+        setRecordError('사용자 정보를 찾을 수 없습니다. 다시 로그인해주세요.');
+        return;
+      }
+
+      const combinedDateTime = new Date(`${recordData.eatDate}T${recordData.eatTime}:00`);
+
+      await addMedicineHistory({
+        medicineDataId: selectedMedication.id,
+        eatDate: combinedDateTime,
+        regDate: new Date(),
+        userId: userId,
+        dataId: '', // Firestore에서 자동 생성
+      });
+
+      setShowRecordBottomSheet(false);
+      alert('복용 기록이 저장되었습니다!');
+    } catch (err) {
+      console.error('복용 기록 저장 실패:', err);
+      setRecordError('복용 기록 저장에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setRecordLoading(false);
+    }
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -304,10 +365,7 @@ const MedicationManagement: React.FC = () => {
                     <IonButton
                       fill="outline"
                       className="action-button secondary"
-                      onClick={() => {
-                        // 복용 기록 기능 (추후 구현)
-                        alert('복용 기록 기능은 준비 중입니다.');
-                      }}
+                      onClick={() => openRecordBottomSheet(medication)}
                     >
                       복용 기록
                     </IonButton>
@@ -407,6 +465,103 @@ const MedicationManagement: React.FC = () => {
                 약물 등록하기
               </IonButton>
             </div>
+          </IonContent>
+        </IonModal>
+
+        {/* 복용 기록 바텀 시트 */}
+        <IonModal 
+          isOpen={showRecordBottomSheet} 
+          onDidDismiss={() => setShowRecordBottomSheet(false)}
+          breakpoints={[0, 0.6]}
+          initialBreakpoint={0.6}
+        >
+          <IonHeader>
+            <IonToolbar>
+              <IonTitle>복용 기록 등록</IonTitle>
+              <IonButton 
+                fill="clear" 
+                onClick={() => setShowRecordBottomSheet(false)}
+                slot="end"
+              >
+                <IonIcon icon={close} />
+              </IonButton>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent className="ion-padding">
+            {selectedMedication && (
+              <div className="record-form">
+                <div className="selected-medication-info">
+                  <h3>{selectedMedication.name}</h3>
+                  <p>1회 {selectedMedication.dosage}정</p>
+                </div>
+
+                <IonItem>
+                  <IonLabel position="stacked">복용 날짜 *</IonLabel>
+                  <IonDatetimeButton datetime="recordEatDate"></IonDatetimeButton>
+                  <IonModal keepContentsMounted={true}>
+                    <IonDatetime
+                      id="recordEatDate"
+                      presentation="date"
+                      value={recordData.eatDate}
+                      onIonChange={(e) => setRecordData(prev => ({ 
+                        ...prev, 
+                        eatDate: e.detail.value ? String(e.detail.value).split('T')[0] : '' 
+                      }))}
+                    ></IonDatetime>
+                  </IonModal>
+                </IonItem>
+
+                <IonItem>
+                  <IonLabel position="stacked">복용 시간 *</IonLabel>
+                  <IonDatetimeButton datetime="recordEatTime"></IonDatetimeButton>
+                  <IonModal keepContentsMounted={true}>
+                    <IonDatetime
+                      id="recordEatTime"
+                      presentation="time"
+                      value={recordData.eatTime}
+                      onIonChange={(e) => setRecordData(prev => ({ 
+                        ...prev, 
+                        eatTime: e.detail.value ? String(e.detail.value).split('T')[1].substring(0, 5) : '' 
+                      }))}
+                    ></IonDatetime>
+                  </IonModal>
+                </IonItem>
+
+                <IonItem>
+                  <IonLabel position="stacked">메모 (선택 사항)</IonLabel>
+                  <IonTextarea
+                    value={recordData.memo}
+                    onIonInput={(e) => setRecordData(prev => ({ ...prev, memo: e.detail.value! }))}
+                    placeholder="추가 메모를 입력하세요"
+                    rows={3}
+                  ></IonTextarea>
+                </IonItem>
+
+                <IonButton
+                  expand="block"
+                  onClick={saveRecord}
+                  disabled={recordLoading || !recordData.eatDate || !recordData.eatTime}
+                  className="ion-margin-top"
+                >
+                  <IonIcon icon={save} slot="start" />
+                  {recordLoading ? '저장 중...' : '기록 등록'}
+                </IonButton>
+
+                {recordLoading && (
+                  <div className="loading-container">
+                    <IonSpinner name="crescent" />
+                  </div>
+                )}
+
+                <IonAlert
+                  isOpen={!!recordError}
+                  onDidDismiss={() => setRecordError(null)}
+                  header="오류"
+                  message={recordError || ''}
+                  buttons={['확인']}
+                />
+              </div>
+            )}
           </IonContent>
         </IonModal>
 

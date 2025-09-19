@@ -34,19 +34,22 @@ ion-app {
   font-size: 24px;
 }
 
-.notification-badge {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  font-size: 10px;
-  font-weight: 600;
-  min-width: 18px;
-  height: 18px;
-  border-radius: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 4px;
+.home-notification-badge {
+  position: absolute !important;
+  top: 4px !important;
+  right: 4px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  min-width: 18px !important;
+  height: 18px !important;
+  border-radius: 9px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 4px !important;
+  z-index: 10 !important;
+  background-color: #dc2626 !important;
+  color: white !important;
 }
 
 .header-logout-button {
@@ -657,10 +660,82 @@ ion-app {
   color: white;
 }
 
+
 /* 예약 상세 바텀 시트 스타일 */
 .reservation-modal-content {
   padding: 20px;
   min-height: 100%;
+}
+
+/* 복약 기록 섹션 스타일 */
+.medicine-history-section {
+  margin-top: 24px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 16px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.section-title ion-icon {
+  font-size: 24px;
+  color: #10b981;
+}
+
+.medicine-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.medicine-record-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+}
+
+.medicine-record-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.medicine-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #065f46;
+  margin: 0;
+  flex: 1;
+}
+
+.medicine-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.medicine-time ion-icon {
+  font-size: 16px;
+  color: #10b981;
+}
+
+.medicine-time span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #047857;
 }
 
 .modal-header {

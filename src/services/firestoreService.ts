@@ -8,6 +8,7 @@ import {
   query,
   orderBy,
   limit,
+  where,
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
@@ -16,6 +17,15 @@ export interface SampleData {
   message: string;
   timestamp: Date;
   userId?: string;
+}
+
+export interface Medicine {
+  dataId?: string;
+  isNoti: boolean;
+  name: string;
+  quantity: string;
+  times: string[];
+  userId: string;
 }
 
 export class FirestoreService {
@@ -69,6 +79,63 @@ export class FirestoreService {
       await deleteDoc(docRef);
     } catch (error) {
       console.error('Error deleting document:', error);
+      throw error;
+    }
+  }
+
+  // 약물 관련 함수들
+  static async addMedicine(data: Omit<Medicine, 'dataId'>): Promise<string> {
+    try {
+      const docRef = await addDoc(collection(db, 'medicine'), {
+        ...data,
+      });
+      return docRef.id;
+    } catch (error) {
+      console.error('Error adding medicine:', error);
+      throw error;
+    }
+  }
+
+  static async getMedicinesByUserId(userId: string): Promise<Medicine[]> {
+    try {
+      const q = query(
+        collection(db, 'medicine'),
+        where('userId', '==', userId)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      
+      const medicines = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          dataId: doc.id,
+          ...data,
+        } as Medicine;
+      });
+      
+      return medicines;
+    } catch (error) {
+      console.error('Error getting medicines:', error);
+      throw error;
+    }
+  }
+
+  static async updateMedicine(dataId: string, data: Partial<Medicine>): Promise<void> {
+    try {
+      const docRef = doc(db, 'medicine', dataId);
+      await updateDoc(docRef, data);
+    } catch (error) {
+      console.error('Error updating medicine:', error);
+      throw error;
+    }
+  }
+
+  static async deleteMedicine(dataId: string): Promise<void> {
+    try {
+      const docRef = doc(db, 'medicine', dataId);
+      await deleteDoc(docRef);
+    } catch (error) {
+      console.error('Error deleting medicine:', error);
       throw error;
     }
   }

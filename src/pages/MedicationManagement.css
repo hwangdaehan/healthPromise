@@ -121,6 +121,253 @@ ion-card {
   flex: 1;
 }
 
+/* 복약 등록 버튼 */
+.add-medication-button {
+  --background: #10b981;
+  --color: white;
+  --border-radius: 12px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  height: 56px;
+}
+
+/* 복약 목록 */
+.medications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 빈 상태 */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
+}
+
+.empty-icon {
+  font-size: 64px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+
+.empty-state p {
+  margin: 8px 0;
+  font-size: 16px;
+}
+
+/* 복약 카드 - 모던 디자인 */
+.medication-card {
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: none;
+  overflow: hidden;
+  background: white;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.medication-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* 상단 이미지 영역 */
+.medication-image-area {
+  height: 120px;
+  background: linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.medication-image-area::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-20px, -20px) rotate(180deg); }
+}
+
+.medication-icon {
+  font-size: 48px;
+  color: rgba(255, 255, 255, 0.9);
+  z-index: 1;
+}
+
+/* 중앙 텍스트 정보 영역 */
+.medication-content {
+  padding: 24px;
+  background: white;
+}
+
+.medication-label {
+  display: inline-block;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 약물 제목과 복용량 행 */
+.medication-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 16px;
+}
+
+.medication-name {
+  font-size: 28.8px; /* 24px * 1.2 */
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.2;
+  flex: 1;
+}
+
+.medication-dosage-badge {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 20px;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dosage-number {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 16px;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* 복용 시간 섹션 */
+.medication-times {
+  margin-bottom: 20px;
+}
+
+.times-label {
+  font-size: 16.8px; /* 14px * 1.2 */
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+.times-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.time-chip {
+  --background: #f8fafc;
+  --color: #475569;
+  font-size: 15.6px; /* 13px * 1.2 */
+  font-weight: 600;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 6px 12px;
+}
+
+/* 하단 액션 버튼 영역 */
+.medication-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.action-button {
+  flex: 1;
+  height: 44px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.action-button.secondary {
+  --background: white;
+  --color: #3b82f6;
+  --border-color: #3b82f6;
+  --border-width: 2px;
+  --border-style: solid;
+}
+
+.action-button.secondary:hover {
+  --background: #f0f9ff;
+}
+
+.action-button.primary {
+  --background: #3b82f6;
+  --color: white;
+  --border-radius: 12px;
+}
+
+.action-button.primary:hover {
+  --background: #2563eb;
+}
+
+/* 알림 상태 배지 */
+.notification-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.notification-badge ion-icon {
+  font-size: 18px;
+}
+
+.notification-badge.enabled {
+  background: rgba(34, 197, 94, 0.9);
+  color: white;
+}
+
+.notification-badge.disabled {
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+}
+
+/* 모달 폼 */
+.modal-form {
+  padding: 20px 0;
+}
+
 /* 큰 등록 버튼 */
 .large-add-button {
   --background: #10b981;

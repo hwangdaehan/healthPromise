@@ -612,8 +612,8 @@ ion-app {
   position: absolute;
   bottom: 2px;
   right: 2px;
-  width: 6px;
-  height: 6px;
+  width: 12px;
+  height: 12px;
   background: #fbbf24;
   border-radius: 50%;
   border: 1px solid #ffffff;

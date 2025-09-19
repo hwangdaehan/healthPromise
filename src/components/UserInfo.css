@@ -20,6 +20,24 @@
   box-shadow: 0 4px 16px rgba(30, 41, 59, 0.2);
 }
 
+/* 뒤로가기 화살표 색상만 타이틀과 일치 */
+.user-info-back {
+  --color: #2563eb !important;
+}
+
+.user-info-back ion-icon {
+  color: #2563eb !important;
+  --color: #2563eb !important;
+}
+
+.user-info-back::part(native) {
+  color: #2563eb !important;
+}
+
+.user-info-back ion-icon::before {
+  color: #2563eb !important;
+}
+
 .welcome-banner ion-card-content {
   padding: 20px;
 }

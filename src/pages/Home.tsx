@@ -15,11 +15,15 @@ import {
   IonToolbar,
   IonTitle,
   IonBadge,
+  IonModal,
+  IonItem,
+  IonLabel,
 } from '@ionic/react';
-import { calendar, medical, chevronBack, chevronForward, logOut, business, notifications } from 'ionicons/icons';
+import { useIonViewWillEnter } from '@ionic/react';
+import { calendar, medical, chevronBack, chevronForward, logOut, business, notifications, time, location, call } from 'ionicons/icons';
 import { getCurrentUserSession, clearUserSession, hasUserPermission } from '../services/userService';
 import { getFavoriteHospitals, removeFavoriteHospital, FavoriteHospital } from '../services/favoriteHospitalService';
-import { addReservation } from '../services/reservationService';
+import { addReservation, getReservations } from '../services/reservationService';
 import HospitalDetailModal from '../components/HospitalDetailModal';
 import AppointmentModal, { AppointmentData } from '../components/AppointmentModal';
 import { App } from '@capacitor/app';
@@ -45,6 +49,15 @@ const Home: React.FC = () => {
   // 예약 모달 관련 상태
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   
+  // 예약 데이터 상태
+  const [latestReservation, setLatestReservation] = useState<any>(null);
+  const [allReservations, setAllReservations] = useState<any[]>([]);
+  
+  // 예약 상세 모달 상태
+  const [showReservationModal, setShowReservationModal] = useState(false);
+  const [selectedDateReservations, setSelectedDateReservations] = useState<any[]>([]);
+  const [selectedModalDate, setSelectedModalDate] = useState<Date | null>(null);
+  
   useEffect(() => {
     // 세션에서 사용자 정보 가져오기
     const userSession = getCurrentUserSession();
@@ -61,6 +74,12 @@ const Home: React.FC = () => {
       }
     }
   }, []);
+
+  // 화면 진입 시 즐겨찾기 병원 갱신
+  useIonViewWillEnter(() => {
+    loadFavoriteHospitals();
+    loadReservations();
+  });
 
   // 앱 상태 변화 감지 (전화걸기 후 복귀)
   useEffect(() => {
@@ -85,6 +104,8 @@ const Home: React.FC = () => {
             // 앱이 다시 활성화됨 (통화 종료 후 복귀)
             setTimeout(() => {
               handleAppStateChange();
+              // 즐겨찾기 병원 목록도 새로고침
+              loadFavoriteHospitals();
             }, 500); // 약간의 지연을 두어 안정성 확보
           }
         });
@@ -131,6 +152,27 @@ const Home: React.FC = () => {
       setFavoriteHospitals(favorites);
     } catch (error) {
       console.error('즐겨찾기 병원 목록 로드 실패:', error);
+    }
+  };
+
+  // 예약한 병원 목록 로드
+  const loadReservations = async () => {
+    try {
+      console.log('예약한 병원 목록 로드 시작...');
+      const reservations = await getReservations();
+      console.log('예약한 병원 목록:', reservations);
+      
+      // 모든 예약 데이터 설정
+      setAllReservations(reservations);
+      
+      // 가장 최근 예약 데이터 설정
+      if (reservations.length > 0) {
+        setLatestReservation(reservations[0]);
+      } else {
+        setLatestReservation(null);
+      }
+    } catch (error) {
+      console.error('예약한 병원 목록 로드 실패:', error);
     }
   };
 
@@ -183,8 +225,40 @@ const Home: React.FC = () => {
     );
   };
 
+  const hasReservation = (day: number) => {
+    if (!day) return false;
+    
+    const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    
+    return allReservations.some(reservation => {
+      const reservationDate = reservation.reservationDate.toDate();
+      return (
+        checkDate.getDate() === reservationDate.getDate() &&
+        checkDate.getMonth() === reservationDate.getMonth() &&
+        checkDate.getFullYear() === reservationDate.getFullYear()
+      );
+    });
+  };
+
   const handleDateClick = (day: number) => {
     setSelectedDate(day);
+    
+    // 해당 날짜의 예약 정보 가져오기
+    if (hasReservation(day)) {
+      const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+      const dayReservations = allReservations.filter(reservation => {
+        const reservationDate = reservation.reservationDate.toDate();
+        return (
+          checkDate.getDate() === reservationDate.getDate() &&
+          checkDate.getMonth() === reservationDate.getMonth() &&
+          checkDate.getFullYear() === reservationDate.getFullYear()
+        );
+      });
+      
+      setSelectedDateReservations(dayReservations);
+      setSelectedModalDate(checkDate);
+      setShowReservationModal(true);
+    }
   };
 
   const days = getDaysInMonth(currentDate);
@@ -286,6 +360,33 @@ const Home: React.FC = () => {
     };
   };
 
+  // 예약 날짜 포맷팅
+  const formatReservationDate = (timestamp: any) => {
+    if (!timestamp) return '';
+    const date = timestamp.toDate();
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${year}년 ${month}월 ${day}일`;
+  };
+
+  // 예약 시간 포맷팅
+  const formatReservationTime = (timestamp: any) => {
+    if (!timestamp) return '';
+    const date = timestamp.toDate();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
+  // 모달 날짜 포맷팅
+  const formatModalDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${year}년 ${month}월 ${day}일`;
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -322,7 +423,13 @@ const Home: React.FC = () => {
               <div className="banner-content">
                 <div className="banner-text">
                   <h2 className="banner-title">{userName}님!</h2>
-                  <p className="banner-subtitle">2025년 9월 19일에 서울 아산 병원<br />예약되었어요!</p>
+                  {latestReservation ? (
+                    <p className="banner-subtitle">
+                      <span className="banner-highlight">{formatReservationDate(latestReservation.reservationDate)}</span>에 <span className="banner-highlight">{latestReservation.hospitalName}</span>이 예약되었어요!
+                    </p>
+                  ) : (
+                    <p className="banner-subtitle">건강 관리를 시작해보세요!</p>
+                  )}
                 </div>
                 <div className="banner-icon">
                   <IonIcon icon={business} />
@@ -395,10 +502,11 @@ const Home: React.FC = () => {
                       <IonCol key={dayIndex} className="calendar-day">
                         {day && (
                           <div 
-                            className={`day-number ${isToday(day) ? 'today' : ''} ${selectedDate === day ? 'selected' : ''}`}
+                            className={`day-number ${isToday(day) ? 'today' : ''} ${selectedDate === day ? 'selected' : ''} ${hasReservation(day) ? 'has-reservation' : ''}`}
                             onClick={() => handleDateClick(day)}
                           >
                             {day}
+                            {hasReservation(day) && <div className="reservation-dot"></div>}
                           </div>
                         )}
                       </IonCol>
@@ -458,6 +566,68 @@ const Home: React.FC = () => {
                     hospitalAddress={getLastCallHospital().address}
                     onSave={handleSaveAppointment}
                   />
+                  
+                  {/* 예약 상세 바텀 시트 */}
+                  <IonModal 
+                    isOpen={showReservationModal} 
+                    onDidDismiss={() => setShowReservationModal(false)}
+                    breakpoints={[0, 0.6]}
+                    initialBreakpoint={0.6}
+                    handleBehavior="cycle"
+                  >
+                    <IonContent>
+                      <div className="reservation-modal-content">
+                        <div className="modal-header">
+                          <h2>{selectedModalDate ? formatModalDate(selectedModalDate) : '예약 정보'}</h2>
+                          <IonButton 
+                            fill="clear" 
+                            onClick={() => setShowReservationModal(false)}
+                            className="close-button"
+                          >
+                            <IonIcon icon={chevronBack} />
+                          </IonButton>
+                        </div>
+                        
+                        <div className="reservation-list">
+                          {selectedDateReservations.map((reservation, index) => (
+                            <IonCard key={index} className="reservation-card">
+                              <IonCardContent>
+                                <div className="reservation-header">
+                                  <h3 className="hospital-name">{reservation.hospitalName}</h3>
+                                  <div className="reservation-time">
+                                    <IonIcon icon={time} />
+                                    <span>{formatReservationTime(reservation.reservationDate)}</span>
+                                  </div>
+                                </div>
+                                
+                                <div className="reservation-details">
+                                  <IonItem lines="none" className="detail-item">
+                                    <IonIcon icon={call} slot="start" />
+                                    <IonLabel>
+                                      <p>{reservation.telNo}</p>
+                                    </IonLabel>
+                                  </IonItem>
+                                  
+                                  <IonItem lines="none" className="detail-item">
+                                    <IonIcon icon={location} slot="start" />
+                                    <IonLabel>
+                                      <p>{reservation.address}</p>
+                                    </IonLabel>
+                                  </IonItem>
+                                  
+                                  {reservation.memo && (
+                                    <div className="memo-section">
+                                      <p className="memo-text">{reservation.memo}</p>
+                                    </div>
+                                  )}
+                                </div>
+                              </IonCardContent>
+                            </IonCard>
+                          ))}
+                        </div>
+                      </div>
+                    </IonContent>
+                  </IonModal>
                 </IonPage>
               );
             };

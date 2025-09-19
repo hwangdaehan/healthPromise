@@ -75,38 +75,55 @@ ion-card {
 /* 검색 옵션 스타일 */
 .search-option-container {
   margin: 1.5rem 0;
-}
-
-.search-option-buttons {
-  display: flex;
-  gap: 0.5rem;
   background: #f8fafc;
   border-radius: 12px;
   padding: 4px;
 }
 
-.search-option-btn {
+.tab-buttons {
+  display: flex;
+  gap: 0;
+  background: #f8fafc;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tab-button {
   flex: 1;
   padding: 12px 16px;
   border: none;
-  border-radius: 8px;
   background: transparent;
   color: #6b7280;
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
+  border-radius: 8px;
 }
 
-.search-option-btn.active {
+.tab-button:hover {
+  color: #059669;
+  background: rgba(5, 150, 105, 0.05);
+}
+
+.tab-button.active {
   background: white;
   color: #059669;
   font-weight: 600;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.search-option-btn:hover {
-  color: #059669;
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background: #059669;
+  border-radius: 2px;
 }
 
 .no-data {
@@ -460,10 +477,10 @@ ion-datetime {
 
 .pagination-info {
   text-align: center;
-  font-size: 20px; /* 큰 글씨 */
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 1.5rem;
+  font-size: 14px;
+  font-weight: 500;
+  color: #9ca3af;
+  margin-bottom: 0.5rem;
 }
 
 .pagination-buttons {

@@ -18,8 +18,11 @@ import {
   IonHeader,
   IonToolbar,
   IonTitle,
+  IonButtons,
+  IonBackButton,
 } from '@ionic/react';
-import { person, save, checkmarkCircle } from 'ionicons/icons';
+import { useHistory } from 'react-router-dom';
+import { person, save, checkmarkCircle, arrowBack } from 'ionicons/icons';
 import { RegionService, RegionCode } from '../services/regionService';
 import './UserInfo.css';
 import { upsertUserProfile } from '../services/userService';
@@ -37,6 +40,7 @@ interface UserInfoProps {
 }
 
 const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
+  const history = useHistory();
   const [userInfo, setUserInfo] = useState<UserInfo>({
     name: '',
     birthDate: '',
@@ -135,6 +139,11 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
+          <IonButtons slot="start">
+            <IonButton fill="clear" onClick={() => history.push('/home')} className="user-info-back">
+              <IonIcon icon={arrowBack} />
+            </IonButton>
+          </IonButtons>
           <IonTitle>건강 약속</IonTitle>
         </IonToolbar>
       </IonHeader>

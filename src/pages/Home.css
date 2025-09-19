@@ -131,6 +131,7 @@ ion-header ion-title {
 
 .banner-text {
   flex: 1;
+  margin-right: 8px;
 }
 
 .banner-title {
@@ -164,6 +165,11 @@ ion-header ion-title {
   color: #10b981;
 }
 
+.banner-highlight {
+  color: #fbbf24;
+  font-weight: 600;
+}
+
 /* 메인 제목 섹션 */
 .main-title-section {
   margin-bottom: 20px;
@@ -195,6 +201,9 @@ ion-header ion-title {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  max-height: 360px; /* 너무 길어지지 않도록 제한 */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .favorite-hospital-card {
@@ -204,7 +213,7 @@ ion-header ion-title {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   cursor: pointer;
-  height: 80px;
+  min-height: 80px;
 }
 
 .favorite-hospital-card:hover {
@@ -214,7 +223,7 @@ ion-header ion-title {
 
 .favorite-hospital-card ion-card-content {
   padding: 20px 20px;
-  height: 80px;
+  min-height: 80px;
   display: flex;
   align-items: center;
   box-sizing: border-box;
@@ -226,8 +235,8 @@ ion-header ion-title {
   justify-content: space-between;
   width: 100%;
   height: 100%;
-  padding-top: 20px;
-  padding-bottom: 10px;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .hospital-info {
@@ -616,6 +625,150 @@ ion-header ion-title {
   background: linear-gradient(135deg, #059669 0%, #047857 100%);
   transform: scale(1.15);
   box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+/* 예약이 있는 날짜 스타일 */
+.day-number.has-reservation {
+  position: relative;
+}
+
+.reservation-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 6px;
+  height: 6px;
+  background: #fbbf24;
+  border-radius: 50%;
+  border: 1px solid #ffffff;
+}
+
+/* 예약 상세 바텀 시트 스타일 */
+.reservation-modal-content {
+  padding: 20px;
+  min-height: 100%;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.close-button {
+  --color: #64748b;
+  --background: transparent;
+  --border-radius: 8px;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+}
+
+.reservation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reservation-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.reservation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.reservation-header .hospital-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.reservation-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f1f5f9;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.reservation-time ion-icon {
+  font-size: 16px;
+  color: #2563eb;
+}
+
+.reservation-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reservation-details .detail-item {
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  --inner-padding-start: 0;
+  --min-height: auto;
+  margin-bottom: 8px;
+}
+
+.reservation-details .detail-item ion-icon {
+  color: #64748b;
+  font-size: 18px;
+  margin-right: 12px;
+}
+
+.reservation-details .detail-item p {
+  font-size: 18.2px; /* 14px * 1.3 */
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.memo-section {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border-left: 3px solid #2563eb;
+}
+
+.memo-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.memo-text {
+  font-size: 18.2px !important; /* 14px * 1.3 */
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.5;
 }
 
 /* 애니메이션 */

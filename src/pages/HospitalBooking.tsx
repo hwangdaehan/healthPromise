@@ -23,6 +23,7 @@ import { useHistory } from 'react-router-dom';
 import { App } from '@capacitor/app';
 import { HospitalService, HospitalInfo } from '../services/hospitalService';
 import { addFavoriteHospital, removeFavoriteHospital, isHospitalFavorite } from '../services/favoriteHospitalService';
+import { RegionService } from '../services/regionService';
 import AppointmentModal, { AppointmentData } from '../components/AppointmentModal';
 import './HospitalBooking.css';
 
@@ -250,8 +251,10 @@ interface UserInfo {
   name: string;
   birthDate: string;
   gender: string;
-  시도: string;
-  시군구: string;
+  시도?: string;
+  시군구?: string;
+  sido?: string;
+  sigungu?: string;
 }
 
 const HospitalBooking: React.FC = () => {
@@ -270,16 +273,55 @@ const HospitalBooking: React.FC = () => {
   
   // 사용자 정보 및 검색 옵션
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [searchByLocation, setSearchByLocation] = useState(true); // 거주지 기준 검색 여부 (기본값: true)
+  const [searchByLocation, setSearchByLocation] = useState(true); // 거주지 기준 검색 여부 (기본값: true - 내 지역 검색)
+  const [regionNames, setRegionNames] = useState<{sido: string, sigungu: string} | null>(null);
 
   // 사용자 정보 로드
   useEffect(() => {
-    const savedUserInfo = localStorage.getItem('userInfo');
-    if (savedUserInfo) {
-      const parsedUserInfo = JSON.parse(savedUserInfo);
-      setUserInfo(parsedUserInfo);
+    // userSession에서 사용자 정보 로드
+    const userSession = localStorage.getItem('userSession');
+    if (userSession) {
+      const sessionData = JSON.parse(userSession);
+      console.log('HospitalBooking - 로드된 사용자 세션:', sessionData);
+      setUserInfo(sessionData);
+      
+      // 지역명 가져오기
+      if (sessionData.sido && sessionData.sigungu) {
+        loadRegionNames(sessionData.sido, sessionData.sigungu);
+      }
+    } else {
+      // 기존 localStorage 방식도 지원 (하위 호환성)
+      const savedUserInfo = localStorage.getItem('userInfo');
+      if (savedUserInfo) {
+        const parsedUserInfo = JSON.parse(savedUserInfo);
+        console.log('HospitalBooking - 로드된 사용자 정보 (기존 방식):', parsedUserInfo);
+        setUserInfo(parsedUserInfo);
+        
+        // 지역명 가져오기
+        if (parsedUserInfo.시도 && parsedUserInfo.시군구) {
+          loadRegionNames(parsedUserInfo.시도, parsedUserInfo.시군구);
+        }
+      } else {
+        console.log('HospitalBooking - 사용자 정보가 없습니다.');
+      }
     }
   }, []);
+
+  // 지역명 로드 함수
+  const loadRegionNames = async (sidoCode: string, sigunguCode: string) => {
+    try {
+      const sidoList = await RegionService.get시도목록();
+      const sigunguList = await RegionService.get시군구By시도(parseInt(sidoCode));
+      
+      const sidoName = sidoList.find(sido => sido.코드.toString() === sidoCode)?.코드명 || sidoCode;
+      const sigunguName = sigunguList.find(sigungu => sigungu.코드.toString() === sigunguCode)?.코드명 || sigunguCode;
+      
+      setRegionNames({ sido: sidoName, sigungu: sigunguName });
+    } catch (error) {
+      console.error('지역명 로드 실패:', error);
+      setRegionNames({ sido: sidoCode, sigungu: sigunguCode });
+    }
+  };
 
   // 병원 검색 함수
   const searchHospitals = async (page: number) => {
@@ -302,13 +344,18 @@ const HospitalBooking: React.FC = () => {
       };
 
       // 거주지 기준 검색이 활성화되고 사용자 정보가 있는 경우
-      if (searchByLocation && userInfo && userInfo.시도 && userInfo.시군구) {
-        // 시도코드에 0000 붙이기
-        const sidoCd = userInfo.시도 + '0000';
-        const sgguCd = userInfo.시군구;
+      if (searchByLocation && userInfo) {
+        const sido = userInfo.시도 || userInfo.sido;
+        const sigungu = userInfo.시군구 || userInfo.sigungu;
         
-        searchParams.sidoCd = sidoCd;
-        searchParams.sgguCd = sgguCd;
+        if (sido && sigungu) {
+          // 시도코드에 0000 붙이기
+          const sidoCd = sido + '0000';
+          const sgguCd = sigungu;
+          
+          searchParams.sidoCd = sidoCd;
+          searchParams.sgguCd = sgguCd;
+        }
       }
 
       const result = await HospitalService.searchHospitals(searchParams);
@@ -372,7 +419,7 @@ const HospitalBooking: React.FC = () => {
         
         <IonCard>
           <IonCardHeader>
-            <IonCardTitle>병원 명으로 예약하려는 병원을 검색해주세요</IonCardTitle>
+            <IonCardTitle>예약 병원을 검색해주세요</IonCardTitle>
           </IonCardHeader>
           <IonCardContent>
             <IonItem>
@@ -385,24 +432,24 @@ const HospitalBooking: React.FC = () => {
             </IonItem>
 
             {/* 거주지 기준 검색 옵션 */}
-            {userInfo && userInfo.시도 && userInfo.시군구 && (
-              <div className="search-option-container">
-                <div className="search-option-buttons">
+            <div className="search-option-container">
+              <div className="tab-buttons">
+                <button 
+                  className={`tab-button ${!searchByLocation ? 'active' : ''}`}
+                  onClick={() => setSearchByLocation(false)}
+                >
+                  전체 보기
+                </button>
+                {userInfo && (userInfo.시도 || userInfo.sido) && (userInfo.시군구 || userInfo.sigungu) && (
                   <button 
-                    className={`search-option-btn ${!searchByLocation ? 'active' : ''}`}
-                    onClick={() => setSearchByLocation(false)}
-                  >
-                    전국 검색
-                  </button>
-                  <button 
-                    className={`search-option-btn ${searchByLocation ? 'active' : ''}`}
+                    className={`tab-button ${searchByLocation ? 'active' : ''}`}
                     onClick={() => setSearchByLocation(true)}
                   >
-                    내 지역 검색
+                    {regionNames ? `${regionNames.sigungu.replace(/동안구$/, '')} 보기` : '내 지역 보기'}
                   </button>
-                </div>
+                )}
               </div>
-            )}
+            </div>
 
             <div className="custom-search-button" onClick={() => {
               setCurrentPage(1);
@@ -436,10 +483,10 @@ const HospitalBooking: React.FC = () => {
                 {/* 페이지네이션 */}
                 {totalPages > 1 && (
                   <div className="pagination-container">
-                    <div className="pagination-info">
-                      {currentPage} / {totalPages} 페이지
-                    </div>
                     <div className="pagination-buttons">
+                      <div className="pagination-info">
+                        총 {totalPages} 페이지
+                      </div>
                       <button 
                         className="pagination-btn prev-btn"
                         onClick={goToPreviousPage}

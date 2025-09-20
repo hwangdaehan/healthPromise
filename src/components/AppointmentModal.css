@@ -1,0 +1,277 @@
+/* AppointmentModal 스타일 */
+
+.appointment-modal {
+  --width: 90%;
+  --max-width: 500px;
+  --height: 90%;
+  --border-radius: 16px;
+}
+
+.appointment-header {
+  --background: #1976d2;
+  --color: white;
+  --border-radius: 16px 16px 0 0;
+}
+
+.appointment-title {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.close-btn {
+  --color: white;
+  --background: transparent;
+  --border-radius: 8px;
+  --padding: 8px;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  --background: rgba(255, 255, 255, 0.1);
+}
+
+.appointment-content {
+  --background: #f8f9fa;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+}
+
+/* 병원 정보 카드 */
+.hospital-info-card {
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.hospital-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.hospital-icon {
+  font-size: 24px;
+  color: #1976d2;
+}
+
+.hospital-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.hospital-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hospital-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-icon {
+  font-size: 16px;
+  color: #666;
+  min-width: 16px;
+}
+
+.detail-text {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* 예약 폼 카드 */
+.appointment-form-card {
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-title {
+  font-size: 25.2px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 20px 0;
+}
+
+/* 날짜/시간 섹션 */
+.datetime-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.datetime-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.section-icon {
+  font-size: 18px;
+  color: #1976d2;
+}
+
+.section-label {
+  font-size: 16.8px;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+}
+
+.datetime-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16.8px;
+  background: white;
+  color: #333;
+  transition: all 0.2s ease;
+}
+
+.datetime-input:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+}
+
+/* 메모 섹션 */
+.notes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.notes-textarea {
+  --background: white;
+  --color: #333;
+  --border-radius: 8px;
+  --border: 1px solid #ddd;
+  --padding: 12px;
+  font-size: 16.8px;
+  line-height: 1.4;
+  min-height: 80px;
+}
+
+.notes-textarea:focus {
+  --border-color: #1976d2;
+}
+
+/* 액션 버튼들 */
+.appointment-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 0 20px 0;
+}
+
+.save-button {
+  --background: #1976d2;
+  --color: white;
+  --border-radius: 8px;
+  --padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  height: 48px;
+  transition: all 0.2s ease;
+}
+
+.save-button:hover:not([disabled]) {
+  --background: #1565c0;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+}
+
+.save-button[disabled] {
+  --background: #ccc;
+  --color: #999;
+  transform: none;
+  box-shadow: none;
+}
+
+.cancel-button {
+  --color: #666;
+  --border-color: #ddd;
+  --border-radius: 8px;
+  --padding: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  height: 48px;
+  transition: all 0.2s ease;
+}
+
+.cancel-button:hover {
+  --color: #333;
+  --border-color: #999;
+  --background: #f8f9fa;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 480px) {
+  .appointment-modal {
+    --width: 95%;
+    --height: 95%;
+  }
+  
+  .datetime-grid ion-col {
+    padding: 0 4px;
+  }
+  
+  .hospital-detail-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .detail-text {
+    font-size: 13px;
+  }
+}
+
+/* 다크 모드 지원 */
+@media (prefers-color-scheme: dark) {
+  .appointment-content {
+    --background: #1a1a1a;
+  }
+  
+  .hospital-info-card,
+  .appointment-form-card {
+    --background: #2d2d2d;
+    --color: white;
+  }
+  
+  .hospital-name,
+  .form-title {
+    color: white;
+  }
+  
+  .detail-text,
+  .section-label {
+    color: #ccc;
+  }
+  
+  .datetime-section {
+    background: #333;
+    border-color: #444;
+  }
+  
+  .notes-textarea {
+    --background: #333;
+    --color: white;
+    --border-color: #444;
+  }
+}

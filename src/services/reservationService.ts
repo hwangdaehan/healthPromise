@@ -34,7 +34,10 @@ export const addReservation = async (reservationData: Omit<Reservation, 'id' | '
     if (savedUserInfo) {
       try {
         const userInfo = JSON.parse(savedUserInfo);
-        userId = userInfo.uid;
+        userId = userInfo.uid || userInfo.name; // uid가 없으면 name을 사용
+        
+        console.log('사용자 정보:', userInfo);
+        console.log('사용자 ID:', userId);
       } catch (error) {
         console.log('localStorage 사용자 정보 파싱 실패:', error);
         throw new Error('User not authenticated');
@@ -42,8 +45,20 @@ export const addReservation = async (reservationData: Omit<Reservation, 'id' | '
     }
     
     if (!userId) {
-      throw new Error('User not authenticated');
+      console.error('사용자 ID가 없습니다. localStorage:', savedUserInfo);
+      throw new Error('User not authenticated - no user ID found');
     }
+
+    // userId로 user 컬렉션에서 사용자 존재 여부 확인
+    const userRef = doc(db, 'user', userId);
+    const userDoc = await getDoc(userRef);
+    
+    if (!userDoc.exists()) {
+      console.error('user 컬렉션에 사용자가 존재하지 않습니다:', userId);
+      throw new Error('User not found in database');
+    }
+    
+    console.log('user 컬렉션에서 사용자 확인됨:', userId);
 
     const now = new Date();
     const reservation = {

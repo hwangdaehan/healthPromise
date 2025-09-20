@@ -32,7 +32,6 @@ export const getFavoriteHospitals = async (userId?: string): Promise<FavoriteHos
       }
       
       if (!targetUserId) {
-        console.log('사용자 ID를 찾을 수 없음');
         return [];
       }
     }
@@ -84,7 +83,6 @@ export const addFavoriteHospital = async (hospitalData: Omit<FavoriteHospital, '
     }
     
     if (!userId) {
-      console.log('사용자 ID를 찾을 수 없음');
       return false;
     }
 
@@ -124,7 +122,6 @@ export const removeFavoriteHospital = async (hospitalId: string): Promise<boolea
     }
     
     if (!userId) {
-      console.log('사용자 ID를 찾을 수 없음');
       return false;
     }
 

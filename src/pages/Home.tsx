@@ -26,6 +26,8 @@ import { getFavoriteHospitals, removeFavoriteHospital, FavoriteHospital } from '
 import { addReservation, getReservations } from '../services/reservationService';
 import { getMedicineHistory, MedicineHistory } from '../services/medicineHistoryService';
 import { FirestoreService } from '../services/firestoreService';
+import { MessagingService } from '../services/messagingService';
+import { getUnreadAlarmCount, getAlarms, markAlarmAsRead } from '../services/alarmService';
 import HospitalDetailModal from '../components/HospitalDetailModal';
 import AppointmentModal, { AppointmentData } from '../components/AppointmentModal';
 import { App } from '@capacitor/app';
@@ -63,6 +65,10 @@ const Home: React.FC = () => {
   const [selectedDateReservations, setSelectedDateReservations] = useState<any[]>([]);
   const [selectedDateMedicineHistory, setSelectedDateMedicineHistory] = useState<any[]>([]);
   const [selectedModalDate, setSelectedModalDate] = useState<Date | null>(null);
+  
+  // 알림 리스트 상태
+  const [showAlarmList, setShowAlarmList] = useState(false);
+  const [alarmList, setAlarmList] = useState<any[]>([]);
   
   
   useEffect(() => {
@@ -109,6 +115,7 @@ const Home: React.FC = () => {
     loadFavoriteHospitals();
     loadReservations();
     loadMedicineHistory();
+    updateNotificationCount();
   });
 
   // 앱 상태 변화 감지 (전화걸기 후 복귀)
@@ -213,12 +220,8 @@ const Home: React.FC = () => {
       // 현재 월 예약 개수 로그
       console.log(`${currentDate.getFullYear()}년 ${currentDate.getMonth() + 1}월 예약한 병원목록:`, currentMonthReservations.length);
       
-      // 가장 최근 예약 데이터 설정
-      if (currentMonthReservations.length > 0) {
-        setLatestReservation(currentMonthReservations[0]);
-      } else {
-        setLatestReservation(null);
-      }
+      // 미래의 가장 가까운 예약 찾기
+      await loadUpcomingReservation();
     } catch (error) {
       console.error('예약한 병원 목록 로드 실패:', error);
     }
@@ -236,14 +239,41 @@ const Home: React.FC = () => {
       // 해당 월 예약 개수 로그
       console.log(`${year}년 ${month + 1}월 예약한 병원목록:`, monthReservations.length);
       
-      // 가장 최근 예약 데이터 설정
-      if (monthReservations.length > 0) {
-        setLatestReservation(monthReservations[0]);
+      // 미래의 가장 가까운 예약 찾기
+      await loadUpcomingReservation();
+    } catch (error) {
+      console.error('예약한 병원 목록 로드 실패:', error);
+    }
+  };
+
+  // 미래의 가장 가까운 예약 찾기
+  const loadUpcomingReservation = async () => {
+    try {
+      // 전체 예약 데이터 가져오기 (월별 제한 없이)
+      const allReservations = await getReservations();
+      
+      const now = new Date();
+      
+      // 미래 예약만 필터링
+      const upcomingReservations = allReservations.filter(reservation => {
+        const reservationDate = reservation.reservationDate;
+        return reservationDate > now;
+      });
+      
+      if (upcomingReservations.length > 0) {
+        // 날짜순으로 정렬하여 가장 가까운 예약 선택
+        upcomingReservations.sort((a, b) => {
+          const dateA = a.reservationDate;
+          const dateB = b.reservationDate;
+          return dateA.getTime() - dateB.getTime();
+        });
+        
+        setLatestReservation(upcomingReservations[0]);
       } else {
         setLatestReservation(null);
       }
     } catch (error) {
-      console.error('예약한 병원 목록 로드 실패:', error);
+      console.error('다가오는 예약 로드 실패:', error);
     }
   };
 
@@ -466,13 +496,142 @@ const Home: React.FC = () => {
   };
 
   // 알림 클릭 함수
-  const handleNotificationClick = () => {
+  const handleNotificationClick = async () => {
     // 권한 확인 후 알림 기능 실행
     if (hasUserPermission('read')) {
       console.log('알림 클릭됨 - 권한 있음');
-      // 알림 목록으로 이동하거나 알림 모달 열기
+      
+      try {
+        // 최근 알림 3개 가져오기
+        const alarms = await getAlarms();
+        const recentAlarms = alarms.slice(0, 3);
+        
+        if (recentAlarms.length > 0) {
+          // 알림 리스트 표시
+          setAlarmList(recentAlarms);
+          setShowAlarmList(true);
+          
+          // 읽지 않은 알림들을 읽음 처리
+          for (const alarm of recentAlarms) {
+            if (!alarm.isRead && alarm.id) {
+              await markAlarmAsRead(alarm.id);
+            }
+          }
+        } else {
+          setAlarmList([]);
+          setShowAlarmList(true);
+        }
+        
+        // 알림 개수 업데이트 (읽음 처리 후)
+        await updateNotificationCount();
+      } catch (error) {
+        console.error('알림 조회 실패:', error);
+        setAlarmList([]);
+        setShowAlarmList(true);
+      }
     } else {
       console.log('알림 접근 권한 없음');
+      setAlarmList([]);
+      setShowAlarmList(true);
+    }
+  };
+
+  // 푸시 알림 테스트 함수들
+  const handleTestPushNotification = () => {
+    MessagingService.showLocalNotification(
+      '테스트 알림',
+      '푸시 알림이 정상적으로 작동합니다!'
+    );
+  };
+
+  const handleShowFCMToken = () => {
+    const token = MessagingService.getStoredToken();
+    if (token) {
+      alert(`FCM 토큰:\n${token}`);
+      console.log('FCM 토큰:', token);
+    } else {
+      alert('FCM 토큰이 없습니다. 알림 권한을 허용해주세요.');
+    }
+  };
+
+  // FCM 푸시 발송 테스트
+  const handleSendFCMPush = async () => {
+    try {
+      const success = await MessagingService.sendPushNotification(
+        '테스트 푸시',
+        'FCM을 통한 푸시 알림 테스트입니다!'
+      );
+      
+      if (success) {
+        alert('FCM 푸시가 발송되었습니다!');
+      } else {
+        alert('FCM 푸시 발송에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('FCM 푸시 발송 실패:', error);
+      alert('FCM 푸시 발송에 실패했습니다.');
+    }
+  };
+
+  // 테스트 푸시 발송
+  const handleSendTestPush = async () => {
+    try {
+      const success = await MessagingService.sendTestPush(
+        '테스트 알림',
+        'Firebase Functions를 통한 테스트 푸시입니다!'
+      );
+      
+      if (success) {
+        alert('테스트 푸시가 발송되었습니다!');
+      } else {
+        alert('테스트 푸시 발송에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('테스트 푸시 발송 실패:', error);
+      alert('테스트 푸시 발송에 실패했습니다.');
+    }
+  };
+
+  const handleTestReservationNotification = async () => {
+    await MessagingService.checkAndSendReservationNotifications();
+    // 알림 개수 업데이트
+    await updateNotificationCount();
+    alert('예약 알림 체크를 실행했습니다. 콘솔을 확인해주세요.');
+  };
+
+  const handleAddTestAlarm = async () => {
+    try {
+      const { addAlarm } = await import('../services/alarmService');
+      const savedUserInfo = localStorage.getItem('userInfo');
+      if (savedUserInfo) {
+        const userInfo = JSON.parse(savedUserInfo);
+        const userId = userInfo.uid;
+        
+        await addAlarm({
+          content: '테스트 알림입니다!',
+          dataId: 'test-' + Date.now(),
+          isRead: false,
+          isSuccess: true,
+          title: '테스트 알림',
+          userId: userId
+        });
+        
+        await updateNotificationCount();
+        alert('테스트 알림이 추가되었습니다!');
+      }
+    } catch (error) {
+      console.error('테스트 알림 추가 실패:', error);
+      alert('테스트 알림 추가에 실패했습니다.');
+    }
+  };
+
+  // 알림 개수 업데이트
+  const updateNotificationCount = async () => {
+    try {
+      const count = await getUnreadAlarmCount();
+      setNotificationCount(count);
+    } catch (error) {
+      console.error('알림 개수 업데이트 실패:', error);
     }
   };
 
@@ -771,6 +930,94 @@ const Home: React.FC = () => {
             </IonCardContent>
           </IonCard>
 
+          {/* 푸시 알림 테스트 카드 */}
+          <IonCard className="service-card push-test-card">
+            <IonCardContent>
+              <div className="push-test-simple">
+                <h3 className="test-title">푸시 알림 테스트</h3>
+                <div className="test-buttons-row">
+                  <IonButton 
+                    fill="outline" 
+                    size="small" 
+                    onClick={handleTestPushNotification}
+                    className="test-button-small"
+                  >
+                    로컬 알림
+                  </IonButton>
+                  <IonButton 
+                    fill="outline" 
+                    size="small" 
+                    onClick={handleShowFCMToken}
+                    className="test-button-small"
+                  >
+                    토큰 보기
+                  </IonButton>
+                  <IonButton 
+                    fill="outline" 
+                    size="small" 
+                    onClick={handleTestReservationNotification}
+                    className="test-button-small"
+                  >
+                    예약 알림
+                  </IonButton>
+                </div>
+                <div className="test-buttons-row">
+                  <IonButton 
+                    fill="outline" 
+                    size="small" 
+                    onClick={handleAddTestAlarm}
+                    className="test-button-small"
+                  >
+                    테스트 추가
+                  </IonButton>
+                  <IonButton 
+                    fill="outline" 
+                    size="small" 
+                    onClick={handleSendFCMPush}
+                    className="test-button-small"
+                  >
+                    FCM 푸시
+                  </IonButton>
+                </div>
+                <div className="test-buttons-row">
+                  <IonButton 
+                    fill="outline" 
+                    size="small" 
+                    onClick={handleSendTestPush}
+                    className="test-button-small"
+                  >
+                    테스트 푸시
+                  </IonButton>
+                </div>
+              </div>
+            </IonCardContent>
+          </IonCard>
+
+          {/* 예약 등록 테스트 카드 */}
+          <IonCard className="service-card">
+            <IonCardContent>
+              <div className="service-card-content">
+                <div className="service-text">
+                  <h3 className="service-title">예약 등록 테스트</h3>
+                  <p className="service-subtitle">병원 예약 등록 기능을<br />테스트해보세요</p>
+                </div>
+                <div className="service-icon">
+                  <IonIcon icon={business} />
+                </div>
+              </div>
+              <div className="service-actions">
+                <IonButton 
+                  expand="block" 
+                  fill="outline"
+                  routerLink="/hospital"
+                  className="service-button"
+                >
+                  예약 등록 페이지 열기
+                </IonButton>
+              </div>
+            </IonCardContent>
+          </IonCard>
+
                     </div>
                   </IonContent>
                   
@@ -879,6 +1126,33 @@ const Home: React.FC = () => {
                       </div>
                     </IonContent>
                   </IonModal>
+
+                  {/* 알림 리스트 */}
+                  {showAlarmList && (
+                    <div className="alarm-list-container">
+                      <div className="alarm-list-header">
+                        <span>알림</span>
+                        <button 
+                          className="close-alarm-btn"
+                          onClick={() => setShowAlarmList(false)}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      <div className="alarm-list-content">
+                        {alarmList.length > 0 ? (
+                          alarmList.map((alarm, index) => (
+                            <div key={index} className="alarm-item">
+                              <div className="alarm-title">[{alarm.title}]</div>
+                              <div className="alarm-content">{alarm.content}</div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="no-alarm">알림이 없습니다.</div>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                 </IonPage>
               );

@@ -12,6 +12,7 @@ export interface UserProfile {
   sigungu?: string;
   address?: string;
   phoneNumber?: string;
+  pushToken?: string;
   emergencyContact?: {
     name: string;
     phone: string;
@@ -133,7 +134,6 @@ export const upsertUserProfile = async (profile: Partial<UserProfile>): Promise<
     }
     
     if (!userId) {
-      console.log('사용자 ID를 찾을 수 없음');
       return null;
     }
 
@@ -203,12 +203,13 @@ export const findUserByNameAndBirthDate = async (name: string, birthDate: string
         let userBirthDateString = '';
         if (userBirthDate) {
           if (userBirthDate.toDate) {
-            // Firebase Timestamp인 경우
-            userBirthDateString = userBirthDate.toDate().toISOString().split('T')[0];
+            // Firebase Timestamp인 경우 - 로컬 날짜로 변환
+            const date = userBirthDate.toDate();
+            userBirthDateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
             console.log('Firebase Timestamp 변환:', userBirthDateString);
           } else if (userBirthDate instanceof Date) {
-            // Date 객체인 경우
-            userBirthDateString = userBirthDate.toISOString().split('T')[0];
+            // Date 객체인 경우 - 로컬 날짜로 변환
+            userBirthDateString = `${userBirthDate.getFullYear()}-${String(userBirthDate.getMonth() + 1).padStart(2, '0')}-${String(userBirthDate.getDate()).padStart(2, '0')}`;
             console.log('Date 객체 변환:', userBirthDateString);
           } else {
             // 문자열인 경우

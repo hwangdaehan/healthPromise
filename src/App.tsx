@@ -1,6 +1,7 @@
 import { Redirect, Route, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getCurrentUserSession } from './services/userService';
+import { MessagingService } from './services/messagingService';
 import {
   IonApp,
   IonRouterOutlet,
@@ -78,6 +79,35 @@ const AppContent: React.FC = () => {
     };
     
     setupStatusBar();
+
+    // 푸시 알림 초기화
+    const initializePushNotifications = async () => {
+      try {
+        // FCM 토큰 초기화 및 저장 (사용자별 토큰 관리)
+        const token = await MessagingService.initializeAndSaveToken();
+        if (token) {
+          console.log('FCM 토큰 초기화 완료:', token);
+          
+          // 포그라운드 메시지 리스너 설정
+          const unsubscribe = MessagingService.onMessage((payload) => {
+            console.log('포그라운드 메시지 수신:', payload);
+            // 여기서 알림 표시 로직 추가 가능
+          });
+          
+          // 컴포넌트 언마운트 시 리스너 정리
+          return unsubscribe;
+        } else {
+          console.log('FCM 토큰 초기화 실패');
+        }
+      } catch (error) {
+        console.error('푸시 알림 초기화 실패:', error);
+      }
+    };
+    
+    initializePushNotifications();
+
+    // 매일 예약 알림 체크 시작
+    MessagingService.startDailyNotificationCheck();
 
     // 사용자 정보 확인
     checkUserAuthentication();
@@ -158,7 +188,7 @@ const AppContent: React.FC = () => {
     setIsAuthenticated(true);
   };
 
-  const handleLoginSuccess = (userData: { 
+  const handleLoginSuccess = async (userData: { 
     name: string; 
     birthDate: string; 
     gender?: string; 
@@ -176,6 +206,14 @@ const AppContent: React.FC = () => {
     setIsAuthenticated(true);
     setShowLogin(false);
     setShowUserInfo(false);
+    
+    // 로그인 성공 후 FCM 토큰 초기화 및 저장
+    try {
+      await MessagingService.initializeAndSaveToken();
+      console.log('로그인 후 FCM 토큰 초기화 완료');
+    } catch (error) {
+      console.error('로그인 후 FCM 토큰 초기화 실패:', error);
+    }
     
     // 사용자 정보 다시 확인 (localStorage에서 최신 데이터 가져오기)
     setTimeout(() => {

@@ -24,6 +24,7 @@ import { App } from '@capacitor/app';
 import { HospitalService, HospitalInfo } from '../services/hospitalService';
 import { addFavoriteHospital, removeFavoriteHospital, isHospitalFavorite } from '../services/favoriteHospitalService';
 import { RegionService } from '../services/regionService';
+import { addReservation } from '../services/reservationService';
 import AppointmentModal, { AppointmentData } from '../components/AppointmentModal';
 import './HospitalBooking.css';
 
@@ -49,65 +50,42 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
     checkFavoriteStatus();
   }, [hospital.ykiho]);
 
-  // 앱 상태 변화 감지 (전화걸기 후 복귀)
+  // 앱 상태 변경 감지 (전화 후 앱으로 돌아왔을 때)
   useEffect(() => {
-    const handleAppStateChange = () => {
-      // 전화걸기 후 앱으로 돌아왔을 때 예약 모달 표시
+    const handleAppStateChange = async () => {
       const lastCallTime = localStorage.getItem('lastCallTime');
+      const lastCallHospital = localStorage.getItem('lastCallHospital');
       
-      if (lastCallTime) {
-        setShowAppointmentModal(true);
-        localStorage.removeItem('lastCallTime');
-      }
-    };
-
-    // Capacitor App Plugin으로 앱 상태 변화 감지
-    const setupAppStateListener = async () => {
-      try {
-        // 앱 상태 변화 리스너 등록
-        const listener = await App.addListener('appStateChange', ({ isActive }) => {
-          console.log('앱 상태 변화:', isActive ? '활성화' : '비활성화');
-          
-          if (isActive) {
-            // 앱이 다시 활성화됨 (통화 종료 후 복귀)
-            setTimeout(() => {
-              handleAppStateChange();
-            }, 500); // 약간의 지연을 두어 안정성 확보
-          }
-        });
-
-        // 컴포넌트 마운트 시에도 체크
-        handleAppStateChange();
-
-        // 정리 함수에서 리스너 제거
-        return () => {
-          listener.remove();
-        };
-      } catch (error) {
-        console.error('앱 상태 리스너 설정 실패:', error);
+      if (lastCallTime && lastCallHospital) {
+        const callTime = parseInt(lastCallTime);
+        const now = Date.now();
+        const timeDiff = now - callTime;
         
-        // 폴백: 기존 window focus 이벤트 사용
-        const handleFocus = () => {
-          handleAppStateChange();
-        };
-
-        window.addEventListener('focus', handleFocus);
-        handleAppStateChange();
-
-        return () => {
-          window.removeEventListener('focus', handleFocus);
-        };
+        // 전화 걸기 후 5초 이내에 앱으로 돌아왔다면 예약 모달 열기
+        if (timeDiff > 2000 && timeDiff < 10000) {
+          const hospitalData = JSON.parse(lastCallHospital);
+          if (hospitalData.name === hospital.yadmNm) {
+            setShowAppointmentModal(true);
+            // 중복 실행 방지를 위해 저장된 데이터 삭제
+            localStorage.removeItem('lastCallTime');
+            localStorage.removeItem('lastCallHospital');
+          }
+        }
       }
     };
 
-    const cleanup = setupAppStateListener();
+    // 앱이 포커스를 받을 때마다 체크
+    const handleFocus = () => {
+      setTimeout(handleAppStateChange, 500);
+    };
 
+    window.addEventListener('focus', handleFocus);
+    
     return () => {
-      if (cleanup) {
-        cleanup.then(cleanupFn => cleanupFn && cleanupFn());
-      }
+      window.removeEventListener('focus', handleFocus);
     };
-  }, []);
+  }, [hospital.yadmNm]);
+
 
   const handleCardClick = () => {
     setIsSelected(!isSelected);
@@ -169,10 +147,63 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
   };
 
   // 예약 저장 핸들러
-  const handleSaveAppointment = (appointmentData: AppointmentData) => {
-    console.log('예약 정보 저장:', appointmentData);
-    // TODO: Firebase에 예약 정보 저장
-    alert('예약이 등록되었습니다!');
+  const handleSaveAppointment = async (appointmentData: AppointmentData) => {
+    try {
+      console.log('예약 정보 저장 시작:', appointmentData);
+      console.log('병원 정보:', hospital);
+      
+      // 날짜와 시간을 합쳐서 Date 객체 생성
+      console.log('원본 날짜:', appointmentData.appointmentDate);
+      console.log('원본 시간:', appointmentData.appointmentTime);
+      
+      // IonDatetime에서 받은 ISO 문자열을 파싱
+      const dateStr = appointmentData.appointmentDate.split('T')[0]; // YYYY-MM-DD 부분만 추출
+      const timeStr = appointmentData.appointmentTime.split('T')[1]; // HH:MM:SS 부분만 추출
+      
+      console.log('파싱된 날짜:', dateStr);
+      console.log('파싱된 시간:', timeStr);
+      
+      const appointmentDateTime = new Date(`${dateStr}T${timeStr}`);
+      console.log('생성된 Date 객체:', appointmentDateTime);
+      console.log('Date 유효성:', !isNaN(appointmentDateTime.getTime()));
+      
+      // Date 객체 유효성 검사
+      if (isNaN(appointmentDateTime.getTime())) {
+        throw new Error('잘못된 날짜 형식입니다. 날짜와 시간을 다시 선택해주세요.');
+      }
+      
+      // 예약 데이터 생성
+      const reservationData = {
+        hospitalName: hospital.yadmNm || '',
+        address: hospital.addr || '',
+        telNo: hospital.telno || '',
+        memo: appointmentData.notes || '',
+        reservationDate: appointmentDateTime
+      };
+      
+      console.log('예약 데이터:', reservationData);
+      
+      // localStorage에서 사용자 정보 확인
+      const savedUserInfo = localStorage.getItem('userInfo');
+      console.log('사용자 정보:', savedUserInfo);
+      
+      if (!savedUserInfo) {
+        throw new Error('사용자 정보가 없습니다. 로그인을 다시 해주세요.');
+      }
+      
+      // Firebase에 예약 저장
+      const reservationId = await addReservation(reservationData);
+      console.log('예약 저장 성공, ID:', reservationId);
+      
+      alert('예약이 등록되었습니다!');
+      setShowAppointmentModal(false);
+    } catch (error) {
+      console.error('예약 등록 실패 상세:', error);
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+      console.error('오류 메시지:', errorMessage);
+      console.error('오류 스택:', error instanceof Error ? error.stack : '스택 정보 없음');
+      alert(`예약 등록에 실패했습니다: ${errorMessage}`);
+    }
   };
 
   // 예약 모달 닫기 핸들러

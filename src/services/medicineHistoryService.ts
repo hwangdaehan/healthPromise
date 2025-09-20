@@ -28,7 +28,6 @@ export const getMedicineHistory = async (userId?: string, year?: number, month?:
       }
       
       if (!targetUserId) {
-        console.log('사용자 ID를 찾을 수 없음');
         return [];
       }
     }
@@ -96,7 +95,6 @@ export const addMedicineHistory = async (historyData: Omit<MedicineHistory, 'id'
     }
     
     if (!userId) {
-      console.log('사용자 ID를 찾을 수 없음');
       return false;
     }
 
@@ -135,7 +133,6 @@ export const removeMedicineHistory = async (historyId: string): Promise<boolean>
     }
     
     if (!userId) {
-      console.log('사용자 ID를 찾을 수 없음');
       return false;
     }
 

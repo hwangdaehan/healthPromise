@@ -72,6 +72,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
           email: userProfile.email || '',
           phoneNumber: userProfile.phoneNumber || '',
           address: userProfile.address || '',
+          pushToken: userProfile.pushToken || '',
           emergencyContact: userProfile.emergencyContact || null,
           medicalInfo: userProfile.medicalInfo || null,
           loginTime: new Date().toISOString()
@@ -89,6 +90,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
           email: '',
           phoneNumber: '',
           address: '',
+          pushToken: '',
           emergencyContact: null,
           medicalInfo: null,
           loginTime: new Date().toISOString()

@@ -36,16 +36,12 @@ export const addReservation = async (reservationData: Omit<Reservation, 'id' | '
         const userInfo = JSON.parse(savedUserInfo);
         userId = userInfo.uid || userInfo.name; // uid가 없으면 name을 사용
         
-        console.log('사용자 정보:', userInfo);
-        console.log('사용자 ID:', userId);
       } catch (error) {
-        console.log('localStorage 사용자 정보 파싱 실패:', error);
         throw new Error('User not authenticated');
       }
     }
     
     if (!userId) {
-      console.error('사용자 ID가 없습니다. localStorage:', savedUserInfo);
       throw new Error('User not authenticated - no user ID found');
     }
 
@@ -54,11 +50,9 @@ export const addReservation = async (reservationData: Omit<Reservation, 'id' | '
     const userDoc = await getDoc(userRef);
     
     if (!userDoc.exists()) {
-      console.error('user 컬렉션에 사용자가 존재하지 않습니다:', userId);
       throw new Error('User not found in database');
     }
     
-    console.log('user 컬렉션에서 사용자 확인됨:', userId);
 
     const now = new Date();
     const reservation = {
@@ -71,19 +65,16 @@ export const addReservation = async (reservationData: Omit<Reservation, 'id' | '
       userId: userId
     };
 
-    console.log('예약 추가:', reservation);
 
     const docRef = await addDoc(collection(db, 'reservation'), reservation);
     return docRef.id;
   } catch (error) {
-    console.error('Error adding reservation:', error);
     throw error;
   }
 };
 
 export const getReservations = async (year?: number, month?: number): Promise<Reservation[]> => {
   try {
-    console.log('getReservations 호출됨:', { year, month });
     
     // localStorage에서 사용자 정보 가져오기
     const savedUserInfo = localStorage.getItem('userInfo');
@@ -93,15 +84,12 @@ export const getReservations = async (year?: number, month?: number): Promise<Re
       try {
         const userInfo = JSON.parse(savedUserInfo);
         userId = userInfo.uid;
-        console.log('getReservations - userId:', userId);
       } catch (error) {
-        console.log('getReservations - userInfo 파싱 실패:', error);
         return [];
       }
     }
     
     if (!userId) {
-      console.log('getReservations - userId가 없음');
       return [];
     }
 
@@ -129,9 +117,7 @@ export const getReservations = async (year?: number, month?: number): Promise<Re
       );
     }
     
-    console.log('getReservations - 쿼리 실행 중...');
     const querySnapshot = await getDocs(q);
-    console.log('getReservations - 쿼리 결과 개수:', querySnapshot.size);
     
     const reservations = querySnapshot.docs.map(doc => {
       const data = doc.data();
@@ -148,10 +134,8 @@ export const getReservations = async (year?: number, month?: number): Promise<Re
       } as Reservation;
     });
     
-    console.log('getReservations - 최종 결과:', reservations);
     return reservations;
   } catch (error) {
-    console.error('Error getting reservations:', error);
     return [];
   }
 };
@@ -167,7 +151,6 @@ export const updateReservationStatus = async (reservationId: string, status: Res
         const userInfo = JSON.parse(savedUserInfo);
         userId = userInfo.uid;
       } catch (error) {
-        console.log('localStorage 사용자 정보 파싱 실패:', error);
         return false;
       }
     }
@@ -184,7 +167,6 @@ export const updateReservationStatus = async (reservationId: string, status: Res
     
     return true;
   } catch (error) {
-    console.error('Error updating reservation status:', error);
     return false;
   }
 };

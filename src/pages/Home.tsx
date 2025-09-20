@@ -27,6 +27,7 @@ import { addReservation, getReservations } from '../services/reservationService'
 import { getMedicineHistory, MedicineHistory } from '../services/medicineHistoryService';
 import { FirestoreService } from '../services/firestoreService';
 import { MessagingService } from '../services/messagingService';
+import { getMessaging, getToken } from 'firebase/messaging';
 import { getUnreadAlarmCount, getAlarms, markAlarmAsRead } from '../services/alarmService';
 import HospitalDetailModal from '../components/HospitalDetailModal';
 import AppointmentModal, { AppointmentData } from '../components/AppointmentModal';
@@ -502,17 +503,17 @@ const Home: React.FC = () => {
       console.log('알림 클릭됨 - 권한 있음');
       
       try {
-        // 최근 알림 3개 가져오기
+        // 모든 알림 가져오기
         const alarms = await getAlarms();
-        const recentAlarms = alarms.slice(0, 3);
         
-        if (recentAlarms.length > 0) {
-          // 알림 리스트 표시
+        if (alarms.length > 0) {
+          // 최근 3개만 표시
+          const recentAlarms = alarms.slice(0, 3);
           setAlarmList(recentAlarms);
           setShowAlarmList(true);
           
-          // 읽지 않은 알림들을 읽음 처리
-          for (const alarm of recentAlarms) {
+          // 모든 읽지 않은 알림들을 읽음 처리
+          for (const alarm of alarms) {
             if (!alarm.isRead && alarm.id) {
               await markAlarmAsRead(alarm.id);
             }
@@ -525,12 +526,10 @@ const Home: React.FC = () => {
         // 알림 개수 업데이트 (읽음 처리 후)
         await updateNotificationCount();
       } catch (error) {
-        console.error('알림 조회 실패:', error);
         setAlarmList([]);
         setShowAlarmList(true);
       }
     } else {
-      console.log('알림 접근 권한 없음');
       setAlarmList([]);
       setShowAlarmList(true);
     }
@@ -544,6 +543,23 @@ const Home: React.FC = () => {
     alert('예약 알림 체크를 실행했습니다. 콘솔을 확인해주세요.');
   };
 
+  const handleShowFCMToken = async () => {
+    try {
+      const messaging = getMessaging();
+      const currentToken = await getToken(messaging, {
+        vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
+      });
+
+      if (currentToken) {
+        alert(`FCM 토큰: ${currentToken.substring(0, 50)}...`);
+      } else {
+        alert('FCM 토큰을 가져올 수 없습니다.');
+      }
+    } catch (error) {
+      alert('FCM 토큰 가져오기 실패');
+    }
+  };
+
 
   // 알림 개수 업데이트
   const updateNotificationCount = async () => {
@@ -551,7 +567,6 @@ const Home: React.FC = () => {
       const count = await getUnreadAlarmCount();
       setNotificationCount(count);
     } catch (error) {
-      console.error('알림 개수 업데이트 실패:', error);
     }
   };
 
@@ -743,7 +758,6 @@ const Home: React.FC = () => {
                               <IonCard 
                                 key={hospital.id} 
                                 className="favorite-hospital-card"
-                                onClick={() => handleFavoriteHospitalClick(hospital)}
                               >
                                 <IonCardContent>
                                   <div className="favorite-hospital-content">
@@ -751,7 +765,7 @@ const Home: React.FC = () => {
                                       <h3 className="favorite-hospital-name">{hospital.name}</h3>
                                       <p className="hospital-address">{hospital.address.replace(/^[가-힣]+도\s+/, '')}</p>
                                     </div>
-                                    <div className="hospital-arrow">
+                                    <div className="hospital-arrow" onClick={() => handleFavoriteHospitalClick(hospital)}>
                                       <IonIcon icon={chevronForward} />
                                     </div>
                                   </div>
@@ -863,13 +877,21 @@ const Home: React.FC = () => {
                 </div>
               </div>
               <div className="service-actions">
-                <IonButton 
+                <IonButton
                   expand="block" 
                   fill="outline"
                   onClick={handleTestReservationNotification}
                   className="service-button"
                 >
                   예약 알림 발송
+                </IonButton>
+                <IonButton
+                  expand="block" 
+                  fill="outline"
+                  onClick={handleShowFCMToken}
+                  className="service-button"
+                >
+                  FCM 토큰 확인
                 </IonButton>
               </div>
             </IonCardContent>

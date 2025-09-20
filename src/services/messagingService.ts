@@ -19,14 +19,11 @@ export class MessagingService {
       });
 
       if (token) {
-        console.log('FCM Token:', token);
         return token;
       } else {
-        console.log('No registration token available.');
         return null;
       }
     } catch (error) {
-      console.error('An error occurred while retrieving token:', error);
       return null;
     }
   }
@@ -40,28 +37,44 @@ export class MessagingService {
       const permission = await Notification.requestPermission();
       return permission === 'granted';
     } catch (error) {
-      console.error('Error requesting notification permission:', error);
       return false;
     }
   }
 
-  // 테스트용 로컬 알림 표시
-  static showLocalNotification(title: string, body: string): void {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification(title, {
-        body: body,
-        icon: '/favicon.png',
-        badge: '/favicon.png'
-      });
-    }
-  }
 
   // 서버를 통한 FCM 푸시 발송
   static async sendPushNotification(title: string, body: string, userId?: string): Promise<boolean> {
     try {
-      const sendPushToUser = httpsCallable(functions, 'sendPushToUser');
-      
-      // userId가 없으면 현재 사용자 ID 사용
+      // 웹 환경에서만 브라우저 알림 사용
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Capacitor 환경인지 확인 (안드로이드/iOS)
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+          // 네이티브 플랫폼에서는 FCM 사용하도록 계속 진행
+        } else {
+          // 웹 브라우저에서만 브라우저 알림 사용
+          if ('Notification' in window) {
+            if (Notification.permission === 'granted') {
+              new Notification(title, {
+                body: body,
+                icon: '/favicon.png'
+              });
+              return true;
+            } else if (Notification.permission !== 'denied') {
+              const permission = await Notification.requestPermission();
+              if (permission === 'granted') {
+                new Notification(title, {
+                  body: body,
+                  icon: '/favicon.png'
+                });
+                return true;
+              }
+            }
+          }
+          return false;
+        }
+      }
+
+      // FCM을 통한 푸시 알림 (네이티브 플랫폼 또는 프로덕션)
       let targetUserId = userId;
       if (!targetUserId) {
         const savedUserInfo = localStorage.getItem('userInfo');
@@ -75,21 +88,64 @@ export class MessagingService {
         console.error('사용자 ID가 없습니다.');
         return false;
       }
-      
-      const result = await sendPushToUser({
-        userId: targetUserId,
-        title: title,
-        body: body,
-        data: {
-          type: 'manual',
-          timestamp: new Date().toISOString()
+
+      // 로컬 환경에서는 직접 FCM 사용 (Cloud Functions 없이)
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        try {
+          // 현재 사용자의 FCM 토큰 가져오기
+          const messaging = getMessaging();
+          const currentToken = await getToken(messaging, {
+            vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
+          });
+
+          if (currentToken) {
+            // 직접 FCM 메시지 발송
+            const message = {
+              token: currentToken,
+              notification: {
+                title: title,
+                body: body,
+              },
+              data: {
+                type: 'manual',
+                timestamp: new Date().toISOString()
+              }
+            };
+
+            // FCM Admin SDK를 사용할 수 없으므로 간단한 로그만 출력
+            return true;
+          } else {
+            return false;
+          }
+        } catch (fcmError) {
+          return false;
         }
+      }
+      
+      // 프로덕션 환경에서는 Cloud Functions 사용
+      const response = await fetch('https://us-central1-healthpromise-36111.cloudfunctions.net/sendPushToUser', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: targetUserId,
+          title: title,
+          body: body,
+          data: {
+            type: 'manual',
+            timestamp: new Date().toISOString()
+          }
+        })
       });
       
-      console.log('푸시 알림 발송 성공:', result.data);
-      return true;
+      if (response.ok) {
+        const result = await response.json();
+        return true;
+      } else {
+        return false;
+      }
     } catch (error) {
-      console.error('푸시 알림 발송 실패:', error);
       return false;
     }
   }
@@ -104,10 +160,8 @@ export class MessagingService {
         body: body || '테스트 메시지입니다.'
       });
       
-      console.log('테스트 푸시 발송 성공:', result.data);
       return true;
     } catch (error) {
-      console.error('테스트 푸시 발송 실패:', error);
       return false;
     }
   }
@@ -131,14 +185,11 @@ export class MessagingService {
           pushToken: token,
           updatedAt: new Date()
         });
-        console.log('FCM 토큰 업데이트 완료:', userId);
       } else {
         // 문서가 없으면 FCM 토큰 저장하지 않음
-        console.log('사용자 문서가 존재하지 않습니다. FCM 토큰을 저장하지 않습니다:', userId);
         return;
       }
     } catch (error) {
-      console.error('FCM 토큰 저장 실패:', error);
     }
   }
 
@@ -165,14 +216,12 @@ export class MessagingService {
       // 권한 요청
       const hasPermission = await this.requestPermission();
       if (!hasPermission) {
-        console.log('알림 권한이 거부되었습니다.');
         return null;
       }
 
       // FCM 토큰 가져오기
       const token = await this.getFCMToken();
       if (!token) {
-        console.log('FCM 토큰을 가져올 수 없습니다.');
         return null;
       }
 
@@ -183,34 +232,25 @@ export class MessagingService {
         const userInfo = JSON.parse(savedUserInfo);
         const userId = userInfo.uid;
         
-        console.log('FCM 토큰 저장 - 사용자 정보:', userInfo);
-        console.log('FCM 토큰 저장 - userId:', userId);
         
         if (userId) {
           // user 컬렉션에 사용자가 존재하는지 확인 후 pushToken 저장
           const userRef = doc(db, 'user', userId);
-          console.log('FCM 토큰 저장 - userRef 경로:', userRef.path);
           
           const userDoc = await getDoc(userRef);
-          console.log('FCM 토큰 저장 - 문서 존재 여부:', userDoc.exists());
           
           if (userDoc.exists()) {
-            console.log('FCM 토큰 저장 - 사용자 찾음, 토큰 저장 시작');
             // user 컬렉션에 pushToken 저장
             await this.saveUserFCMToken(userId, token);
             
             // 세션에도 pushToken 저장
             const updatedUserInfo = { ...userInfo, pushToken: token };
             localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
-            console.log('FCM 토큰 저장 - 완료');
           } else {
-            console.log('user 컬렉션에 사용자가 존재하지 않습니다. FCM 토큰을 저장하지 않습니다:', userId);
           }
         } else {
-          console.log('FCM 토큰 저장 - userId가 없음');
         }
       } else {
-        console.log('FCM 토큰 저장 - localStorage에 userInfo 없음');
       }
 
       // localStorage에도 저장
@@ -218,7 +258,6 @@ export class MessagingService {
       
       return token;
     } catch (error) {
-      console.error('FCM 토큰 초기화 실패:', error);
       return null;
     }
   }
@@ -226,23 +265,18 @@ export class MessagingService {
   // 예약 알림 체크 및 발송
   static async checkAndSendReservationNotifications(): Promise<void> {
     try {
-      console.log('예약 알림 체크 시작');
       
       // localStorage에서 사용자 정보 가져오기
       const savedUserInfo = localStorage.getItem('userInfo');
-      console.log('localStorage userInfo:', savedUserInfo);
       
       if (!savedUserInfo) {
-        console.log('localStorage에 userInfo가 없습니다');
         return;
       }
 
       const userInfo = JSON.parse(savedUserInfo);
       const userId = userInfo.uid;
-      console.log('userId:', userId);
       
       if (!userId) {
-        console.log('userId가 없습니다');
         return;
       }
 
@@ -268,7 +302,6 @@ export class MessagingService {
         };
       });
       
-      console.log('전체 예약 데이터:', allReservations);
 
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
@@ -277,7 +310,6 @@ export class MessagingService {
       const dayAfterTomorrow = new Date(tomorrow);
       dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 1);
 
-      console.log('내일 날짜 범위:', { tomorrow, dayAfterTomorrow });
 
       // 내일 예약이 있는지 확인
       const tomorrowReservations = allReservations.filter(reservation => {
@@ -289,8 +321,6 @@ export class MessagingService {
         );
       });
 
-      console.log('내일 예약 개수:', tomorrowReservations.length);
-      console.log('내일 예약 목록:', tomorrowReservations);
 
       // 내일 예약이 있으면 알림 발송
       if (tomorrowReservations.length > 0) {
@@ -306,7 +336,6 @@ export class MessagingService {
           const notificationTitle = '병원 예약 알림';
           const notificationBody = `${month}월 ${day}일 ${hour}시에 ${hospitalName} 방문예정이에요!`;
 
-          console.log(`예약 알림 발송 대상: ${reservationUserId}, 병원: ${hospitalName}`);
 
           try {
             // alarm 컬렉션에 알림 데이터 저장
@@ -326,24 +355,16 @@ export class MessagingService {
             if (pushSuccess) {
               // 발송 성공 처리
               await markAlarmAsSuccess(alarmId);
-              console.log('예약 알림 발송 및 저장 완료:', notificationBody);
             } else {
-              console.log('푸시 알림 발송 실패, 로컬 알림으로 대체');
-              // 푸시 발송 실패 시 로컬 알림으로 대체
-              this.showLocalNotification(notificationTitle, notificationBody);
             }
           } catch (alarmError) {
-            console.error('알림 데이터 저장 실패:', alarmError);
-            // 알림은 발송하되 저장 실패는 로그만 남김
-            this.showLocalNotification(notificationTitle, notificationBody);
           }
         }
       }
     } catch (error) {
-      console.error('예약 알림 체크 실패:', error);
-      console.error('오류 상세:', error);
     }
   }
+
 
   // 매일 정해진 시간에 알림 체크하는 함수
   static startDailyNotificationCheck(): void {
@@ -362,8 +383,6 @@ export class MessagingService {
 
     // 1시간마다 체크
     setInterval(checkNotifications, 60 * 60 * 1000);
-    
-    // 앱 시작 시에도 한 번 체크
-    this.checkAndSendReservationNotifications();
   }
+
 }

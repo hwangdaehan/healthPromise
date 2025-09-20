@@ -22,10 +22,8 @@ export const addAlarm = async (alarmData: Omit<Alarm, 'id' | 'regDate'>): Promis
     };
     
     const docRef = await addDoc(alarmRef, newAlarm);
-    console.log('알림 데이터 추가 완료:', docRef.id);
     return docRef.id;
   } catch (error) {
-    console.error('알림 데이터 추가 실패:', error);
     throw error;
   }
 };
@@ -43,7 +41,6 @@ export const getAlarms = async (userId?: string): Promise<Alarm[]> => {
           const userInfo = JSON.parse(savedUserInfo);
           targetUserId = userInfo.uid;
         } catch (error) {
-          console.log('localStorage 사용자 정보 파싱 실패:', error);
           return [];
         }
       }
@@ -77,7 +74,6 @@ export const getAlarms = async (userId?: string): Promise<Alarm[]> => {
     
     return alarms;
   } catch (error) {
-    console.error('알림 목록 조회 실패:', error);
     return [];
   }
 };
@@ -90,10 +86,8 @@ export const markAlarmAsRead = async (alarmId: string): Promise<boolean> => {
       isRead: true
     });
     
-    console.log('알림 읽음 처리 완료:', alarmId);
     return true;
   } catch (error) {
-    console.error('알림 읽음 처리 실패:', error);
     return false;
   }
 };
@@ -106,10 +100,8 @@ export const markAlarmAsSuccess = async (alarmId: string): Promise<boolean> => {
       isSuccess: true
     });
     
-    console.log('알림 발송 성공 처리 완료:', alarmId);
     return true;
   } catch (error) {
-    console.error('알림 발송 성공 처리 실패:', error);
     return false;
   }
 };
@@ -117,10 +109,37 @@ export const markAlarmAsSuccess = async (alarmId: string): Promise<boolean> => {
 // 읽지 않은 알림 개수 조회
 export const getUnreadAlarmCount = async (userId?: string): Promise<number> => {
   try {
-    const alarms = await getAlarms(userId);
-    return alarms.filter(alarm => !alarm.isRead).length;
+    let targetUserId = userId;
+    
+    // userId가 제공되지 않은 경우 localStorage에서 가져오기
+    if (!targetUserId) {
+      const savedUserInfo = localStorage.getItem('userInfo');
+      if (savedUserInfo) {
+        try {
+          const userInfo = JSON.parse(savedUserInfo);
+          targetUserId = userInfo.uid;
+        } catch (error) {
+          return 0;
+        }
+      }
+      
+      if (!targetUserId) {
+        return 0;
+      }
+    }
+
+    const alarmsRef = collection(db, 'alarm');
+    const q = query(
+      alarmsRef, 
+      where('userId', '==', targetUserId),
+      where('isRead', '==', false),
+      orderBy('regDate', 'desc')
+    );
+    const querySnapshot = await getDocs(q);
+    
+    const unreadCount = querySnapshot.docs.length;
+    return unreadCount;
   } catch (error) {
-    console.error('읽지 않은 알림 개수 조회 실패:', error);
     return 0;
   }
 };

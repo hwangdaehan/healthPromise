@@ -1036,3 +1036,22 @@ ion-tab-button ion-label {
   font-size: 16.8px;
 }
 
+/* 즐겨찾기 병원 섹션 헤더 */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.hospital-arrow {
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.hospital-arrow:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+

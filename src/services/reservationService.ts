@@ -83,6 +83,8 @@ export const addReservation = async (reservationData: Omit<Reservation, 'id' | '
 
 export const getReservations = async (year?: number, month?: number): Promise<Reservation[]> => {
   try {
+    console.log('getReservations 호출됨:', { year, month });
+    
     // localStorage에서 사용자 정보 가져오기
     const savedUserInfo = localStorage.getItem('userInfo');
     let userId = null;
@@ -91,12 +93,15 @@ export const getReservations = async (year?: number, month?: number): Promise<Re
       try {
         const userInfo = JSON.parse(savedUserInfo);
         userId = userInfo.uid;
+        console.log('getReservations - userId:', userId);
       } catch (error) {
+        console.log('getReservations - userInfo 파싱 실패:', error);
         return [];
       }
     }
     
     if (!userId) {
+      console.log('getReservations - userId가 없음');
       return [];
     }
 
@@ -124,7 +129,9 @@ export const getReservations = async (year?: number, month?: number): Promise<Re
       );
     }
     
+    console.log('getReservations - 쿼리 실행 중...');
     const querySnapshot = await getDocs(q);
+    console.log('getReservations - 쿼리 결과 개수:', querySnapshot.size);
     
     const reservations = querySnapshot.docs.map(doc => {
       const data = doc.data();
@@ -141,6 +148,7 @@ export const getReservations = async (year?: number, month?: number): Promise<Re
       } as Reservation;
     });
     
+    console.log('getReservations - 최종 결과:', reservations);
     return reservations;
   } catch (error) {
     console.error('Error getting reservations:', error);

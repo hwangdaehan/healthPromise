@@ -226,17 +226,49 @@ export class MessagingService {
   // 예약 알림 체크 및 발송
   static async checkAndSendReservationNotifications(): Promise<void> {
     try {
+      console.log('예약 알림 체크 시작');
+      
       // localStorage에서 사용자 정보 가져오기
       const savedUserInfo = localStorage.getItem('userInfo');
-      if (!savedUserInfo) return;
+      console.log('localStorage userInfo:', savedUserInfo);
+      
+      if (!savedUserInfo) {
+        console.log('localStorage에 userInfo가 없습니다');
+        return;
+      }
 
       const userInfo = JSON.parse(savedUserInfo);
       const userId = userInfo.uid;
-      if (!userId) return;
+      console.log('userId:', userId);
+      
+      if (!userId) {
+        console.log('userId가 없습니다');
+        return;
+      }
 
-      // 모든 예약 데이터 가져오기
-      const { getReservations } = await import('./reservationService');
-      const allReservations = await getReservations();
+      // 모든 예약 데이터 가져오기 (전체 사용자 대상)
+      const { collection, getDocs, query, orderBy } = await import('firebase/firestore');
+      const { db } = await import('../config/firebase');
+      
+      const reservationsRef = collection(db, 'reservation');
+      const q = query(reservationsRef, orderBy('reservationDate', 'desc'));
+      const querySnapshot = await getDocs(q);
+      
+      const allReservations = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          address: data.address || '',
+          hospitalName: data.hospitalName || '',
+          memo: data.memo || '',
+          regDate: data.regDate?.toDate() || new Date(),
+          reservationDate: data.reservationDate?.toDate() || new Date(),
+          telNo: data.telNo || '',
+          userId: data.userId || ''
+        };
+      });
+      
+      console.log('전체 예약 데이터:', allReservations);
 
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
@@ -244,6 +276,8 @@ export class MessagingService {
 
       const dayAfterTomorrow = new Date(tomorrow);
       dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 1);
+
+      console.log('내일 날짜 범위:', { tomorrow, dayAfterTomorrow });
 
       // 내일 예약이 있는지 확인
       const tomorrowReservations = allReservations.filter(reservation => {
@@ -255,10 +289,14 @@ export class MessagingService {
         );
       });
 
+      console.log('내일 예약 개수:', tomorrowReservations.length);
+      console.log('내일 예약 목록:', tomorrowReservations);
+
       // 내일 예약이 있으면 알림 발송
       if (tomorrowReservations.length > 0) {
         for (const reservation of tomorrowReservations) {
           const reservationDate = reservation.reservationDate;
+          const reservationUserId = reservation.userId; // 예약한 사용자의 ID
           
           const month = reservationDate.getMonth() + 1;
           const day = reservationDate.getDate();
@@ -267,6 +305,8 @@ export class MessagingService {
 
           const notificationTitle = '병원 예약 알림';
           const notificationBody = `${month}월 ${day}일 ${hour}시에 ${hospitalName} 방문예정이에요!`;
+
+          console.log(`예약 알림 발송 대상: ${reservationUserId}, 병원: ${hospitalName}`);
 
           try {
             // alarm 컬렉션에 알림 데이터 저장
@@ -277,16 +317,21 @@ export class MessagingService {
               isRead: false,
               isSuccess: false,
               title: notificationTitle,
-              userId: userId
+              userId: reservationUserId // 예약한 사용자의 ID 사용
             });
 
-            // 로컬 알림 발송
-            this.showLocalNotification(notificationTitle, notificationBody);
+            // FCM 푸시 알림 발송
+            const pushSuccess = await this.sendPushNotification(notificationTitle, notificationBody, reservationUserId);
             
-            // 발송 성공 처리
-            await markAlarmAsSuccess(alarmId);
-            
-            console.log('예약 알림 발송 및 저장 완료:', notificationBody);
+            if (pushSuccess) {
+              // 발송 성공 처리
+              await markAlarmAsSuccess(alarmId);
+              console.log('예약 알림 발송 및 저장 완료:', notificationBody);
+            } else {
+              console.log('푸시 알림 발송 실패, 로컬 알림으로 대체');
+              // 푸시 발송 실패 시 로컬 알림으로 대체
+              this.showLocalNotification(notificationTitle, notificationBody);
+            }
           } catch (alarmError) {
             console.error('알림 데이터 저장 실패:', alarmError);
             // 알림은 발송하되 저장 실패는 로그만 남김
@@ -296,6 +341,7 @@ export class MessagingService {
       }
     } catch (error) {
       console.error('예약 알림 체크 실패:', error);
+      console.error('오류 상세:', error);
     }
   }
 

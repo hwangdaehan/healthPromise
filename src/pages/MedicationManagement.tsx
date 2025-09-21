@@ -4,13 +4,9 @@ import {
   IonPage,
   IonButton,
   IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
   IonItem,
   IonLabel,
   IonInput,
-  IonDatetime,
   IonSelect,
   IonSelectOption,
   IonList,
@@ -20,15 +16,10 @@ import {
   IonToolbar,
   IonTitle,
   IonModal,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonDatetimeButton,
-  IonTextarea,
   IonSpinner,
   IonAlert,
 } from '@ionic/react';
-import { medical, time, checkmarkCircle, closeCircle, arrowBack, add, trash, notifications, notificationsOff, save, close } from 'ionicons/icons';
+import { medical, time, checkmarkCircle, closeCircle, arrowBack, add, trash, notifications, notificationsOff, close } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { FirestoreService, Medicine } from '../services/firestoreService';
 import { getCurrentUserSession } from '../services/userService';
@@ -64,11 +55,6 @@ const MedicationManagement: React.FC = () => {
   const [showMedicineRecordModal, setShowMedicineRecordModal] = useState(false);
   const [showRecordBottomSheet, setShowRecordBottomSheet] = useState(false);
   const [selectedMedication, setSelectedMedication] = useState<Medication | null>(null);
-  const [recordData, setRecordData] = useState({
-    eatDate: new Date().toISOString().split('T')[0],
-    eatTime: new Date().toTimeString().split(' ')[0].substring(0, 5),
-    memo: '',
-  });
   const [recordLoading, setRecordLoading] = useState(false);
   const [recordError, setRecordError] = useState<string | null>(null);
   const [newMedication, setNewMedication] = useState({
@@ -249,16 +235,11 @@ const MedicationManagement: React.FC = () => {
   // 복용 기록 바텀 시트 열기
   const openRecordBottomSheet = (medication: Medication) => {
     setSelectedMedication(medication);
-    setRecordData({
-      eatDate: new Date().toISOString().split('T')[0],
-      eatTime: new Date().toTimeString().split(' ')[0].substring(0, 5),
-      memo: '',
-    });
     setRecordError(null);
     setShowRecordBottomSheet(true);
   };
 
-  // 복용 기록 저장
+  // 복용 기록 저장 (현재 시간으로 자동 저장)
   const saveRecord = async () => {
     if (!selectedMedication) return;
 
@@ -272,11 +253,12 @@ const MedicationManagement: React.FC = () => {
         return;
       }
 
-      const combinedDateTime = new Date(`${recordData.eatDate}T${recordData.eatTime}:00`);
+      // 현재 시간으로 자동 저장
+      const currentDateTime = new Date();
 
       await addMedicineHistory({
         medicineDataId: selectedMedication.id,
-        eatDate: combinedDateTime,
+        eatDate: currentDateTime,
         regDate: new Date(),
         userId: userId,
         dataId: '', // Firestore에서 자동 생성
@@ -468,12 +450,10 @@ const MedicationManagement: React.FC = () => {
           </IonContent>
         </IonModal>
 
-        {/* 복용 기록 바텀 시트 */}
+        {/* 복용 기록 등록 모달 */}
         <IonModal 
           isOpen={showRecordBottomSheet} 
           onDidDismiss={() => setShowRecordBottomSheet(false)}
-          breakpoints={[0, 0.6]}
-          initialBreakpoint={0.6}
         >
           <IonHeader>
             <IonToolbar>
@@ -489,69 +469,28 @@ const MedicationManagement: React.FC = () => {
           </IonHeader>
           <IonContent className="ion-padding">
             {selectedMedication && (
-              <div className="record-form">
-                <div className="selected-medication-info">
-                  <h3>{selectedMedication.name}</h3>
-                  <p>1회 {selectedMedication.dosage}정</p>
+              <div className="simple-record-form">
+                <div className="medication-info">
+                  <IonIcon icon={medical} className="medication-icon-large" />
+                  <h2>{selectedMedication.name}</h2>
+                  <p className="dosage-info">1회 {selectedMedication.dosage}정</p>
                 </div>
 
-                <IonItem>
-                  <IonLabel position="stacked">복용 날짜 *</IonLabel>
-                  <IonDatetimeButton datetime="recordEatDate"></IonDatetimeButton>
-                  <IonModal keepContentsMounted={true}>
-                    <IonDatetime
-                      id="recordEatDate"
-                      presentation="date"
-                      value={recordData.eatDate}
-                      onIonChange={(e) => setRecordData(prev => ({ 
-                        ...prev, 
-                        eatDate: e.detail.value ? String(e.detail.value).split('T')[0] : '' 
-                      }))}
-                    ></IonDatetime>
-                  </IonModal>
-                </IonItem>
-
-                <IonItem>
-                  <IonLabel position="stacked">복용 시간 *</IonLabel>
-                  <IonDatetimeButton datetime="recordEatTime"></IonDatetimeButton>
-                  <IonModal keepContentsMounted={true}>
-                    <IonDatetime
-                      id="recordEatTime"
-                      presentation="time"
-                      value={recordData.eatTime}
-                      onIonChange={(e) => setRecordData(prev => ({ 
-                        ...prev, 
-                        eatTime: e.detail.value ? String(e.detail.value).split('T')[1].substring(0, 5) : '' 
-                      }))}
-                    ></IonDatetime>
-                  </IonModal>
-                </IonItem>
-
-                <IonItem>
-                  <IonLabel position="stacked">메모 (선택 사항)</IonLabel>
-                  <IonTextarea
-                    value={recordData.memo}
-                    onIonInput={(e) => setRecordData(prev => ({ ...prev, memo: e.detail.value! }))}
-                    placeholder="추가 메모를 입력하세요"
-                    rows={3}
-                  ></IonTextarea>
-                </IonItem>
-
-                <IonButton
-                  expand="block"
-                  onClick={saveRecord}
-                  disabled={recordLoading || !recordData.eatDate || !recordData.eatTime}
-                  className="ion-margin-top"
-                >
-                  <IonIcon icon={save} slot="start" />
-                  {recordLoading ? '저장 중...' : '기록 등록'}
-                </IonButton>
-
-                {recordLoading && (
-                  <div className="loading-container">
-                    <IonSpinner name="crescent" />
-                  </div>
-                )}
+                <div className="circular-button-container">
+                  <IonButton
+                    className="circular-record-button"
+                    onClick={saveRecord}
+                    disabled={recordLoading}
+                    fill="clear"
+                  >
+                    {recordLoading ? (
+                      <IonSpinner name="crescent" />
+                    ) : (
+                      <IonIcon icon={checkmarkCircle} />
+                    )}
+                  </IonButton>
+                  <p className="button-label">눌러서 복용완료!</p>
+                </div>
 
                 <IonAlert
                   isOpen={!!recordError}

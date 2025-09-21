@@ -758,6 +758,7 @@ const Home: React.FC = () => {
                               <IonCard 
                                 key={hospital.id} 
                                 className="favorite-hospital-card"
+                                onClick={() => handleFavoriteHospitalClick(hospital)}
                               >
                                 <IonCardContent>
                                   <div className="favorite-hospital-content">
@@ -765,7 +766,7 @@ const Home: React.FC = () => {
                                       <h3 className="favorite-hospital-name">{hospital.name}</h3>
                                       <p className="hospital-address">{hospital.address.replace(/^[가-힣]+도\s+/, '')}</p>
                                     </div>
-                                    <div className="hospital-arrow" onClick={() => handleFavoriteHospitalClick(hospital)}>
+                                    <div className="hospital-arrow">
                                       <IonIcon icon={chevronForward} />
                                     </div>
                                   </div>

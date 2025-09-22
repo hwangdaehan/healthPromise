@@ -461,14 +461,14 @@ const HospitalBooking: React.FC = () => {
         
         <IonCard>
           <IonCardHeader>
-            <IonCardTitle>예약 병원을 검색해주세요</IonCardTitle>
+            <IonCardTitle>병원 찾기</IonCardTitle>
           </IonCardHeader>
           <IonCardContent>
             <IonItem>
               <IonInput
                 value={hospitalName}
                 onIonInput={(e) => setHospitalName(e.detail.value!)}
-                placeholder="병원명을 입력하세요"
+                placeholder="병원 이름을 검색해보세요!"
                 clearInput={true}
               />
             </IonItem>
@@ -508,74 +508,68 @@ const HospitalBooking: React.FC = () => {
         {/* 검색 결과 카드들 */}
         {searchResults.length > 0 && (
           <div className="search-results-container">
-            <IonCard>
-              <IonCardHeader>
-                <IonCardTitle>검색 결과 (총 {totalCount}개)</IonCardTitle>
-              </IonCardHeader>
-              <IonCardContent>
-                <div className="hospital-cards-list">
-                  {searchResults.map((hospital, index) => (
-                    <HospitalCard 
-                      key={hospital.ykiho || index} 
-                      hospital={hospital} 
-                    />
-                  ))}
-                </div>
+            <div className="search-count">{totalCount}건</div>
+            <div className="hospital-cards-list">
+              {searchResults.map((hospital, index) => (
+                <HospitalCard 
+                  key={hospital.ykiho || index} 
+                  hospital={hospital} 
+                />
+              ))}
+            </div>
                 
-                {/* 페이지네이션 */}
-                {totalPages > 1 && (
-                  <div className="pagination-container">
-                    <div className="pagination-buttons">
-                      <div className="pagination-info">
-                        총 {totalPages} 페이지
-                      </div>
-                      <button 
-                        className="pagination-btn prev-btn"
-                        onClick={goToPreviousPage}
-                        disabled={currentPage === 1}
-                      >
-                        <IonIcon icon={chevronBack} />
-                        이전
-                      </button>
-                      
-                      <div className="page-numbers">
-                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                          let pageNum;
-                          if (totalPages <= 5) {
-                            pageNum = i + 1;
-                          } else if (currentPage <= 3) {
-                            pageNum = i + 1;
-                          } else if (currentPage >= totalPages - 2) {
-                            pageNum = totalPages - 4 + i;
-                          } else {
-                            pageNum = currentPage - 2 + i;
-                          }
-                          
-                          return (
-                            <button
-                              key={pageNum}
-                              className={`page-btn ${currentPage === pageNum ? 'active' : ''}`}
-                              onClick={() => goToPage(pageNum)}
-                            >
-                              {pageNum}
-                            </button>
-                          );
-                        })}
-                      </div>
-                      
-                      <button 
-                        className="pagination-btn next-btn"
-                        onClick={goToNextPage}
-                        disabled={currentPage === totalPages}
-                      >
-                        다음
-                        <IonIcon icon={chevronForward} />
-                      </button>
-                    </div>
+            {/* 페이지네이션 */}
+            {totalPages > 1 && (
+              <div className="pagination-container">
+                <div className="pagination-buttons">
+                  <div className="pagination-info">
+                    총 {totalPages} 페이지
                   </div>
-                )}
-              </IonCardContent>
-            </IonCard>
+                  <button 
+                    className="pagination-btn prev-btn"
+                    onClick={goToPreviousPage}
+                    disabled={currentPage === 1}
+                  >
+                    <IonIcon icon={chevronBack} />
+                    이전
+                  </button>
+                  
+                  <div className="page-numbers">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+                      
+                      return (
+                        <button
+                          key={pageNum}
+                          className={`page-btn ${currentPage === pageNum ? 'active' : ''}`}
+                          onClick={() => goToPage(pageNum)}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  
+                  <button 
+                    className="pagination-btn next-btn"
+                    onClick={goToNextPage}
+                    disabled={currentPage === totalPages}
+                  >
+                    다음
+                    <IonIcon icon={chevronForward} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

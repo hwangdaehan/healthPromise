@@ -615,7 +615,7 @@ ion-card.service-card:hover {
 
 /* 병원 예약 카드 - 파란색 테두리 */
 .hospital-card {
-  border: 2px solid #2563eb !important;
+  border: none !important;
 }
 
 .hospital-card .service-icon {

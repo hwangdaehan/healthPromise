@@ -20,7 +20,7 @@ import {
   IonLabel,
 } from '@ionic/react';
 import { useIonViewWillEnter } from '@ionic/react';
-import { calendar, medical, chevronBack, chevronForward, business, notificationsOutline, time, location, call } from 'ionicons/icons';
+import { calendar, medical, chevronBack, chevronForward, business, notificationsOutline, time, location, call, star } from 'ionicons/icons';
 import { getCurrentUserSession, hasUserPermission } from '../services/userService';
 import { getFavoriteHospitals, removeFavoriteHospital, FavoriteHospital } from '../services/favoriteHospitalService';
 import { addReservation, getReservations } from '../services/reservationService';
@@ -744,8 +744,7 @@ const Home: React.FC = () => {
                             </div>
                             <div className="notice-item notice-2">
                               <div className="notice-content">
-                                <h3>공지사항 2</h3>
-                                <p>병원 예약 시스템 업데이트</p>
+                                <AdBanner />
                               </div>
                             </div>
                             <div className="notice-item notice-3">
@@ -824,12 +823,12 @@ const Home: React.FC = () => {
             <IonCard className="service-card hospital-card" routerLink="/hospital">
               <IonCardContent>
                 <div className="service-card-content">
-                  <div className="service-icon">
-                    <IonIcon icon={calendar} />
-                  </div>
                   <div className="service-text">
-                    <h3 className="service-title">병원 예약</h3>
-                    <p className="service-subtitle">병원 예약 관리</p>
+                    <div className="service-icon">
+                      <IonIcon icon={calendar} />
+                    </div>
+                    <p className="service-line1">병원</p>
+                    <p className="service-line2">예약하기</p>
                   </div>
                 </div>
               </IonCardContent>
@@ -839,12 +838,12 @@ const Home: React.FC = () => {
             <IonCard className="service-card medication-card" routerLink="/medication">
               <IonCardContent>
                 <div className="service-card-content">
-                  <div className="service-icon">
-                    <IonIcon icon={medical} />
-                  </div>
                   <div className="service-text">
-                    <h3 className="service-title">복약 관리</h3>
-                    <p className="service-subtitle">복약 알림 확인하기</p>
+                    <div className="service-icon">
+                      <IonIcon icon={medical} />
+                    </div>
+                    <p className="service-line1">내가 먹은 약</p>
+                    <p className="service-line2">관리하기</p>
                   </div>
                 </div>
               </IonCardContent>
@@ -854,12 +853,12 @@ const Home: React.FC = () => {
             <IonCard className="service-card favorite-hospitals-card" routerLink="/favorite-hospitals">
               <IonCardContent>
                 <div className="service-card-content">
-                  <div className="service-icon">
-                    <IonIcon icon={business} />
-                  </div>
                   <div className="service-text">
-                    <h3 className="service-title">즐겨찾는 병원</h3>
-                    <p className="service-subtitle">즐겨찾는 병원 관리</p>
+                    <div className="service-icon">
+                      <IonIcon icon={star} />
+                    </div>
+                    <p className="service-line1">자주 가는 병원</p>
+                    <p className="service-line2">즐겨찾기</p>
                   </div>
                 </div>
               </IonCardContent>
@@ -869,15 +868,6 @@ const Home: React.FC = () => {
           {/* 병원 예약 푸시 알림 테스트 */}
           <IonCard className="service-card">
             <IonCardContent>
-              <div className="service-card-content">
-                <div className="service-text">
-                  <h3 className="service-title">병원 예약 알림</h3>
-                  <p className="service-subtitle">병원 예약 푸시 알림을<br />테스트해보세요</p>
-                </div>
-                <div className="service-icon">
-                  <IonIcon icon={notificationsOutline} />
-                </div>
-              </div>
               <div className="service-actions">
                 <IonButton
                   expand="block" 

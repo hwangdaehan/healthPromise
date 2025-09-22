@@ -155,8 +155,9 @@ ion-app {
 .service-cards-container {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 20px;
+  width: 100%;
 }
 
 .service-card {
@@ -166,6 +167,19 @@ ion-app {
   border: none !important;
   transition: all 0.3s ease !important;
   cursor: pointer !important;
+  width: 100%;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.service-card ion-card-content {
+  --padding-start: 0 !important;
+  --padding-end: 0 !important;
+  --padding-top: 0 !important;
+  --padding-bottom: 0 !important;
+  padding: 0 !important;
 }
 
 .service-card:hover {
@@ -192,13 +206,16 @@ ion-card.service-card:hover {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 16px 12px;
+  padding: 0;
   gap: 12px;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
 }
 
 .service-icon {
-  width: 48px;
-  height: 48px;
+  width: 20px;
+  height: 20px;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -207,26 +224,33 @@ ion-card.service-card:hover {
 }
 
 .hospital-card .service-icon {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
+  background: transparent !important;
+  color: #3b82f6 !important;
 }
 
 .medication-card .service-icon {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
+  background: transparent !important;
+  color: #10b981 !important;
 }
 
 .favorite-hospitals-card .service-icon {
-  background: linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%);
-  color: white;
+  background: transparent !important;
+  color: #FFD700 !important;
 }
 
-.service-icon ion-icon {
-  font-size: 24px;
+.favorite-hospitals-card .service-icon ion-icon {
+  color: #FFD700 !important;
 }
 
 .service-text {
-  flex: 1;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .service-title {
@@ -242,6 +266,34 @@ ion-card.service-card:hover {
   color: #6b7280;
   margin: 0;
   line-height: 1.3;
+}
+
+/* 서비스 카드 문구 스타일 */
+.service-line1 {
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  color: #1f2937;
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+}
+
+.service-line2 {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #1f2937;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.service-text p {
+  word-break: keep-all;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.service-icon ion-icon {
+  font-size: 20px;
 }
 
 
@@ -483,12 +535,15 @@ ion-card.service-card:hover {
 }
 
 .service-card-content {
-  display: grid;
-  grid-template-columns: 1fr 60px;
-  column-gap: 16px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  text-align: center;
+  padding: 0;
+  gap: 12px;
   width: 100%;
   height: 100%;
+  justify-content: center;
 }
 
 .service-text {
@@ -554,7 +609,7 @@ ion-card.service-card:hover {
 }
 
 .hospital-card .service-icon {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+  background: transparent !important;
 }
 
 .hospital-card .service-icon ion-icon {
@@ -567,7 +622,7 @@ ion-card.service-card:hover {
 }
 
 .medication-card .service-icon {
-  background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%) !important;
+  background: transparent !important;
 }
 
 .medication-card .service-icon ion-icon {

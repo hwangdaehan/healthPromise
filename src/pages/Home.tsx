@@ -31,6 +31,7 @@ import { getMessaging, getToken } from 'firebase/messaging';
 import { getUnreadAlarmCount, getAlarms, markAlarmAsRead } from '../services/alarmService';
 import HospitalDetailModal from '../components/HospitalDetailModal';
 import AppointmentModal, { AppointmentData } from '../components/AppointmentModal';
+import AdBanner from '../components/AdBanner';
 import { App } from '@capacitor/app';
 import './Home.css';
 
@@ -537,27 +538,28 @@ const Home: React.FC = () => {
 
 
   const handleTestReservationNotification = async () => {
-    await MessagingService.checkAndSendReservationNotifications();
-    // 알림 개수 업데이트
-    await updateNotificationCount();
-    alert('예약 알림 체크를 실행했습니다. 콘솔을 확인해주세요.');
+    // await MessagingService.checkAndSendReservationNotifications();
+    // // 알림 개수 업데이트
+    // await updateNotificationCount();
+    alert('푸시 알림 발송이 비활성화되었습니다.');
   };
 
   const handleShowFCMToken = async () => {
-    try {
-      const messaging = getMessaging();
-      const currentToken = await getToken(messaging, {
-        vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
-      });
+    // try {
+    //   const messaging = getMessaging();
+    //   const currentToken = await getToken(messaging, {
+    //     vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
+    //   });
 
-      if (currentToken) {
-        alert(`FCM 토큰: ${currentToken.substring(0, 50)}...`);
-      } else {
-        alert('FCM 토큰을 가져올 수 없습니다.');
-      }
-    } catch (error) {
-      alert('FCM 토큰 가져오기 실패');
-    }
+    //   if (currentToken) {
+    //     alert(`FCM 토큰: ${currentToken.substring(0, 50)}...`);
+    //   } else {
+    //     alert('FCM 토큰을 가져올 수 없습니다.');
+    //   }
+    // } catch (error) {
+    //   alert('FCM 토큰 가져오기 실패');
+    // }
+    alert('FCM 토큰 기능이 비활성화되었습니다.');
   };
 
 
@@ -836,6 +838,9 @@ const Home: React.FC = () => {
               </IonGrid>
             </IonCardContent>
           </IonCard>
+
+          {/* 달력 밑 배너 광고 */}
+          <AdBanner />
 
           {/* 병원 예약 카드 */}
           <IonCard className="service-card hospital-card" routerLink="/hospital">

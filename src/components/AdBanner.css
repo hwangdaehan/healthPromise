@@ -1,0 +1,69 @@
+.ad-banner-container {
+  position: relative;
+  margin: 16px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.ad-banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  min-height: 50px;
+}
+
+.ad-banner-text {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+  text-align: center;
+}
+
+.ad-banner-close-button {
+  --color: white;
+  --background: transparent;
+  --border-radius: 50%;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  min-width: 32px;
+  min-height: 32px;
+  margin: 0;
+}
+
+.ad-banner-close-button:hover {
+  --background: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 모바일 최적화 */
+@media (max-width: 768px) {
+  .ad-banner-content {
+    padding: 10px 12px;
+    min-height: 45px;
+  }
+  
+  .ad-banner-text {
+    font-size: 13px;
+  }
+  
+  .ad-banner-close-button {
+    min-width: 28px;
+    min-height: 28px;
+  }
+}

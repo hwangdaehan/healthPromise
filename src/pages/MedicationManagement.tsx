@@ -24,6 +24,7 @@ import { useHistory } from 'react-router-dom';
 import { FirestoreService, Medicine } from '../services/firestoreService';
 import { getCurrentUserSession } from '../services/userService';
 import { getMedicineHistory, addMedicineHistory } from '../services/medicineHistoryService';
+import { AdMobService } from '../services/admobService';
 import './MedicationManagement.css';
 
 interface Medication {
@@ -116,6 +117,18 @@ const MedicationManagement: React.FC = () => {
     };
 
     loadMedications();
+    
+    // AdMob 초기화
+    const initializeAdMob = async () => {
+      try {
+        await AdMobService.initialize();
+        console.log('MedicationManagement에서 AdMob 초기화 완료');
+      } catch (error) {
+        console.error('AdMob 초기화 실패:', error);
+      }
+    };
+    
+    initializeAdMob();
   }, []);
 
   const frequencies = [
@@ -126,9 +139,8 @@ const MedicationManagement: React.FC = () => {
   ];
 
   const timeOptions = [
-    '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00',
-    '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', 
-    '20:00', '21:00', '22:00', '23:00', '00:00'
+    '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', 
+    '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'
   ];
 
   const addMedication = async () => {
@@ -294,7 +306,19 @@ const MedicationManagement: React.FC = () => {
         {/* 복약 등록 버튼 */}
         <IonButton
           expand="block"
-          onClick={() => setShowAddModal(true)}
+          onClick={async () => {
+            // 앱 열기 광고 표시
+            try {
+              console.log('복약 등록 버튼 클릭 - 광고 표시 시도...');
+              await AdMobService.showInterstitialAd();
+              console.log('광고 표시 성공');
+            } catch (error) {
+              console.log('광고 표시 실패:', error);
+            }
+            
+            // 광고 후 모달 열기
+            setShowAddModal(true);
+          }}
           className="add-medication-button"
         >
           <IonIcon icon={add} slot="start" />

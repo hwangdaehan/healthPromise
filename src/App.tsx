@@ -80,34 +80,34 @@ const AppContent: React.FC = () => {
     
     setupStatusBar();
 
-    // 푸시 알림 초기화
-    const initializePushNotifications = async () => {
-      try {
-        // FCM 토큰 초기화 및 저장 (사용자별 토큰 관리)
-        const token = await MessagingService.initializeAndSaveToken();
-        if (token) {
-          console.log('FCM 토큰 초기화 완료:', token);
-          
-          // 포그라운드 메시지 리스너 설정
-          const unsubscribe = MessagingService.onMessage((payload) => {
-            console.log('포그라운드 메시지 수신:', payload);
-            // 여기서 알림 표시 로직 추가 가능
-          });
-          
-          // 컴포넌트 언마운트 시 리스너 정리
-          return unsubscribe;
-        } else {
-          console.log('FCM 토큰 초기화 실패');
-        }
-      } catch (error) {
-        console.error('푸시 알림 초기화 실패:', error);
-      }
-    };
+    // 푸시 알림 초기화 - 주석처리
+    // const initializePushNotifications = async () => {
+    //   try {
+    //     // FCM 토큰 초기화 및 저장 (사용자별 토큰 관리)
+    //     const token = await MessagingService.initializeAndSaveToken();
+    //     if (token) {
+    //       console.log('FCM 토큰 초기화 완료:', token);
+    //       
+    //       // 포그라운드 메시지 리스너 설정
+    //       const unsubscribe = MessagingService.onMessage((payload) => {
+    //         console.log('포그라운드 메시지 수신:', payload);
+    //         // 여기서 알림 표시 로직 추가 가능
+    //       });
+    //       
+    //       // 컴포넌트 언마운트 시 리스너 정리
+    //       return unsubscribe;
+    //     } else {
+    //       console.log('FCM 토큰 초기화 실패');
+    //     }
+    //   } catch (error) {
+    //     console.error('푸시 알림 초기화 실패:', error);
+    //   }
+    // };
     
-    initializePushNotifications();
+    // initializePushNotifications();
 
-    // 매일 예약 알림 체크 시작
-    MessagingService.startDailyNotificationCheck();
+    // 매일 예약 알림 체크 시작 - 주석처리
+    // MessagingService.startDailyNotificationCheck();
 
     // 사용자 정보 확인
     checkUserAuthentication();

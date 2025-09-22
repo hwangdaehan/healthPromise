@@ -167,9 +167,9 @@ export const scheduledReservationNotifications = functions.pubsub
     }
   });
 
-// 복약 알림 스케줄러 (매분 실행)
+// 복약 알림 스케줄러 (오전 9시~오후 9시 매시간 실행)
 export const scheduledMedicineNotifications = functions.pubsub
-  .schedule('* * * * *') // 매분 실행
+  .schedule('0 9-21 * * *') // 오전 9시~오후 9시 매시간 실행
   .timeZone('Asia/Seoul')
   .onRun(async (context) => {
     try {

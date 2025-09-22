@@ -48,7 +48,7 @@ export class MessagingService {
       // 웹 환경에서만 브라우저 알림 사용
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         // Capacitor 환경인지 확인 (안드로이드/iOS)
-        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+        if ((window as any).Capacitor && (window as any).Capacitor.isNativePlatform()) {
           // 네이티브 플랫폼에서는 FCM 사용하도록 계속 진행
         } else {
           // 웹 브라우저에서만 브라우저 알림 사용
@@ -93,6 +93,7 @@ export class MessagingService {
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         try {
           // 현재 사용자의 FCM 토큰 가져오기
+          const { getMessaging } = await import('firebase/messaging');
           const messaging = getMessaging();
           const currentToken = await getToken(messaging, {
             vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY

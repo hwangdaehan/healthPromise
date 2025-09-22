@@ -50,5 +50,7 @@
 		<string>NotoSansKR-Regular.ttf</string>
 		<string>NotoSansKR-Bold.ttf</string>
 	</array>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-4735367527487227~7019721685</string>
 </dict>
 </plist>

@@ -19,7 +19,7 @@ import {
   IonSpinner,
   IonAlert,
 } from '@ionic/react';
-import { medical, time, checkmarkCircle, closeCircle, arrowBack, add, trash, notifications, notificationsOff, close } from 'ionicons/icons';
+import { medical, time, checkmarkCircle, closeCircle, arrowBack, add, trash, notifications, notificationsOff, close, notificationsOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { FirestoreService, Medicine } from '../services/firestoreService';
 import { getCurrentUserSession } from '../services/userService';
@@ -290,14 +290,23 @@ const MedicationManagement: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>건강 약속</IonTitle>
+          <IonTitle>
+            <svg 
+              width="32" 
+              height="32" 
+              viewBox="0 0 24 24" 
+              fill="#2563eb"
+              style={{ display: 'flex', alignItems: 'center' }}
+            >
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+          </IonTitle>
           <IonButton 
             fill="clear" 
-            onClick={() => history.goBack()}
-            className="back-button"
             slot="end"
+            className="header-notification-button"
           >
-            <IonIcon icon={arrowBack} />
+            <IonIcon icon={notificationsOutline} />
           </IonButton>
         </IonToolbar>
       </IonHeader>

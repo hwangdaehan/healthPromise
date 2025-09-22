@@ -88,11 +88,14 @@ ion-header ion-toolbar {
   --border-color: transparent !important;
   --padding-start: 20px;
   --padding-end: 20px;
-  --padding-top: env(safe-area-inset-top, 0px);
+  --padding-top: 0px;
+  --min-height: 80px;
   box-shadow: none !important;
   border: none !important;
   border-bottom: none !important;
   background: var(--primary-gray) !important;
+  display: flex;
+  align-items: center;
 }
 
 ion-title {
@@ -115,10 +118,16 @@ ion-header ion-button {
   font-size: 18px;
   font-weight: 600;
   height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 ion-header ion-button ion-icon {
   font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* 헤더 아이콘 색상 - 종 아이콘을 검정색으로 */
@@ -128,6 +137,26 @@ ion-header ion-button ion-icon[name="notifications"],
 ion-header ion-button ion-icon[name="notifications-outline"] {
   color: #000000 !important;
   --color: #000000 !important;
+}
+
+/* 종 아이콘 중앙정렬 강제 */
+.header-notification-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+}
+
+.header-notification-button ion-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 24px !important;
+  height: 24px !important;
+  font-size: 24px !important;
 }
 
 /* 뒤로가기 버튼 - 화살표만 표시 */

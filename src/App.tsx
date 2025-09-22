@@ -16,6 +16,7 @@ import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 import HospitalBooking from './pages/HospitalBooking';
 import MedicationManagement from './pages/MedicationManagement';
+import FavoriteHospitals from './pages/FavoriteHospitals';
 import UserInfo from './components/UserInfo';
 import Login from './components/Login';
 
@@ -280,6 +281,9 @@ const AppContent: React.FC = () => {
           </Route>
           <Route exact path="/medication">
             <MedicationManagement />
+          </Route>
+          <Route exact path="/favorite-hospitals">
+            <FavoriteHospitals />
           </Route>
           <Route exact path="/">
             <Redirect to="/home" />

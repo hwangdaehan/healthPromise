@@ -20,8 +20,8 @@ import {
   IonLabel,
 } from '@ionic/react';
 import { useIonViewWillEnter } from '@ionic/react';
-import { calendar, medical, chevronBack, chevronForward, logOut, business, notifications, time, location, call } from 'ionicons/icons';
-import { getCurrentUserSession, clearUserSession, hasUserPermission } from '../services/userService';
+import { calendar, medical, chevronBack, chevronForward, business, notificationsOutline, time, location, call } from 'ionicons/icons';
+import { getCurrentUserSession, hasUserPermission } from '../services/userService';
 import { getFavoriteHospitals, removeFavoriteHospital, FavoriteHospital } from '../services/favoriteHospitalService';
 import { addReservation, getReservations } from '../services/reservationService';
 import { getMedicineHistory, MedicineHistory } from '../services/medicineHistoryService';
@@ -487,15 +487,6 @@ const Home: React.FC = () => {
 
   const days = getDaysInMonth(currentDate);
 
-  // 로그아웃 함수
-  const handleLogout = () => {
-    // 세션에서 사용자 정보 삭제
-    clearUserSession();
-    // 기존 localStorage도 삭제 (하위 호환성)
-    localStorage.removeItem('userInfo');
-    // 페이지 새로고침하여 UserInfo 컴포넌트로 이동
-    window.location.reload();
-  };
 
   // 알림 클릭 함수
   const handleNotificationClick = async () => {
@@ -710,83 +701,68 @@ const Home: React.FC = () => {
             onClick={handleNotificationClick}
             className="header-notification-button"
           >
-            <IonIcon icon={notifications} />
+            <IonIcon icon={notificationsOutline} />
             {notificationCount > 0 && (
               <IonBadge color="danger" className="home-notification-badge">
                 {getNotificationDisplay(notificationCount)}
               </IonBadge>
             )}
           </IonButton>
-          <IonButton 
-            fill="clear" 
-            slot="end"
-            onClick={handleLogout}
-            className="header-logout-button"
-          >
-            <IonIcon icon={logOut} />
-          </IonButton>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <div className="main-container">
-          {/* 예약 알림 배너 */}
-          <IonCard className="promotion-banner">
-            <IonCardContent>
-              <div className="banner-content">
-                <div className="banner-text">
-                  <h2 className="banner-title">{userName}님!</h2>
-                  {latestReservation ? (
-                    <p className="banner-subtitle">
-                      <span className="banner-highlight">{formatReservationDate(latestReservation.reservationDate)}</span>에 <span className="banner-highlight">{latestReservation.hospitalName}</span>이 예약되었어요!
-                    </p>
-                  ) : (
-                    <p className="banner-subtitle">건강 관리를 시작해보세요!</p>
-                  )}
-                </div>
-                <div className="banner-icon">
-                  <IonIcon icon={business} />
-                </div>
+        {/* 예약 알림 배너 - 최상단 */}
+        <IonCard className="promotion-banner">
+          <IonCardContent>
+            <div className="banner-content">
+              <div className="banner-text">
+                <h2 className="banner-title">{userName}님!</h2>
+                {latestReservation ? (
+                  <p className="banner-subtitle">
+                    <span className="banner-highlight">{formatReservationDate(latestReservation.reservationDate)}</span>에 <span className="banner-highlight">{latestReservation.hospitalName}</span>이 예약되었어요!
+                  </p>
+                ) : (
+                  <p className="banner-subtitle">건강 관리를 시작해보세요!</p>
+                )}
               </div>
-            </IonCardContent>
-          </IonCard>
-
-
-                      {/* 즐겨찾기 병원 섹션 */}
-                      <div className="favorite-hospitals-section">
-                        <h2 className="section-title">자주다니는 병원 ({favoriteHospitals.length}개)</h2>
-                        {favoriteHospitals.length > 0 ? (
-                          <div className="favorite-hospitals-list">
-                            {favoriteHospitals.map((hospital) => (
-                              <IonCard 
-                                key={hospital.id} 
-                                className="favorite-hospital-card"
-                                onClick={() => handleFavoriteHospitalClick(hospital)}
-                              >
-                                <IonCardContent>
-                                  <div className="favorite-hospital-content">
-                                    <div className="hospital-info">
-                                      <h3 className="favorite-hospital-name">{hospital.name}</h3>
-                                      <p className="hospital-address">{hospital.address.replace(/^[가-힣]+도\s+/, '')}</p>
-                                    </div>
-                                    <div className="hospital-arrow">
-                                      <IonIcon icon={chevronForward} />
-                                    </div>
-                                  </div>
-                                </IonCardContent>
-                              </IonCard>
-                            ))}
+              <div className="banner-icon">
+                <IonIcon icon={business} />
+              </div>
+            </div>
+          </IonCardContent>
+        </IonCard>
+        <div className="main-container">
+                      {/* 롤링 공지사항 */}
+                      <div className="rolling-notice-section">
+                        <div className="rolling-notice-container">
+                          <div className="rolling-notice-content">
+                            <div className="notice-item notice-1">
+                              <div className="notice-content">
+                                <h3>공지사항 1</h3>
+                                <p>새로운 서비스가 출시되었습니다!</p>
+                              </div>
+                            </div>
+                            <div className="notice-item notice-2">
+                              <div className="notice-content">
+                                <h3>공지사항 2</h3>
+                                <p>병원 예약 시스템 업데이트</p>
+                              </div>
+                            </div>
+                            <div className="notice-item notice-3">
+                              <div className="notice-content">
+                                <h3>공지사항 3</h3>
+                                <p>복약 알림 기능 개선</p>
+                              </div>
+                            </div>
                           </div>
-                        ) : (
-                          <div className="no-favorites-message">
-                            <p>자주다니는 병원이 없습니다.</p>
-                            <p>병원 예약에서 즐겨찾기를 등록해보세요!</p>
-                          </div>
-                        )}
+                        </div>
                       </div>
 
           {/* 건강 캘린더 카드 */}
           <IonCard className="calendar-card">
             <IonCardContent>
+              {/* 내 활동 제목 */}
+              <h2 className="activity-title">내 활동</h2>
               <div className="calendar-header">
                 <IonButton fill="clear" onClick={goToPreviousMonth} className="nav-button">
                   <IonIcon icon={chevronBack} />
@@ -842,33 +818,53 @@ const Home: React.FC = () => {
           {/* 달력 밑 배너 광고 */}
           <AdBanner />
 
-          {/* 병원 예약 카드 */}
-          <IonCard className="service-card hospital-card" routerLink="/hospital">
-              <div className="service-card-content">
-                <div className="service-text">
-                  <h3 className="service-title hospital-title">병원 예약 <IonIcon icon={chevronForward} className="chevron-icon" /></h3>
-                  <p className="service-subtitle">병원 예약을 쉽고 간편하게<br />관리하세요</p>
+          {/* 서비스 카드 섹션 */}
+          <div className="service-cards-container">
+            {/* 병원 예약 카드 */}
+            <IonCard className="service-card hospital-card" routerLink="/hospital">
+              <IonCardContent>
+                <div className="service-card-content">
+                  <div className="service-icon">
+                    <IonIcon icon={calendar} />
+                  </div>
+                  <div className="service-text">
+                    <h3 className="service-title">병원 예약</h3>
+                    <p className="service-subtitle">병원 예약 관리</p>
+                  </div>
                 </div>
-                <div className="service-icon">
-                  <IonIcon icon={calendar} />
-                </div>
-              </div>
-          </IonCard>
+              </IonCardContent>
+            </IonCard>
 
-          {/* 복약 관리 카드 */}
-          <IonCard className="service-card medication-card" routerLink="/medication">
-            <IonCardContent>
-              <div className="service-card-content">
-                <div className="service-text">
-                  <h3 className="service-title medication-title">복약 관리</h3>
-                  <p className="service-subtitle">약물 복용을 체계적으로<br />관리하세요</p>
+            {/* 복약 관리 카드 */}
+            <IonCard className="service-card medication-card" routerLink="/medication">
+              <IonCardContent>
+                <div className="service-card-content">
+                  <div className="service-icon">
+                    <IonIcon icon={medical} />
+                  </div>
+                  <div className="service-text">
+                    <h3 className="service-title">복약 관리</h3>
+                    <p className="service-subtitle">복약 알림 확인하기</p>
+                  </div>
                 </div>
-                <div className="service-icon">
-                  <IonIcon icon={medical} />
+              </IonCardContent>
+            </IonCard>
+
+            {/* 즐겨찾는 병원 카드 */}
+            <IonCard className="service-card favorite-hospitals-card" routerLink="/favorite-hospitals">
+              <IonCardContent>
+                <div className="service-card-content">
+                  <div className="service-icon">
+                    <IonIcon icon={business} />
+                  </div>
+                  <div className="service-text">
+                    <h3 className="service-title">즐겨찾는 병원</h3>
+                    <p className="service-subtitle">즐겨찾는 병원 관리</p>
+                  </div>
                 </div>
-              </div>
-            </IonCardContent>
-          </IonCard>
+              </IonCardContent>
+            </IonCard>
+          </div>
 
           {/* 병원 예약 푸시 알림 테스트 */}
           <IonCard className="service-card">
@@ -879,7 +875,7 @@ const Home: React.FC = () => {
                   <p className="service-subtitle">병원 예약 푸시 알림을<br />테스트해보세요</p>
                 </div>
                 <div className="service-icon">
-                  <IonIcon icon={notifications} />
+                  <IonIcon icon={notificationsOutline} />
                 </div>
               </div>
               <div className="service-actions">

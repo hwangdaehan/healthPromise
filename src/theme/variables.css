@@ -75,28 +75,37 @@ ion-content {
   --color: var(--text-dark);
 }
 
-/* 헤더 - 통일된 파란색 배경 */
+/* 헤더 - 메인 배경색과 동일한 배경 */
+ion-header {
+  box-shadow: none !important;
+  border: none !important;
+  border-bottom: none !important;
+}
+
 ion-header ion-toolbar {
-  --background: #2563eb;
-  --color: white;
-  --border-color: transparent;
+  --background: var(--primary-gray) !important;
+  --color: var(--text-dark) !important;
+  --border-color: transparent !important;
   --padding-start: 20px;
   --padding-end: 20px;
   --padding-top: env(safe-area-inset-top, 0px);
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+  box-shadow: none !important;
+  border: none !important;
+  border-bottom: none !important;
+  background: var(--primary-gray) !important;
 }
 
 ion-title {
   font-size: 24px;
   font-weight: 700;
-  color: white;
+  color: var(--text-dark);
   text-align: left;
   letter-spacing: -0.5px;
 }
 
 /* 헤더 버튼 통일 */
 ion-header ion-button {
-  --color: white;
+  --color: var(--text-dark);
   --background: transparent;
   --border-radius: 8px;
   --padding-start: 8px;
@@ -112,9 +121,18 @@ ion-header ion-button ion-icon {
   font-size: 24px;
 }
 
+/* 헤더 아이콘 색상 - 종 아이콘을 검정색으로 */
+ion-header ion-button[data-icon="notifications"] ion-icon,
+ion-header ion-button .notifications-icon,
+ion-header ion-button ion-icon[name="notifications"],
+ion-header ion-button ion-icon[name="notifications-outline"] {
+  color: #000000 !important;
+  --color: #000000 !important;
+}
+
 /* 뒤로가기 버튼 - 화살표만 표시 */
 .back-button {
-  --color: white;
+  --color: var(--text-dark);
   --background: transparent;
   --border-radius: 0;
   --padding-start: 0;

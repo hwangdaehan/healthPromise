@@ -4,8 +4,8 @@
 
 /* 뒤로가기 버튼 */
 .back-button {
-  --color: rgba(255, 255, 255, 0.9);
-  --background: rgba(255, 255, 255, 0.1);
+  --color: #2563eb;
+  --background: rgba(37, 99, 235, 0.1);
   --border-radius: 12px;
   --padding-start: 12px;
   --padding-end: 16px;
@@ -16,7 +16,7 @@
 }
 
 .back-button:hover {
-  --background: rgba(255, 255, 255, 0.2);
+  --background: rgba(37, 99, 235, 0.2);
 }
 
 .back-button ion-icon {

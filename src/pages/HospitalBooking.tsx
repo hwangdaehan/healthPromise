@@ -438,18 +438,18 @@ const HospitalBooking: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonTitle>
-            <svg 
-              width="32" 
-              height="32" 
-              viewBox="0 0 24 24" 
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
               fill="#2563eb"
               style={{ display: 'flex', alignItems: 'center' }}
             >
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
             </svg>
           </IonTitle>
-          <IonButton 
-            fill="clear" 
+          <IonButton
+            fill="clear"
             slot="end"
             className="header-notification-button"
           >
@@ -458,7 +458,6 @@ const HospitalBooking: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        
         <IonCard>
           <IonCardHeader>
             <IonCardTitle>병원 찾기</IonCardTitle>
@@ -467,7 +466,7 @@ const HospitalBooking: React.FC = () => {
             <IonItem>
               <IonInput
                 value={hospitalName}
-                onIonInput={(e) => setHospitalName(e.detail.value!)}
+                onIonInput={e => setHospitalName(e.detail.value!)}
                 placeholder="병원 이름을 검색해보세요!"
                 clearInput={true}
               />
@@ -476,27 +475,34 @@ const HospitalBooking: React.FC = () => {
             {/* 거주지 기준 검색 옵션 */}
             <div className="search-option-container">
               <div className="tab-buttons">
-                <button 
+                <button
                   className={`tab-button ${!searchByLocation ? 'active' : ''}`}
                   onClick={() => setSearchByLocation(false)}
                 >
                   전체 보기
                 </button>
-                {userInfo && (userInfo.시도 || userInfo.sido) && (userInfo.시군구 || userInfo.sigungu) && (
-                  <button 
-                    className={`tab-button ${searchByLocation ? 'active' : ''}`}
-                    onClick={() => setSearchByLocation(true)}
-                  >
-                    {regionNames ? `${regionNames.sigungu.replace(/동안구$/, '')} 보기` : '내 지역 보기'}
-                  </button>
-                )}
+                {userInfo &&
+                  (userInfo.시도 || userInfo.sido) &&
+                  (userInfo.시군구 || userInfo.sigungu) && (
+                    <button
+                      className={`tab-button ${searchByLocation ? 'active' : ''}`}
+                      onClick={() => setSearchByLocation(true)}
+                    >
+                      {regionNames
+                        ? `${regionNames.sigungu.replace(/동안구$/, '')} 보기`
+                        : '내 지역 보기'}
+                    </button>
+                  )}
               </div>
             </div>
 
-            <div className="custom-search-button" onClick={() => {
-              setCurrentPage(1);
-              searchHospitals(1);
-            }}>
+            <div
+              className="custom-search-button"
+              onClick={() => {
+                setCurrentPage(1);
+                searchHospitals(1);
+              }}
+            >
               <IonIcon icon={search} className="search-icon" />
               <span className="search-text">
                 {isLoading ? '검색 중...' : '병원 검색하기'}
@@ -511,29 +517,18 @@ const HospitalBooking: React.FC = () => {
             <div className="search-count">{totalCount}건</div>
             <div className="hospital-cards-list">
               {searchResults.map((hospital, index) => (
-                <HospitalCard 
-                  key={hospital.ykiho || index} 
-                  hospital={hospital} 
+                <HospitalCard
+                  key={hospital.ykiho || index}
+                  hospital={hospital}
                 />
               ))}
             </div>
-                
+
             {/* 페이지네이션 */}
             {totalPages > 1 && (
               <div className="pagination-container">
                 <div className="pagination-buttons">
-                  <div className="pagination-info">
-                    총 {totalPages} 페이지
-                  </div>
-                  <button 
-                    className="pagination-btn prev-btn"
-                    onClick={goToPreviousPage}
-                    disabled={currentPage === 1}
-                  >
-                    <IonIcon icon={chevronBack} />
-                    이전
-                  </button>
-                  
+                  <div className="pagination-info">총 {totalPages} 페이지</div>
                   <div className="page-numbers">
                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                       let pageNum;
@@ -546,7 +541,7 @@ const HospitalBooking: React.FC = () => {
                       } else {
                         pageNum = currentPage - 2 + i;
                       }
-                      
+
                       return (
                         <button
                           key={pageNum}
@@ -558,15 +553,25 @@ const HospitalBooking: React.FC = () => {
                       );
                     })}
                   </div>
-                  
-                  <button 
-                    className="pagination-btn next-btn"
-                    onClick={goToNextPage}
-                    disabled={currentPage === totalPages}
-                  >
-                    다음
-                    <IonIcon icon={chevronForward} />
-                  </button>
+
+                  <div className="nav-buttons">
+                    <button
+                      className="pagination-btn prev-btn"
+                      onClick={goToPreviousPage}
+                      disabled={currentPage === 1}
+                    >
+                      <IonIcon icon={chevronBack} />
+                      이전
+                    </button>
+                    <button
+                      className="pagination-btn next-btn"
+                      onClick={goToNextPage}
+                      disabled={currentPage === totalPages}
+                    >
+                      다음
+                      <IonIcon icon={chevronForward} />
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -578,10 +583,22 @@ const HospitalBooking: React.FC = () => {
           <div className="no-results-container">
             <IonCard>
               <IonCardContent>
-                <p style={{ textAlign: 'center', color: '#666', fontSize: '18px' }}>
+                <p
+                  style={{
+                    textAlign: 'center',
+                    color: '#666',
+                    fontSize: '18px',
+                  }}
+                >
                   검색 결과가 없습니다.
                 </p>
-                <p style={{ textAlign: 'center', color: '#999', fontSize: '16px' }}>
+                <p
+                  style={{
+                    textAlign: 'center',
+                    color: '#999',
+                    fontSize: '16px',
+                  }}
+                >
                   다른 병원명으로 검색해보세요.
                 </p>
               </IonCardContent>

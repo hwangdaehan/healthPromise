@@ -1,0 +1,146 @@
+/* 즐겨찾는 병원 페이지 스타일 */
+
+.favorite-hospitals-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+.loading-container {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b7280;
+}
+
+.hospital-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: none;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.hospital-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.hospital-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.hospital-info {
+  flex: 1;
+}
+
+.hospital-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.hospital-address,
+.hospital-phone {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #6b7280;
+  margin: 4px 0;
+}
+
+.hospital-address ion-icon,
+.hospital-phone ion-icon {
+  font-size: 16px;
+  color: #9ca3af;
+}
+
+.hospital-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.favorite-button {
+  --color: #f59e0b;
+  --background: transparent;
+  --border-radius: 8px;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  height: 40px;
+  width: 40px;
+}
+
+.call-button {
+  --border-radius: 8px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  height: 40px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+}
+
+.empty-icon {
+  font-size: 64px;
+  color: #d1d5db;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 8px 0;
+}
+
+.empty-state p {
+  font-size: 16px;
+  margin: 0 0 24px 0;
+  color: #6b7280;
+}
+
+.go-to-hospital-button {
+  --border-radius: 12px;
+  --padding-start: 24px;
+  --padding-end: 24px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  height: 48px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .hospital-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .hospital-actions {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .favorite-button {
+    width: auto;
+  }
+}

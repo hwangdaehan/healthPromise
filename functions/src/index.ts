@@ -18,7 +18,7 @@ export const sendPushToUser = functions.https.onRequest((req, res) => {
     try {
       // 사용자 정보에서 pushToken 가져오기
       const userDoc = await admin.firestore().collection('user').doc(userId).get();
-      
+
       if (!userDoc.exists) {
         return res.status(404).json({ error: 'User not found' });
       }
@@ -42,7 +42,7 @@ export const sendPushToUser = functions.https.onRequest((req, res) => {
 
       // FCM으로 푸시 발송
       const response = await admin.messaging().send(message);
-      
+
       return res.status(200).json({
         success: true,
         messageId: response,
@@ -90,7 +90,7 @@ export const sendTestPush = functions.https.onRequest((req, res) => {
 
       // FCM으로 푸시 발송
       const response = await admin.messaging().sendMulticast(message);
-      
+
       return res.status(200).json({
         success: true,
         successCount: response.successCount,

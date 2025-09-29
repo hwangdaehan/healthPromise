@@ -10,6 +10,15 @@ export default defineConfig({
     react(),
     legacy()
   ],
+  server: {
+    host: '0.0.0.0',
+    port: 5173,
+    strictPort: true,
+    hmr: {
+      host: '192.168.45.72',
+      port: 5173
+    }
+  },
   test: {
     globals: true,
     environment: 'jsdom',

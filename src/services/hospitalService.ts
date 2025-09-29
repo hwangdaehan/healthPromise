@@ -43,7 +43,9 @@ export interface HospitalSearchResult {
 }
 
 // API 키는 환경변수에서 가져오거나 실제 키로 교체해야 합니다
-const API_KEY = import.meta.env.VITE_HOSPITAL_API_KEY || 'f59bba5ced858802b0bbd4ba54677b128e3e528bbf41a8a0c47c342838573cb9';
+const API_KEY =
+  import.meta.env.VITE_HOSPITAL_API_KEY ||
+  'f59bba5ced858802b0bbd4ba54677b128e3e528bbf41a8a0c47c342838573cb9';
 const BASE_URL = 'https://apis.data.go.kr/B551182/hospInfoServicev2/getHospBasisList';
 
 export class HospitalService {
@@ -75,16 +77,16 @@ export class HospitalService {
         searchParams.append('sgguCd', params.sgguCd);
       }
       const response = await fetch(`${BASE_URL}?${searchParams}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const responseText = await response.text();
       console.log('API 응답 텍스트:', responseText.substring(0, 200)); // 처음 200자만 로그
-      
+
       const data = JSON.parse(responseText);
-      
+
       // API 응답 구조에 따라 데이터 추출
       if (data.response && data.response.body) {
         const body = data.response.body;
@@ -92,27 +94,27 @@ export class HospitalService {
         const currentPage = params.pageNo || 1;
         const numOfRows = params.numOfRows || 10;
         const totalPages = Math.ceil(totalCount / numOfRows);
-        
+
         let hospitals: HospitalInfo[] = [];
         if (body.items && body.items.item) {
           const items = body.items.item;
           // 단일 객체인 경우 배열로 변환
           hospitals = Array.isArray(items) ? items : [items];
         }
-        
+
         return {
           hospitals,
           totalCount,
           currentPage,
-          totalPages
+          totalPages,
         };
       }
-      
+
       return {
         hospitals: [],
         totalCount: 0,
         currentPage: params.pageNo || 1,
-        totalPages: 0
+        totalPages: 0,
       };
     } catch (error) {
       console.error('병원 검색 중 오류 발생:', error);

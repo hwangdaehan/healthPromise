@@ -44,9 +44,7 @@ export const Card: React.FC<CardProps> = ({
           <IonCardTitle className="text-subheading">{title}</IonCardTitle>
         </IonCardHeader>
       )}
-      <IonCardContent className="p-0">
-        {children}
-      </IonCardContent>
+      <IonCardContent className="p-0">{children}</IonCardContent>
     </IonCard>
   );
 };

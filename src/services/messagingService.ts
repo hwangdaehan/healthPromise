@@ -9,6 +9,11 @@ export class MessagingService {
 
   static async getFCMToken(): Promise<string | null> {
     try {
+      if (!messaging) {
+        console.log('Firebase Messaging not available');
+        return null;
+      }
+
       if (!this.VAPID_KEY) {
         console.warn('VAPID key not configured');
         return null;
@@ -24,11 +29,16 @@ export class MessagingService {
         return null;
       }
     } catch (error) {
+      console.log('Failed to get FCM token:', error);
       return null;
     }
   }
 
   static onMessage(callback: (payload: any) => void): () => void {
+    if (!messaging) {
+      console.log('Firebase Messaging not available for onMessage');
+      return () => {}; // 빈 함수 반환
+    }
     return onMessage(messaging, callback);
   }
 
@@ -41,9 +51,12 @@ export class MessagingService {
     }
   }
 
-
   // 서버를 통한 FCM 푸시 발송
-  static async sendPushNotification(title: string, body: string, userId?: string): Promise<boolean> {
+  static async sendPushNotification(
+    title: string,
+    body: string,
+    userId?: string
+  ): Promise<boolean> {
     try {
       // 웹 환경에서만 브라우저 알림 사용
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
@@ -56,7 +69,7 @@ export class MessagingService {
             if (Notification.permission === 'granted') {
               new Notification(title, {
                 body: body,
-                icon: '/favicon.png'
+                icon: '/favicon.png',
               });
               return true;
             } else if (Notification.permission !== 'denied') {
@@ -64,7 +77,7 @@ export class MessagingService {
               if (permission === 'granted') {
                 new Notification(title, {
                   body: body,
-                  icon: '/favicon.png'
+                  icon: '/favicon.png',
                 });
                 return true;
               }
@@ -83,7 +96,7 @@ export class MessagingService {
           targetUserId = userInfo.uid;
         }
       }
-      
+
       if (!targetUserId) {
         console.error('사용자 ID가 없습니다.');
         return false;
@@ -96,7 +109,7 @@ export class MessagingService {
           const { getMessaging } = await import('firebase/messaging');
           const messaging = getMessaging();
           const currentToken = await getToken(messaging, {
-            vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
+            vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
           });
 
           if (currentToken) {
@@ -109,8 +122,8 @@ export class MessagingService {
               },
               data: {
                 type: 'manual',
-                timestamp: new Date().toISOString()
-              }
+                timestamp: new Date().toISOString(),
+              },
             };
 
             // FCM Admin SDK를 사용할 수 없으므로 간단한 로그만 출력
@@ -122,24 +135,27 @@ export class MessagingService {
           return false;
         }
       }
-      
+
       // 프로덕션 환경에서는 Cloud Functions 사용
-      const response = await fetch('https://us-central1-healthpromise-36111.cloudfunctions.net/sendPushToUser', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: targetUserId,
-          title: title,
-          body: body,
-          data: {
-            type: 'manual',
-            timestamp: new Date().toISOString()
-          }
-        })
-      });
-      
+      const response = await fetch(
+        'https://us-central1-healthpromise-36111.cloudfunctions.net/sendPushToUser',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: targetUserId,
+            title: title,
+            body: body,
+            data: {
+              type: 'manual',
+              timestamp: new Date().toISOString(),
+            },
+          }),
+        }
+      );
+
       if (response.ok) {
         const result = await response.json();
         return true;
@@ -155,12 +171,12 @@ export class MessagingService {
   static async sendTestPush(title?: string, body?: string): Promise<boolean> {
     try {
       const sendTestPush = httpsCallable(functions, 'sendTestPush');
-      
+
       const result = await sendTestPush({
         title: title || '테스트 알림',
-        body: body || '테스트 메시지입니다.'
+        body: body || '테스트 메시지입니다.',
       });
-      
+
       return true;
     } catch (error) {
       return false;
@@ -176,22 +192,21 @@ export class MessagingService {
   static async saveUserFCMToken(userId: string, token: string): Promise<void> {
     try {
       const userRef = doc(db, 'user', userId);
-      
+
       // 먼저 문서가 존재하는지 확인
       const userDoc = await getDoc(userRef);
-      
+
       if (userDoc.exists()) {
         // 문서가 존재하면 업데이트
         await updateDoc(userRef, {
           pushToken: token,
-          updatedAt: new Date()
+          updatedAt: new Date(),
         });
       } else {
         // 문서가 없으면 FCM 토큰 저장하지 않음
         return;
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   // 사용자별 FCM 토큰 가져오기 (user 컬렉션에서 조회)
@@ -199,7 +214,7 @@ export class MessagingService {
     try {
       const userRef = doc(db, 'user', userId);
       const userDoc = await getDoc(userRef);
-      
+
       if (userDoc.exists()) {
         const userData = userDoc.data();
         return userData.pushToken || null;
@@ -228,22 +243,21 @@ export class MessagingService {
 
       // localStorage에서 사용자 정보 가져오기
       const savedUserInfo = localStorage.getItem('userInfo');
-      
+
       if (savedUserInfo) {
         const userInfo = JSON.parse(savedUserInfo);
         const userId = userInfo.uid;
-        
-        
+
         if (userId) {
           // user 컬렉션에 사용자가 존재하는지 확인 후 pushToken 저장
           const userRef = doc(db, 'user', userId);
-          
+
           const userDoc = await getDoc(userRef);
-          
+
           if (userDoc.exists()) {
             // user 컬렉션에 pushToken 저장
             await this.saveUserFCMToken(userId, token);
-            
+
             // 세션에도 pushToken 저장
             const updatedUserInfo = { ...userInfo, pushToken: token };
             localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
@@ -256,7 +270,7 @@ export class MessagingService {
 
       // localStorage에도 저장
       localStorage.setItem('fcmToken', token);
-      
+
       return token;
     } catch (error) {
       return null;
@@ -266,17 +280,16 @@ export class MessagingService {
   // 예약 알림 체크 및 발송
   static async checkAndSendReservationNotifications(): Promise<void> {
     try {
-      
       // localStorage에서 사용자 정보 가져오기
       const savedUserInfo = localStorage.getItem('userInfo');
-      
+
       if (!savedUserInfo) {
         return;
       }
 
       const userInfo = JSON.parse(savedUserInfo);
       const userId = userInfo.uid;
-      
+
       if (!userId) {
         return;
       }
@@ -284,11 +297,11 @@ export class MessagingService {
       // 모든 예약 데이터 가져오기 (전체 사용자 대상)
       const { collection, getDocs, query, orderBy } = await import('firebase/firestore');
       const { db } = await import('../config/firebase');
-      
+
       const reservationsRef = collection(db, 'reservation');
       const q = query(reservationsRef, orderBy('reservationDate', 'desc'));
       const querySnapshot = await getDocs(q);
-      
+
       const allReservations = querySnapshot.docs.map(doc => {
         const data = doc.data();
         return {
@@ -299,10 +312,9 @@ export class MessagingService {
           regDate: data.regDate?.toDate() || new Date(),
           reservationDate: data.reservationDate?.toDate() || new Date(),
           telNo: data.telNo || '',
-          userId: data.userId || ''
+          userId: data.userId || '',
         };
       });
-      
 
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
@@ -311,24 +323,19 @@ export class MessagingService {
       const dayAfterTomorrow = new Date(tomorrow);
       dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 1);
 
-
       // 내일 예약이 있는지 확인
       const tomorrowReservations = allReservations.filter(reservation => {
         const reservationDate = reservation.reservationDate;
-        
-        return (
-          reservationDate >= tomorrow && 
-          reservationDate < dayAfterTomorrow
-        );
-      });
 
+        return reservationDate >= tomorrow && reservationDate < dayAfterTomorrow;
+      });
 
       // 내일 예약이 있으면 알림 발송
       if (tomorrowReservations.length > 0) {
         for (const reservation of tomorrowReservations) {
           const reservationDate = reservation.reservationDate;
           const reservationUserId = reservation.userId; // 예약한 사용자의 ID
-          
+
           const month = reservationDate.getMonth() + 1;
           const day = reservationDate.getDate();
           const hour = reservationDate.getHours();
@@ -336,7 +343,6 @@ export class MessagingService {
 
           const notificationTitle = '병원 예약 알림';
           const notificationBody = `${month}월 ${day}일 ${hour}시에 ${hospitalName} 방문예정이에요!`;
-
 
           try {
             // alarm 컬렉션에 알림 데이터 저장
@@ -347,35 +353,36 @@ export class MessagingService {
               isRead: false,
               isSuccess: false,
               title: notificationTitle,
-              userId: reservationUserId // 예약한 사용자의 ID 사용
+              userId: reservationUserId, // 예약한 사용자의 ID 사용
             });
 
             // FCM 푸시 알림 발송
-            const pushSuccess = await this.sendPushNotification(notificationTitle, notificationBody, reservationUserId);
-            
+            const pushSuccess = await this.sendPushNotification(
+              notificationTitle,
+              notificationBody,
+              reservationUserId
+            );
+
             if (pushSuccess) {
               // 발송 성공 처리
               await markAlarmAsSuccess(alarmId);
             } else {
             }
-          } catch (alarmError) {
-          }
+          } catch (alarmError) {}
         }
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   }
-
 
   // 매일 정해진 시간에 알림 체크하는 함수
   static startDailyNotificationCheck(): void {
     // 매일 오전 9시에 체크 (원하는 시간으로 변경 가능)
     const checkTime = 9; // 9시
-    
+
     const checkNotifications = () => {
       const now = new Date();
       const currentHour = now.getHours();
-      
+
       // 지정된 시간이면 알림 체크
       if (currentHour === checkTime) {
         this.checkAndSendReservationNotifications();
@@ -385,5 +392,4 @@ export class MessagingService {
     // 1시간마다 체크
     setInterval(checkNotifications, 60 * 60 * 1000);
   }
-
 }

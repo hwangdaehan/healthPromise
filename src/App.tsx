@@ -1,9 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import {
-  IonApp,
-  setupIonicReact
-} from '@ionic/react';
+import { IonApp, setupIonicReact } from '@ionic/react';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { IonReactRouter } from '@ionic/react-router';
 import AppRouter from './router/AppRouter';
@@ -34,10 +31,13 @@ import '@ionic/react/css/display.css';
 
 /* import '@ionic/react/css/palettes/dark.always.css'; */
 /* import '@ionic/react/css/palettes/dark.class.css'; */
-import '@ionic/react/css/palettes/dark.system.css';
+/* import '@ionic/react/css/palettes/dark.system.css'; */
 
 /* Theme variables */
 import './theme/variables.css';
+
+/* Tailwind CSS */
+import './index.css';
 
 setupIonicReact();
 
@@ -83,7 +83,7 @@ const AppContent: React.FC = () => {
         style={{
           background: backgroundColor,
           minHeight: '100vh',
-          transition: 'background 0.8s ease-in-out'
+          transition: 'background 0.8s ease-in-out',
         }}
       >
         <AppRouter showTabs={location.pathname !== '/login' && location.pathname !== '/register'} />

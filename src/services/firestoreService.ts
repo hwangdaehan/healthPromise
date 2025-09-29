@@ -99,13 +99,10 @@ export class FirestoreService {
 
   static async getMedicinesByUserId(userId: string): Promise<Medicine[]> {
     try {
-      const q = query(
-        collection(db, 'medicine'),
-        where('userId', '==', userId)
-      );
-      
+      const q = query(collection(db, 'medicine'), where('userId', '==', userId));
+
       const querySnapshot = await getDocs(q);
-      
+
       const medicines = querySnapshot.docs.map(doc => {
         const data = doc.data();
         return {
@@ -113,7 +110,7 @@ export class FirestoreService {
           ...data,
         } as Medicine;
       });
-      
+
       return medicines;
     } catch (error) {
       console.error('Error getting medicines:', error);
@@ -125,11 +122,11 @@ export class FirestoreService {
     try {
       const docRef = doc(db, 'medicine', medicineId);
       const docSnap = await getDoc(docRef);
-      
+
       if (!docSnap.exists()) {
         return null;
       }
-      
+
       const data = docSnap.data();
       return {
         dataId: docSnap.id,

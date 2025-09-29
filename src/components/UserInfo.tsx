@@ -64,7 +64,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
     setIsLoadingRegions(true);
     try {
       const 시도목록 = await RegionService.get시도목록();
-        console.log(시도목록);
+      console.log(시도목록);
       set시도목록(시도목록);
     } catch (error) {
       console.error('지역 데이터 로드 실패:', error);
@@ -73,36 +73,42 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
     }
   };
 
-              const handleSave = async () => {
-                console.log('handleSave 함수 실행됨!');
-                console.log('현재 userInfo:', userInfo);
-                console.log('모든 필드 체크:', {
-                  name: !!userInfo.name,
-                  birthDate: !!userInfo.birthDate,
-                  gender: !!userInfo.gender,
-                  시도: !!userInfo.시도,
-                  시군구: !!userInfo.시군구
-                });
-                
-                if (userInfo.name && userInfo.birthDate && userInfo.gender && userInfo.시도 && userInfo.시군구) {
-                  console.log('모든 필드가 채워짐! Firebase 저장 시작...');
-                  try {
-                    await upsertUserProfile({
-                      birthDate: userInfo.birthDate,
-                      gender: userInfo.gender as 'male' | 'female' | 'other',
-                      name: userInfo.name,
-                      sido: userInfo.시도,
-                      sigungu: userInfo.시군구,
-                    });
-                    console.log('Firebase 저장 완료!');
-                  } catch (e) {
-                    console.error('Firebase 저장 실패:', e);
-                  }
-                  onSave(userInfo);
-                } else {
-                  console.log('일부 필드가 비어있음. 저장하지 않음.');
-                }
-              };
+  const handleSave = async () => {
+    console.log('handleSave 함수 실행됨!');
+    console.log('현재 userInfo:', userInfo);
+    console.log('모든 필드 체크:', {
+      name: !!userInfo.name,
+      birthDate: !!userInfo.birthDate,
+      gender: !!userInfo.gender,
+      시도: !!userInfo.시도,
+      시군구: !!userInfo.시군구,
+    });
+
+    if (
+      userInfo.name &&
+      userInfo.birthDate &&
+      userInfo.gender &&
+      userInfo.시도 &&
+      userInfo.시군구
+    ) {
+      console.log('모든 필드가 채워짐! Firebase 저장 시작...');
+      try {
+        await upsertUserProfile({
+          birthDate: userInfo.birthDate,
+          gender: userInfo.gender as 'male' | 'female' | 'other',
+          name: userInfo.name,
+          sido: userInfo.시도,
+          sigungu: userInfo.시군구,
+        });
+        console.log('Firebase 저장 완료!');
+      } catch (e) {
+        console.error('Firebase 저장 실패:', e);
+      }
+      onSave(userInfo);
+    } else {
+      console.log('일부 필드가 비어있음. 저장하지 않음.');
+    }
+  };
 
   const updateUserInfo = (field: keyof UserInfo, value: string) => {
     if (field === '시도') {
@@ -110,14 +116,14 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
       setUserInfo(prev => ({
         ...prev,
         [field]: value,
-        시군구: ''
+        시군구: '',
       }));
       // 시군구 목록 즉시 로드
       load시군구목록(parseInt(value));
     } else {
       setUserInfo(prev => ({
         ...prev,
-        [field]: value
+        [field]: value,
       }));
     }
   };
@@ -140,7 +146,11 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonButton fill="clear" onClick={() => history.push('/home')} className="user-info-back">
+            <IonButton
+              fill="clear"
+              onClick={() => history.push('/home')}
+              className="user-info-back"
+            >
               <IonIcon icon={arrowBack} />
             </IonButton>
           </IonButtons>
@@ -155,12 +165,8 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
               <div className="banner-content">
                 <div className="banner-text">
                   <h2 className="banner-title">환영합니다! 👋</h2>
-                  <h3 className="banner-form-title">
-                    기본 정보를 입력해주세요!
-                  </h3>
-                  <p className="banner-subtitle">
-                    건강한 하루를 위한 첫 걸음을 시작해보세요
-                  </p>
+                  <h3 className="banner-form-title">기본 정보를 입력해주세요!</h3>
+                  <p className="banner-subtitle">건강한 하루를 위한 첫 걸음을 시작해보세요</p>
                 </div>
                 <div className="banner-icon">
                   <IonIcon icon={person} />
@@ -185,25 +191,19 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
               </div>
 
               <div className="input-group">
-                <IonLabel className="input-label">
-                  생년월일을 알려주세요 *
-                </IonLabel>
+                <IonLabel className="input-label">생년월일을 알려주세요 *</IonLabel>
                 <IonItem>
                   <IonInput
                     type="date"
                     value={userInfo.birthDate}
-                    onIonInput={e =>
-                      updateUserInfo('birthDate', e.detail.value!)
-                    }
+                    onIonInput={e => updateUserInfo('birthDate', e.detail.value!)}
                     placeholder="생년월일을 선택하세요"
                   />
                 </IonItem>
               </div>
 
               <div className="input-group">
-                <IonLabel className="input-label">
-                  성별을 선택해주세요 *
-                </IonLabel>
+                <IonLabel className="input-label">성별을 선택해주세요 *</IonLabel>
                 <IonRadioGroup
                   value={userInfo.gender}
                   onIonChange={e => updateUserInfo('gender', e.detail.value)}
@@ -221,9 +221,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
               </div>
 
               <div className="input-group">
-                <IonLabel className="input-label">
-                  거주 지역을 선택해주세요 *
-                </IonLabel>
+                <IonLabel className="input-label">거주 지역을 선택해주세요 *</IonLabel>
 
                 <div className="region-select-container">
                   <IonItem className="region-select-item">
@@ -235,10 +233,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
                       disabled={isLoadingRegions}
                     >
                       {시도목록.map(시도 => (
-                        <IonSelectOption
-                          key={시도.코드}
-                          value={시도.코드.toString()}
-                        >
+                        <IonSelectOption key={시도.코드} value={시도.코드.toString()}>
                           {시도.코드명}
                         </IonSelectOption>
                       ))}
@@ -249,9 +244,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
                     <IonLabel position="stacked">시/군/구</IonLabel>
                     <IonSelect
                       value={userInfo.시군구}
-                      onIonChange={e =>
-                        updateUserInfo('시군구', e.detail.value)
-                      }
+                      onIonChange={e => updateUserInfo('시군구', e.detail.value)}
                       placeholder={
                         !userInfo.시도
                           ? '먼저 시/도를 선택하세요'
@@ -262,10 +255,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
                       disabled={!userInfo.시도 || isLoading시군구}
                     >
                       {시군구목록.map(시군구 => (
-                        <IonSelectOption
-                          key={시군구.코드}
-                          value={시군구.코드.toString()}
-                        >
+                        <IonSelectOption key={시군구.코드} value={시군구.코드.toString()}>
                           {시군구.코드명}
                         </IonSelectOption>
                       ))}

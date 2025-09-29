@@ -32,7 +32,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onRegisterSuccess }) => {
       style={{
         background: 'transparent',
         minHeight: '100vh',
-        transition: 'background 0.8s ease-in-out'
+        transition: 'background 0.8s ease-in-out',
       }}
     >
       <UserInfo onSave={handleUserInfoSave} />

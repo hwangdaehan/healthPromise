@@ -1,5 +1,14 @@
 {
-    "recommendations": [
-        "Webnative.webnative"
-    ]
+  "recommendations": [
+    "Webnative.webnative",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-typescript-next",
+    "formulahendry.auto-rename-tag",
+    "ms-vscode.vscode-json",
+    "christian-kohler.path-intellisense",
+    "visualstudioexptteam.vscodeintellicode",
+    "ionic.ionic"
+  ]
 }

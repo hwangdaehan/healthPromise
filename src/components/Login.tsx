@@ -22,12 +22,12 @@ import { findUserByNameAndBirthDate } from '../services/userService';
 import './Login.css';
 
 interface LoginProps {
-  onLoginSuccess?: (userData: { 
-    name: string; 
-    birthDate: string; 
-    gender?: string; 
-    sido?: string; 
-    sigungu?: string; 
+  onLoginSuccess?: (userData: {
+    name: string;
+    birthDate: string;
+    gender?: string;
+    sido?: string;
+    sigungu?: string;
   }) => void;
   onGoToRegister?: () => void;
 }
@@ -43,7 +43,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
       setError('이름을 입력해주세요.');
       return;
     }
-    
+
     if (!birthDate) {
       setError('생년월일을 선택해주세요.');
       return;
@@ -55,17 +55,19 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
     try {
       // Firebase user 컬렉션에서 이름과 생년월일로 사용자 찾기
       const userProfile = await findUserByNameAndBirthDate(name.trim(), birthDate);
-      
+
       let userData;
-      
+
       if (userProfile) {
         // Firebase에서 사용자 정보를 찾은 경우 - 모든 정보를 세션에 저장
         userData = {
           uid: userProfile.uid, // Firebase 사용자 ID 추가
           name: userProfile.name || name.trim(),
-          birthDate: userProfile.birthDate ? 
-            ((userProfile.birthDate as any).toDate ? (userProfile.birthDate as any).toDate().toISOString() : String(userProfile.birthDate)) : 
-            birthDate,
+          birthDate: userProfile.birthDate
+            ? (userProfile.birthDate as any).toDate
+              ? (userProfile.birthDate as any).toDate().toISOString()
+              : String(userProfile.birthDate)
+            : birthDate,
           gender: userProfile.gender || '',
           sido: userProfile.sido || '',
           sigungu: userProfile.sigungu || '',
@@ -75,9 +77,9 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
           pushToken: userProfile.pushToken || '',
           emergencyContact: userProfile.emergencyContact || null,
           medicalInfo: userProfile.medicalInfo || null,
-          loginTime: new Date().toISOString()
+          loginTime: new Date().toISOString(),
         };
-        
+
         console.log('사용자 정보를 찾았습니다:', userProfile);
       } else {
         // Firebase에서 사용자 정보를 찾지 못한 경우 (기본값으로 저장)
@@ -93,21 +95,21 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
           pushToken: '',
           emergencyContact: null,
           medicalInfo: null,
-          loginTime: new Date().toISOString()
+          loginTime: new Date().toISOString(),
         };
-        
+
         console.log('사용자 정보를 찾지 못했습니다. 기본값으로 저장합니다.');
       }
-      
+
       localStorage.setItem('userInfo', JSON.stringify(userData));
-      
+
       if (onLoginSuccess) {
-        onLoginSuccess({ 
-          name: userData.name, 
+        onLoginSuccess({
+          name: userData.name,
           birthDate: userData.birthDate,
           gender: userData.gender,
           sido: userData.sido,
-          sigungu: userData.sigungu
+          sigungu: userData.sigungu,
         });
       }
     } catch (error) {
@@ -135,7 +137,6 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
         <div className="login-container">
           <IonCard className="login-card">
             <IonCardContent>
-              
               <div className="login-form">
                 <IonItem className="form-item">
                   <IonIcon icon={person} slot="start" />
@@ -143,7 +144,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
                   <IonInput
                     type="text"
                     value={name}
-                    onIonInput={(e) => setName(e.detail.value!)}
+                    onIonInput={e => setName(e.detail.value!)}
                     placeholder="이름을 입력하세요"
                     clearInput={true}
                   />
@@ -155,7 +156,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
                   <IonInput
                     type="date"
                     value={birthDate}
-                    onIonInput={(e) => setBirthDate(e.detail.value!)}
+                    onIonInput={e => setBirthDate(e.detail.value!)}
                     placeholder="생년월일을 선택하세요"
                   />
                 </IonItem>
@@ -176,7 +177,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
                   </>
                 )}
               </IonButton>
-              
+
               <IonButton
                 fill="clear"
                 expand="block"

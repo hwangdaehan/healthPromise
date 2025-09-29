@@ -75,7 +75,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
           transition: 'background 0.8s ease-in-out',
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'center'
+          alignItems: 'center',
         }}
       >
         <div>로딩 중...</div>

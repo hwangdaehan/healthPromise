@@ -50,9 +50,7 @@ const AdBanner: React.FC<AdBannerProps> = ({ onClose }) => {
   return (
     <div className="ad-banner-container">
       <div className="ad-banner-content">
-        <div className="ad-banner-text">
-          {isAdLoaded ? '' : '광고 로딩 중...'}
-        </div>
+        <div className="ad-banner-text">{isAdLoaded ? '' : '광고 로딩 중...'}</div>
         <IonButton
           fill="clear"
           size="small"

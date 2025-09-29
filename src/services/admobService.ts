@@ -1,8 +1,14 @@
-import { AdMob, BannerAdOptions, BannerAdSize, BannerAdPosition, RewardAdOptions } from '@capacitor-community/admob';
+import {
+  AdMob,
+  BannerAdOptions,
+  BannerAdSize,
+  BannerAdPosition,
+  RewardAdOptions,
+} from '@capacitor-community/admob';
 
 export class AdMobService {
   private static readonly APP_ID = 'ca-app-pub-4735367527487227~7019721685';
-  
+
   // 실제 광고 단위 ID
   private static readonly BANNER_AD_ID = 'ca-app-pub-4735367527487227/6345219671'; // 메인 배너 광고
   private static readonly INTERSTITIAL_AD_ID = 'ca-app-pub-4735367527487227/6692364720'; // 앱 열기 광고

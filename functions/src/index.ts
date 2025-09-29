@@ -68,7 +68,7 @@ export const sendTestPush = functions.https.onRequest((req, res) => {
       const usersSnapshot = await admin.firestore().collection('user').get();
       const tokens: string[] = [];
 
-      usersSnapshot.forEach((doc) => {
+      usersSnapshot.forEach(doc => {
         const userData = doc.data();
         if (userData.pushToken) {
           tokens.push(userData.pushToken);
@@ -107,7 +107,7 @@ export const sendTestPush = functions.https.onRequest((req, res) => {
 export const scheduledReservationNotifications = functions.pubsub
   .schedule('0 9 * * *')
   .timeZone('Asia/Seoul')
-  .onRun(async (context) => {
+  .onRun(async context => {
     console.log('예약 알림 스케줄러 비활성화됨');
     return null;
   });
@@ -116,7 +116,7 @@ export const scheduledReservationNotifications = functions.pubsub
 export const scheduledMedicineNotifications = functions.pubsub
   .schedule('0 9-21 * * *') // 오전 9시~오후 9시 매시간 실행
   .timeZone('Asia/Seoul')
-  .onRun(async (context) => {
+  .onRun(async context => {
     console.log('복약 알림 스케줄러 비활성화됨');
     return null;
   });

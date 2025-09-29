@@ -1,4 +1,14 @@
-import { doc, getDoc, setDoc, addDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  addDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  orderBy,
+} from 'firebase/firestore';
 import { db } from '../config/firebase';
 // Firebase Auth는 사용하지 않음 - localStorage 기반으로 변경
 
@@ -25,22 +35,23 @@ export interface Reservation {
   updatedAt?: Date;
 }
 
-export const addReservation = async (reservationData: Omit<Reservation, 'id' | 'regDate' | 'userId'>): Promise<string> => {
+export const addReservation = async (
+  reservationData: Omit<Reservation, 'id' | 'regDate' | 'userId'>
+): Promise<string> => {
   try {
     // localStorage에서 사용자 정보 가져오기
     const savedUserInfo = localStorage.getItem('userInfo');
     let userId = null;
-    
+
     if (savedUserInfo) {
       try {
         const userInfo = JSON.parse(savedUserInfo);
         userId = userInfo.uid || userInfo.name; // uid가 없으면 name을 사용
-        
       } catch (error) {
         throw new Error('User not authenticated');
       }
     }
-    
+
     if (!userId) {
       throw new Error('User not authenticated - no user ID found');
     }
@@ -48,11 +59,10 @@ export const addReservation = async (reservationData: Omit<Reservation, 'id' | '
     // userId로 user 컬렉션에서 사용자 존재 여부 확인
     const userRef = doc(db, 'user', userId);
     const userDoc = await getDoc(userRef);
-    
+
     if (!userDoc.exists()) {
       throw new Error('User not found in database');
     }
-    
 
     const now = new Date();
     const reservation = {
@@ -62,9 +72,8 @@ export const addReservation = async (reservationData: Omit<Reservation, 'id' | '
       regDate: now,
       reservationDate: reservationData.reservationDate,
       telNo: reservationData.telNo,
-      userId: userId
+      userId: userId,
     };
-
 
     const docRef = await addDoc(collection(db, 'reservation'), reservation);
     return docRef.id;
@@ -75,11 +84,10 @@ export const addReservation = async (reservationData: Omit<Reservation, 'id' | '
 
 export const getReservations = async (year?: number, month?: number): Promise<Reservation[]> => {
   try {
-    
     // localStorage에서 사용자 정보 가져오기
     const savedUserInfo = localStorage.getItem('userInfo');
     let userId = null;
-    
+
     if (savedUserInfo) {
       try {
         const userInfo = JSON.parse(savedUserInfo);
@@ -88,21 +96,21 @@ export const getReservations = async (year?: number, month?: number): Promise<Re
         return [];
       }
     }
-    
+
     if (!userId) {
       return [];
     }
 
     const reservationsRef = collection(db, 'reservation');
     let q;
-    
+
     if (year !== undefined && month !== undefined) {
       // 특정 월의 시작일과 종료일 계산
       const startDate = new Date(year, month, 1);
       const endDate = new Date(year, month + 1, 0, 23, 59, 59, 999);
-      
+
       q = query(
-        reservationsRef, 
+        reservationsRef,
         where('userId', '==', userId),
         where('reservationDate', '>=', startDate),
         where('reservationDate', '<=', endDate),
@@ -110,18 +118,14 @@ export const getReservations = async (year?: number, month?: number): Promise<Re
       );
     } else {
       // 전체 데이터 조회
-      q = query(
-        reservationsRef, 
-        where('userId', '==', userId),
-        orderBy('reservationDate', 'desc')
-      );
+      q = query(reservationsRef, where('userId', '==', userId), orderBy('reservationDate', 'desc'));
     }
-    
+
     const querySnapshot = await getDocs(q);
-    
+
     const reservations = querySnapshot.docs.map(doc => {
       const data = doc.data();
-      
+
       return {
         id: doc.id,
         address: data.address || '',
@@ -130,22 +134,25 @@ export const getReservations = async (year?: number, month?: number): Promise<Re
         regDate: data.regDate?.toDate() || new Date(),
         reservationDate: data.reservationDate?.toDate() || new Date(),
         telNo: data.telNo || '',
-        userId: data.userId || ''
+        userId: data.userId || '',
       } as Reservation;
     });
-    
+
     return reservations;
   } catch (error) {
     return [];
   }
 };
 
-export const updateReservationStatus = async (reservationId: string, status: Reservation['status']): Promise<boolean> => {
+export const updateReservationStatus = async (
+  reservationId: string,
+  status: Reservation['status']
+): Promise<boolean> => {
   try {
     // localStorage에서 사용자 정보 가져오기
     const savedUserInfo = localStorage.getItem('userInfo');
     let userId = null;
-    
+
     if (savedUserInfo) {
       try {
         const userInfo = JSON.parse(savedUserInfo);
@@ -154,17 +161,21 @@ export const updateReservationStatus = async (reservationId: string, status: Res
         return false;
       }
     }
-    
+
     if (!userId) {
       return false;
     }
 
     const reservationRef = doc(db, 'reservation', reservationId);
-    await setDoc(reservationRef, { 
-      status, 
-      regDate: new Date() 
-    }, { merge: true });
-    
+    await setDoc(
+      reservationRef,
+      {
+        status,
+        regDate: new Date(),
+      },
+      { merge: true }
+    );
+
     return true;
   } catch (error) {
     return false;

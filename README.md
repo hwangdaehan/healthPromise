@@ -24,19 +24,22 @@ Before running this project, make sure you have:
 ## 🛠️ Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <your-repo-url>
    cd healthPromise
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up Firebase configuration**
-   
+
    Create a `.env` file in the root directory and add your Firebase configuration:
+
    ```env
    VITE_FIREBASE_API_KEY=your_api_key_here
    VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
@@ -53,21 +56,25 @@ Before running this project, make sure you have:
 ## 🔥 Firebase Setup
 
 ### 1. Create a Firebase Project
+
 1. Go to [Firebase Console](https://console.firebase.google.com/)
 2. Create a new project
 3. Enable Authentication, Firestore Database, and Cloud Messaging
 
 ### 2. Configure Authentication
+
 1. In Firebase Console, go to Authentication > Sign-in method
 2. Enable Google Sign-In
 3. Add your domain to authorized domains
 
 ### 3. Configure Firestore
+
 1. Go to Firestore Database
 2. Create a database in test mode (for development)
 3. The app will automatically create the `sampleData` collection
 
 ### 4. Configure Cloud Messaging
+
 1. Go to Project Settings > Cloud Messaging
 2. Generate a Web Push certificate
 3. Copy the VAPID key to your `.env` file
@@ -75,6 +82,7 @@ Before running this project, make sure you have:
 ## 🏃‍♂️ Running the Project
 
 ### Development Server
+
 ```bash
 npm run dev
 # or
@@ -84,11 +92,13 @@ ionic serve
 The app will be available at `http://localhost:8100`
 
 ### Building for Production
+
 ```bash
 npm run build
 ```
 
 ### Linting and Formatting
+
 ```bash
 # Check for linting errors
 npm run lint
@@ -106,18 +116,22 @@ npm run format:check
 ## 📱 Mobile Development
 
 ### iOS Setup
+
 1. **Add iOS platform** (if not already added)
+
    ```bash
    npx cap add ios
    ```
 
 2. **Build and sync**
+
    ```bash
    npm run build
    npx cap sync ios
    ```
 
 3. **Open in Xcode**
+
    ```bash
    npx cap open ios
    ```
@@ -127,18 +141,22 @@ npm run format:check
    - Click the Run button
 
 ### Android Setup
+
 1. **Add Android platform** (if not already added)
+
    ```bash
    npx cap add android
    ```
 
 2. **Build and sync**
+
    ```bash
    npm run build
    npx cap sync android
    ```
 
 3. **Open in Android Studio**
+
    ```bash
    npx cap open android
    ```
@@ -150,11 +168,13 @@ npm run format:check
 ## 🧪 Testing
 
 ### Unit Tests
+
 ```bash
 npm run test.unit
 ```
 
 ### E2E Tests
+
 ```bash
 npm run test.e2e
 ```

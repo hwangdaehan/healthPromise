@@ -15,7 +15,11 @@ import {
 } from '@ionic/react';
 import { arrowBack, business, call, location, star, starOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import { getFavoriteHospitals, removeFavoriteHospital, FavoriteHospital } from '../services/favoriteHospitalService';
+import {
+  getFavoriteHospitals,
+  removeFavoriteHospital,
+  FavoriteHospital,
+} from '../services/favoriteHospitalService';
 import { getCurrentUserSession } from '../services/userService';
 import './FavoriteHospitals.css';
 
@@ -33,7 +37,7 @@ const FavoriteHospitals: React.FC = () => {
       setLoading(true);
       const userSession = await getCurrentUserSession();
       let userId = null;
-      
+
       if (userSession && userSession.isAuthenticated) {
         userId = userSession.user?.uid;
       } else {
@@ -47,7 +51,7 @@ const FavoriteHospitals: React.FC = () => {
           }
         }
       }
-      
+
       const favorites = await getFavoriteHospitals(userId);
       setFavoriteHospitals(favorites);
     } catch (error) {
@@ -75,8 +79,8 @@ const FavoriteHospitals: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonTitle>즐겨찾는 병원</IonTitle>
-          <IonButton 
-            fill="clear" 
+          <IonButton
+            fill="clear"
             onClick={() => history.goBack()}
             className="back-button"
             slot="end"
@@ -94,7 +98,7 @@ const FavoriteHospitals: React.FC = () => {
           ) : favoriteHospitals.length > 0 ? (
             <IonGrid>
               <IonRow>
-                {favoriteHospitals.map((hospital) => (
+                {favoriteHospitals.map(hospital => (
                   <IonCol size="12" key={hospital.id}>
                     <IonCard className="hospital-card">
                       <IonCardContent>

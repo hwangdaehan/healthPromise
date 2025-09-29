@@ -215,13 +215,18 @@ ion-card {
   right: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
   animation: float 6s ease-in-out infinite;
 }
 
 @keyframes float {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(-20px, -20px) rotate(180deg); }
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-20px, -20px) rotate(180deg);
+  }
 }
 
 .medication-icon {
@@ -520,29 +525,29 @@ ion-card {
   .large-title {
     font-size: 24px !important;
   }
-  
+
   .large-label {
     font-size: 18px;
   }
-  
+
   .large-input {
     font-size: 18px;
     height: 56px;
   }
-  
+
   .time-button {
     font-size: 16px;
     padding: 14px 20px;
   }
-  
+
   .medication-name {
     font-size: 20px;
   }
-  
+
   .medication-dosage {
     font-size: 18px;
   }
-  
+
   .medication-time-button {
     font-size: 16px;
     padding: 14px 16px;
@@ -739,7 +744,7 @@ ion-card {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
   border-radius: 50%;
 }
 

@@ -19,8 +19,9 @@ import {
   IonItem,
   IonLabel,
 } from '@ionic/react';
+import { useHistory } from 'react-router-dom';
 import { useIonViewWillEnter } from '@ionic/react';
-import { calendar, medical, chevronBack, chevronForward, business, notificationsOutline, time, location, call, star } from 'ionicons/icons';
+import { calendar, medical, chevronBack, chevronForward, business, notificationsOutline, time, location, call, star, logOut } from 'ionicons/icons';
 import { getCurrentUserSession, hasUserPermission } from '../services/userService';
 import { getFavoriteHospitals, removeFavoriteHospital, FavoriteHospital } from '../services/favoriteHospitalService';
 import { addReservation, getReservations } from '../services/reservationService';
@@ -38,9 +39,10 @@ import './Home.css';
 // 사용자 정보 인터페이스 제거됨
 
 const Home: React.FC = () => {
+  const history = useHistory();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<number | null>(null);
-  
+
   // 사용자 정보 가져오기
   const [userName, setUserName] = useState<string>('사용자');
   
@@ -690,6 +692,14 @@ const Home: React.FC = () => {
     return `${year}년 ${month}월 ${day}일`;
   };
 
+  // 로그아웃 핸들러
+  const handleLogout = () => {
+    // localStorage 클리어
+    localStorage.removeItem('userInfo');
+    // 로그인 페이지로 이동
+    history.push('/login');
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -880,7 +890,7 @@ const Home: React.FC = () => {
             <IonCardContent>
               <div className="service-actions">
                 <IonButton
-                  expand="block" 
+                  expand="block"
                   fill="outline"
                   onClick={handleTestReservationNotification}
                   className="service-button"
@@ -888,7 +898,7 @@ const Home: React.FC = () => {
                   예약 알림 발송
                 </IonButton>
                 <IonButton
-                  expand="block" 
+                  expand="block"
                   fill="outline"
                   onClick={handleShowFCMToken}
                   className="service-button"
@@ -898,6 +908,16 @@ const Home: React.FC = () => {
               </div>
             </IonCardContent>
           </IonCard>
+          <IonButton
+            expand="block"
+            fill="outline"
+            color="danger"
+            onClick={handleLogout}
+            className="service-button"
+          >
+            <IonIcon icon={logOut} slot="start" />
+            로그아웃
+          </IonButton>
 
 
                     </div>

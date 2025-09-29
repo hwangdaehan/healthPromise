@@ -5,13 +5,13 @@ import { getMessaging } from 'firebase/messaging';
 import { getFunctions } from 'firebase/functions';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyDoCU5xx-XIrMPTqSF4mOoH54iS-qY2MXo',
-  authDomain: 'healthpromise-36111.firebaseapp.com',
-  projectId: 'healthpromise-36111',
-  storageBucket: 'healthpromise-36111.firebasestorage.app',
-  messagingSenderId: '506246950736',
-  appId: '1:506246950736:web:2ca3bec04fae105f954655',
-  measurementId: 'G-1GL9ZPF93F',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase

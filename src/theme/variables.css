@@ -19,7 +19,9 @@ http://ionicframework.com/docs/theming/ */
 /* 전역 배경을 화이트로 설정 */
 ion-app {
   --background: var(--primary-gray);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Noto Sans KR', 'Malgun Gothic', sans-serif;
 }
 
 /* 안드로이드 폰트 강제 적용 */
@@ -29,18 +31,170 @@ ion-app {
 
 /* 안드로이드 전용 폰트 설정 */
 @media screen and (max-width: 768px) {
-  ion-app, ion-content, ion-header, ion-toolbar, ion-title, ion-button, ion-card, ion-item, ion-label, ion-input, ion-textarea, ion-select, div, span, p, h1, h2, h3, h4, h5, h6 {
+  ion-app,
+  ion-content,
+  ion-header,
+  ion-toolbar,
+  ion-title,
+  ion-button,
+  ion-card,
+  ion-item,
+  ion-label,
+  ion-input,
+  ion-textarea,
+  ion-select,
+  div,
+  span,
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'Noto Sans KR', 'Malgun Gothic', 'Roboto', 'Arial', sans-serif !important;
   }
 }
 
 /* 안드로이드 WebView 폰트 강제 적용 */
-body, html {
+body,
+html {
   font-family: 'Noto Sans KR', 'Malgun Gothic', 'Roboto', 'Arial', sans-serif !important;
 }
 
 /* 모든 텍스트 요소에 폰트 강제 적용 */
-ion-app, ion-content, ion-header, ion-toolbar, ion-title, ion-button, ion-card, ion-item, ion-label, ion-input, ion-textarea, ion-select, ion-radio, ion-checkbox, ion-toggle, ion-range, ion-datetime, ion-picker, ion-alert, ion-action-sheet, ion-modal, ion-popover, ion-loading, ion-toast, ion-refresher, ion-infinite-scroll, ion-virtual-scroll, ion-list, ion-list-header, ion-note, ion-text, ion-badge, ion-chip, ion-fab, ion-fab-button, ion-fab-list, ion-segment, ion-segment-button, ion-slides, ion-slide, ion-tabs, ion-tab, ion-tab-bar, ion-tab-button, ion-router, ion-router-outlet, ion-route, ion-route-redirect, ion-nav, ion-nav-link, ion-back-button, ion-menu, ion-menu-button, ion-menu-toggle, ion-split-pane, ion-grid, ion-row, ion-col, ion-searchbar, ion-select-popover, ion-accordion, ion-accordion-group, ion-breadcrumb, ion-breadcrumbs, ion-item-group, ion-item-divider, ion-reorder, ion-reorder-group, ion-skeleton-text, ion-spinner, ion-thumbnail, ion-avatar, ion-img, ion-icon, ion-ripple-effect, ion-route-link, ion-router-link, ion-backdrop, ion-app, ion-page, ion-content, ion-header, ion-footer, ion-toolbar, ion-title, ion-buttons, ion-button, ion-back-button, ion-menu-button, ion-refresh-content, ion-infinite-scroll-content, ion-virtual-scroll-content, ion-slides, ion-slide, ion-tabs, ion-tab, ion-tab-bar, ion-tab-button, ion-router, ion-router-outlet, ion-route, ion-route-redirect, ion-nav, ion-nav-link, ion-back-button, ion-menu, ion-menu-button, ion-menu-toggle, ion-split-pane, ion-grid, ion-row, ion-col, ion-searchbar, ion-select-popover, ion-accordion, ion-accordion-group, ion-breadcrumb, ion-breadcrumbs, ion-item-group, ion-item-divider, ion-reorder, ion-reorder-group, ion-skeleton-text, ion-spinner, ion-thumbnail, ion-avatar, ion-img, ion-icon, ion-ripple-effect, ion-route-link, ion-router-link, ion-backdrop {
+ion-app,
+ion-content,
+ion-header,
+ion-toolbar,
+ion-title,
+ion-button,
+ion-card,
+ion-item,
+ion-label,
+ion-input,
+ion-textarea,
+ion-select,
+ion-radio,
+ion-checkbox,
+ion-toggle,
+ion-range,
+ion-datetime,
+ion-picker,
+ion-alert,
+ion-action-sheet,
+ion-modal,
+ion-popover,
+ion-loading,
+ion-toast,
+ion-refresher,
+ion-infinite-scroll,
+ion-virtual-scroll,
+ion-list,
+ion-list-header,
+ion-note,
+ion-text,
+ion-badge,
+ion-chip,
+ion-fab,
+ion-fab-button,
+ion-fab-list,
+ion-segment,
+ion-segment-button,
+ion-slides,
+ion-slide,
+ion-tabs,
+ion-tab,
+ion-tab-bar,
+ion-tab-button,
+ion-router,
+ion-router-outlet,
+ion-route,
+ion-route-redirect,
+ion-nav,
+ion-nav-link,
+ion-back-button,
+ion-menu,
+ion-menu-button,
+ion-menu-toggle,
+ion-split-pane,
+ion-grid,
+ion-row,
+ion-col,
+ion-searchbar,
+ion-select-popover,
+ion-accordion,
+ion-accordion-group,
+ion-breadcrumb,
+ion-breadcrumbs,
+ion-item-group,
+ion-item-divider,
+ion-reorder,
+ion-reorder-group,
+ion-skeleton-text,
+ion-spinner,
+ion-thumbnail,
+ion-avatar,
+ion-img,
+ion-icon,
+ion-ripple-effect,
+ion-route-link,
+ion-router-link,
+ion-backdrop,
+ion-app,
+ion-page,
+ion-content,
+ion-header,
+ion-footer,
+ion-toolbar,
+ion-title,
+ion-buttons,
+ion-button,
+ion-back-button,
+ion-menu-button,
+ion-refresh-content,
+ion-infinite-scroll-content,
+ion-virtual-scroll-content,
+ion-slides,
+ion-slide,
+ion-tabs,
+ion-tab,
+ion-tab-bar,
+ion-tab-button,
+ion-router,
+ion-router-outlet,
+ion-route,
+ion-route-redirect,
+ion-nav,
+ion-nav-link,
+ion-back-button,
+ion-menu,
+ion-menu-button,
+ion-menu-toggle,
+ion-split-pane,
+ion-grid,
+ion-row,
+ion-col,
+ion-searchbar,
+ion-select-popover,
+ion-accordion,
+ion-accordion-group,
+ion-breadcrumb,
+ion-breadcrumbs,
+ion-item-group,
+ion-item-divider,
+ion-reorder,
+ion-reorder-group,
+ion-skeleton-text,
+ion-spinner,
+ion-thumbnail,
+ion-avatar,
+ion-img,
+ion-icon,
+ion-ripple-effect,
+ion-route-link,
+ion-router-link,
+ion-backdrop {
   font-family: 'Noto Sans KR', 'Malgun Gothic', 'Roboto', 'Arial', sans-serif !important;
 }
 
@@ -131,10 +285,10 @@ ion-header ion-button ion-icon {
 }
 
 /* 헤더 아이콘 색상 - 종 아이콘을 검정색으로 */
-ion-header ion-button[data-icon="notifications"] ion-icon,
+ion-header ion-button[data-icon='notifications'] ion-icon,
 ion-header ion-button .notifications-icon,
-ion-header ion-button ion-icon[name="notifications"],
-ion-header ion-button ion-icon[name="notifications-outline"] {
+ion-header ion-button ion-icon[name='notifications'],
+ion-header ion-button ion-icon[name='notifications-outline'] {
   color: #000000 !important;
   --color: #000000 !important;
 }
@@ -323,12 +477,12 @@ ion-tabs ion-tab-bar.modern-tab-bar ion-tab-button svg {
 
 /* 더 강력한 선택자로 margin 강제 적용 */
 ion-tab-bar.modern-tab-bar ion-tab-button svg,
-ion-tabs ion-tab-bar.modern-tab-bar ion-tab-button svg[style*="display: block"] {
+ion-tabs ion-tab-bar.modern-tab-bar ion-tab-button svg[style*='display: block'] {
   margin-bottom: 3px !important;
 }
 
 /* 더 구체적인 선택자로 강제 적용 */
-ion-tab-bar.modern-tab-bar ion-tab-button svg[width="40"][height="40"] {
+ion-tab-bar.modern-tab-bar ion-tab-button svg[width='40'][height='40'] {
   width: 25px !important;
   height: 25px !important;
 }

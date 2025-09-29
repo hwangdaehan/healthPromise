@@ -44,7 +44,7 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({
   hospitalName,
   hospitalPhone,
   hospitalAddress,
-  onSave
+  onSave,
 }) => {
   const [appointmentDate, setAppointmentDate] = useState('');
   const [appointmentTime, setAppointmentTime] = useState('');
@@ -59,11 +59,11 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({
     const appointmentData: AppointmentData = {
       appointmentDate,
       appointmentTime,
-      notes: notes.trim() || undefined
+      notes: notes.trim() || undefined,
     };
 
     onSave(appointmentData);
-    
+
     // 폼 초기화
     setAppointmentDate('');
     setAppointmentTime('');
@@ -88,7 +88,7 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({
           </IonButton>
         </IonToolbar>
       </IonHeader>
-      
+
       <IonContent className="appointment-content">
         {/* 병원 정보 카드 */}
         <IonCard className="hospital-info-card">
@@ -97,7 +97,7 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({
               <IonIcon icon={medical} className="hospital-icon" />
               <h2 className="hospital-name">{hospitalName}</h2>
             </div>
-            
+
             <div className="hospital-details">
               <div className="hospital-detail-item">
                 <IonIcon icon={call} className="detail-icon" />
@@ -115,29 +115,29 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({
         <IonCard className="appointment-form-card">
           <IonCardContent>
             <h3 className="form-title">예약 정보</h3>
-            
+
             {/* 날짜/시간 선택 */}
             <div className="datetime-sections">
               <div className="datetime-section">
                 <IonIcon icon={calendar} className="section-icon" />
                 <IonLabel className="section-label">예약 날짜</IonLabel>
-                <input 
+                <input
                   type="date"
                   className="datetime-input"
                   min={new Date().toISOString().split('T')[0]}
                   value={appointmentDate}
-                  onChange={(e) => setAppointmentDate(e.target.value)}
+                  onChange={e => setAppointmentDate(e.target.value)}
                 />
               </div>
-              
+
               <div className="datetime-section">
                 <IonIcon icon={time} className="section-icon" />
                 <IonLabel className="section-label">예약 시간</IonLabel>
-                <input 
+                <input
                   type="time"
                   className="datetime-input"
                   value={appointmentTime}
-                  onChange={(e) => setAppointmentTime(e.target.value)}
+                  onChange={e => setAppointmentTime(e.target.value)}
                 />
               </div>
             </div>
@@ -148,7 +148,7 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({
               <IonLabel className="section-label">증상 또는 메모 (선택사항)</IonLabel>
               <IonTextarea
                 value={notes}
-                onIonInput={(e) => setNotes(e.detail.value!)}
+                onIonInput={e => setNotes(e.detail.value!)}
                 placeholder="증상이나 특이사항을 입력해주세요"
                 rows={3}
                 className="notes-textarea"
@@ -167,13 +167,8 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({
           >
             예약 등록하기
           </IonButton>
-          
-          <IonButton
-            expand="block"
-            fill="outline"
-            onClick={handleClose}
-            className="cancel-button"
-          >
+
+          <IonButton expand="block" fill="outline" onClick={handleClose} className="cancel-button">
             취소
           </IonButton>
         </div>

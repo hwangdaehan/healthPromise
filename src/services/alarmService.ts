@@ -1,4 +1,14 @@
-import { collection, addDoc, getDocs, updateDoc, doc, query, where, orderBy, limit } from 'firebase/firestore';
+import {
+  collection,
+  addDoc,
+  getDocs,
+  updateDoc,
+  doc,
+  query,
+  where,
+  orderBy,
+  limit,
+} from 'firebase/firestore';
 import { db } from '../config/firebase';
 
 export interface Alarm {
@@ -18,9 +28,9 @@ export const addAlarm = async (alarmData: Omit<Alarm, 'id' | 'regDate'>): Promis
     const alarmRef = collection(db, 'alarm');
     const newAlarm = {
       ...alarmData,
-      regDate: new Date()
+      regDate: new Date(),
     };
-    
+
     const docRef = await addDoc(alarmRef, newAlarm);
     return docRef.id;
   } catch (error) {
@@ -32,7 +42,7 @@ export const addAlarm = async (alarmData: Omit<Alarm, 'id' | 'regDate'>): Promis
 export const getAlarms = async (userId?: string): Promise<Alarm[]> => {
   try {
     let targetUserId = userId;
-    
+
     // userId가 제공되지 않은 경우 localStorage에서 가져오기
     if (!targetUserId) {
       const savedUserInfo = localStorage.getItem('userInfo');
@@ -44,20 +54,16 @@ export const getAlarms = async (userId?: string): Promise<Alarm[]> => {
           return [];
         }
       }
-      
+
       if (!targetUserId) {
         return [];
       }
     }
 
     const alarmsRef = collection(db, 'alarm');
-    const q = query(
-      alarmsRef, 
-      where('userId', '==', targetUserId),
-      orderBy('regDate', 'desc')
-    );
+    const q = query(alarmsRef, where('userId', '==', targetUserId), orderBy('regDate', 'desc'));
     const querySnapshot = await getDocs(q);
-    
+
     const alarms = querySnapshot.docs.map(doc => {
       const data = doc.data();
       return {
@@ -68,10 +74,10 @@ export const getAlarms = async (userId?: string): Promise<Alarm[]> => {
         isSuccess: data.isSuccess || false,
         regDate: data.regDate?.toDate() || new Date(),
         title: data.title || '',
-        userId: data.userId || ''
+        userId: data.userId || '',
       } as Alarm;
     });
-    
+
     return alarms;
   } catch (error) {
     return [];
@@ -83,9 +89,9 @@ export const markAlarmAsRead = async (alarmId: string): Promise<boolean> => {
   try {
     const alarmRef = doc(db, 'alarm', alarmId);
     await updateDoc(alarmRef, {
-      isRead: true
+      isRead: true,
     });
-    
+
     return true;
   } catch (error) {
     return false;
@@ -97,9 +103,9 @@ export const markAlarmAsSuccess = async (alarmId: string): Promise<boolean> => {
   try {
     const alarmRef = doc(db, 'alarm', alarmId);
     await updateDoc(alarmRef, {
-      isSuccess: true
+      isSuccess: true,
     });
-    
+
     return true;
   } catch (error) {
     return false;
@@ -110,7 +116,7 @@ export const markAlarmAsSuccess = async (alarmId: string): Promise<boolean> => {
 export const getUnreadAlarmCount = async (userId?: string): Promise<number> => {
   try {
     let targetUserId = userId;
-    
+
     // userId가 제공되지 않은 경우 localStorage에서 가져오기
     if (!targetUserId) {
       const savedUserInfo = localStorage.getItem('userInfo');
@@ -122,7 +128,7 @@ export const getUnreadAlarmCount = async (userId?: string): Promise<number> => {
           return 0;
         }
       }
-      
+
       if (!targetUserId) {
         return 0;
       }
@@ -130,13 +136,13 @@ export const getUnreadAlarmCount = async (userId?: string): Promise<number> => {
 
     const alarmsRef = collection(db, 'alarm');
     const q = query(
-      alarmsRef, 
+      alarmsRef,
       where('userId', '==', targetUserId),
       where('isRead', '==', false),
       orderBy('regDate', 'desc')
     );
     const querySnapshot = await getDocs(q);
-    
+
     const unreadCount = querySnapshot.docs.length;
     return unreadCount;
   } catch (error) {

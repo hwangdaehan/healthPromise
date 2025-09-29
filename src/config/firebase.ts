@@ -5,13 +5,13 @@ import { getMessaging } from 'firebase/messaging';
 import { getFunctions } from 'firebase/functions';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDoCU5xx-XIrMPTqSF4mOoH54iS-qY2MXo",
-  authDomain: "healthpromise-36111.firebaseapp.com",
-  projectId: "healthpromise-36111",
-  storageBucket: "healthpromise-36111.firebasestorage.app",
-  messagingSenderId: "506246950736",
-  appId: "1:506246950736:web:2ca3bec04fae105f954655",
-  measurementId: "G-1GL9ZPF93F"
+  apiKey: 'AIzaSyDoCU5xx-XIrMPTqSF4mOoH54iS-qY2MXo',
+  authDomain: 'healthpromise-36111.firebaseapp.com',
+  projectId: 'healthpromise-36111',
+  storageBucket: 'healthpromise-36111.firebasestorage.app',
+  messagingSenderId: '506246950736',
+  appId: '1:506246950736:web:2ca3bec04fae105f954655',
+  measurementId: 'G-1GL9ZPF93F',
 };
 
 // Initialize Firebase
@@ -20,7 +20,18 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firebase services
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const messaging = getMessaging(app);
 export const functions = getFunctions(app);
+
+// Messaging은 지원되는 환경에서만 초기화
+let messaging: any = null;
+try {
+  if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+    messaging = getMessaging(app);
+  }
+} catch (error) {
+  console.log('Firebase Messaging not supported in this browser:', error);
+}
+
+export { messaging };
 
 export default app;

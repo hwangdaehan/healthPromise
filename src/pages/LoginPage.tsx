@@ -45,10 +45,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         transition: 'background 0.8s ease-in-out',
       }}
     >
-      <Login
-        onLoginSuccess={handleLoginSuccess}
-        onGoToRegister={handleGoToRegister}
-      />
+      <Login onLoginSuccess={handleLoginSuccess} onGoToRegister={handleGoToRegister} />
     </div>
   );
 };

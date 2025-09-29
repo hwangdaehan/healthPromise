@@ -19,7 +19,19 @@ import {
   IonSpinner,
   IonAlert,
 } from '@ionic/react';
-import { medical, time, checkmarkCircle, closeCircle, arrowBack, add, trash, notifications, notificationsOff, close, notificationsOutline } from 'ionicons/icons';
+import {
+  medical,
+  time,
+  checkmarkCircle,
+  closeCircle,
+  arrowBack,
+  add,
+  trash,
+  notifications,
+  notificationsOff,
+  close,
+  notificationsOutline,
+} from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { FirestoreService, Medicine } from '../services/firestoreService';
 import { getCurrentUserSession } from '../services/userService';
@@ -73,14 +85,14 @@ const MedicationManagement: React.FC = () => {
   const getUserId = async (): Promise<string> => {
     try {
       const userSession = await getCurrentUserSession();
-      
+
       if (userSession && userSession.user) {
         return userSession.user.uid;
       }
     } catch (error) {
       console.log('사용자 세션 확인 실패:', error);
     }
-    
+
     return '';
   };
 
@@ -89,13 +101,13 @@ const MedicationManagement: React.FC = () => {
     const loadMedications = async () => {
       try {
         const userId = await getUserId();
-        
+
         if (!userId) {
           return;
         }
-        
+
         const medicines = await FirestoreService.getMedicinesByUserId(userId);
-        
+
         // Firestore 데이터를 로컬 Medication 형식으로 변환
         const convertedMedications: Medication[] = medicines.map(medicine => ({
           id: medicine.dataId || '',
@@ -108,7 +120,7 @@ const MedicationManagement: React.FC = () => {
           notes: '',
           notifications: medicine.isNoti,
         }));
-        
+
         setMedications(convertedMedications);
       } catch (error) {
         console.error('약물 데이터 불러오기 중 오류 발생:', error);
@@ -117,7 +129,7 @@ const MedicationManagement: React.FC = () => {
     };
 
     loadMedications();
-    
+
     // AdMob 초기화
     const initializeAdMob = async () => {
       try {
@@ -127,7 +139,7 @@ const MedicationManagement: React.FC = () => {
         console.error('AdMob 초기화 실패:', error);
       }
     };
-    
+
     initializeAdMob();
   }, []);
 
@@ -139,24 +151,40 @@ const MedicationManagement: React.FC = () => {
   ];
 
   const timeOptions = [
-    '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', 
-    '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'
+    '09:00',
+    '10:00',
+    '11:00',
+    '12:00',
+    '13:00',
+    '14:00',
+    '15:00',
+    '16:00',
+    '17:00',
+    '18:00',
+    '19:00',
+    '20:00',
+    '21:00',
   ];
 
   const addMedication = async () => {
-    if (!newMedication.name || !newMedication.dosage || !newMedication.frequency || newMedication.times.length === 0) {
+    if (
+      !newMedication.name ||
+      !newMedication.dosage ||
+      !newMedication.frequency ||
+      newMedication.times.length === 0
+    ) {
       alert('모든 필수 항목을 입력해주세요.');
       return;
     }
 
     try {
       const userId = await getUserId();
-      
+
       if (!userId) {
         alert('사용자 정보가 없습니다. 다시 로그인해주세요.');
         return;
       }
-      
+
       // 복용 시간을 "08", "15", "23" 형식으로 변환
       const timesFormatted = newMedication.times.map(time => {
         const hour = time.split(':')[0];
@@ -172,7 +200,7 @@ const MedicationManagement: React.FC = () => {
       };
 
       const dataId = await FirestoreService.addMedicine(medicineData);
-      
+
       // 로컬 상태도 업데이트
       const medication: Medication = {
         id: dataId,
@@ -214,13 +242,11 @@ const MedicationManagement: React.FC = () => {
   const toggleMedicationTaken = (medicationId: string, time: string) => {
     const today = new Date().toISOString().split('T')[0];
     const recordId = `${medicationId}-${today}-${time}`;
-    
+
     const existingRecord = records.find(r => r.id === recordId);
-    
+
     if (existingRecord) {
-      setRecords(prev => prev.map(r => 
-        r.id === recordId ? { ...r, taken: !r.taken } : r
-      ));
+      setRecords(prev => prev.map(r => (r.id === recordId ? { ...r, taken: !r.taken } : r)));
     } else {
       const medication = medications.find(m => m.id === medicationId);
       if (medication) {
@@ -291,27 +317,22 @@ const MedicationManagement: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonTitle>
-            <svg 
-              width="32" 
-              height="32" 
-              viewBox="0 0 24 24" 
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
               fill="#2563eb"
               style={{ display: 'flex', alignItems: 'center' }}
             >
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
             </svg>
           </IonTitle>
-          <IonButton 
-            fill="clear" 
-            slot="end"
-            className="header-notification-button"
-          >
+          <IonButton fill="clear" slot="end" className="header-notification-button">
             <IonIcon icon={notificationsOutline} />
           </IonButton>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        
         {/* 복약 등록 버튼 */}
         <IonButton
           expand="block"
@@ -324,7 +345,7 @@ const MedicationManagement: React.FC = () => {
             } catch (error) {
               console.log('광고 표시 실패:', error);
             }
-            
+
             // 광고 후 모달 열기
             setShowAddModal(true);
           }}
@@ -333,7 +354,6 @@ const MedicationManagement: React.FC = () => {
           <IonIcon icon={add} slot="start" />
           복약 등록하기
         </IonButton>
-
 
         {/* 등록된 복약 목록 */}
         <div className="medications-list">
@@ -344,12 +364,14 @@ const MedicationManagement: React.FC = () => {
               <p>위의 버튼을 눌러 복약을 등록해보세요.</p>
             </div>
           ) : (
-            medications.map((medication) => (
+            medications.map(medication => (
               <IonCard key={medication.id} className="medication-card">
                 {/* 상단 이미지 영역 */}
                 <div className="medication-image-area">
                   <IonIcon icon={medical} className="medication-icon" />
-                  <div className={`notification-badge ${medication.notifications ? 'enabled' : 'disabled'}`}>
+                  <div
+                    className={`notification-badge ${medication.notifications ? 'enabled' : 'disabled'}`}
+                  >
                     <IonIcon icon={medication.notifications ? notifications : notificationsOff} />
                   </div>
                 </div>
@@ -363,7 +385,7 @@ const MedicationManagement: React.FC = () => {
                       1회 <span className="dosage-number">{medication.dosage}</span>정
                     </div>
                   </div>
-                  
+
                   <div className="medication-times">
                     <div className="times-label">복용 시간</div>
                     <div className="times-chips">
@@ -404,11 +426,7 @@ const MedicationManagement: React.FC = () => {
           <IonHeader>
             <IonToolbar>
               <IonTitle>복약 등록</IonTitle>
-              <IonButton 
-                fill="clear" 
-                onClick={() => setShowAddModal(false)}
-                slot="end"
-              >
+              <IonButton fill="clear" onClick={() => setShowAddModal(false)} slot="end">
                 닫기
               </IonButton>
             </IonToolbar>
@@ -420,7 +438,7 @@ const MedicationManagement: React.FC = () => {
                 <IonInput
                   placeholder="예: 아스피린"
                   value={newMedication.name}
-                  onIonInput={(e) => setNewMedication(prev => ({ ...prev, name: e.detail.value! }))}
+                  onIonInput={e => setNewMedication(prev => ({ ...prev, name: e.detail.value! }))}
                   className="large-input"
                 />
               </div>
@@ -430,7 +448,7 @@ const MedicationManagement: React.FC = () => {
                 <IonInput
                   placeholder="예: 1정"
                   value={newMedication.dosage}
-                  onIonInput={(e) => setNewMedication(prev => ({ ...prev, dosage: e.detail.value! }))}
+                  onIonInput={e => setNewMedication(prev => ({ ...prev, dosage: e.detail.value! }))}
                   className="large-input"
                 />
               </div>
@@ -461,7 +479,9 @@ const MedicationManagement: React.FC = () => {
                     type="checkbox"
                     id="notifications"
                     checked={newMedication.notifications}
-                    onChange={(e) => setNewMedication(prev => ({ ...prev, notifications: e.target.checked }))}
+                    onChange={e =>
+                      setNewMedication(prev => ({ ...prev, notifications: e.target.checked }))
+                    }
                     className="checkbox-input"
                   />
                   <label htmlFor="notifications" className="checkbox-label">
@@ -473,7 +493,9 @@ const MedicationManagement: React.FC = () => {
               <IonButton
                 expand="block"
                 onClick={addMedication}
-                disabled={!newMedication.name || !newMedication.dosage || newMedication.times.length === 0}
+                disabled={
+                  !newMedication.name || !newMedication.dosage || newMedication.times.length === 0
+                }
                 className="large-add-button"
               >
                 <IonIcon icon={medical} slot="start" />
@@ -484,18 +506,14 @@ const MedicationManagement: React.FC = () => {
         </IonModal>
 
         {/* 복용 기록 등록 모달 */}
-        <IonModal 
-          isOpen={showRecordBottomSheet} 
+        <IonModal
+          isOpen={showRecordBottomSheet}
           onDidDismiss={() => setShowRecordBottomSheet(false)}
         >
           <IonHeader>
             <IonToolbar>
               <IonTitle>복용 기록 등록</IonTitle>
-              <IonButton 
-                fill="clear" 
-                onClick={() => setShowRecordBottomSheet(false)}
-                slot="end"
-              >
+              <IonButton fill="clear" onClick={() => setShowRecordBottomSheet(false)} slot="end">
                 <IonIcon icon={close} />
               </IonButton>
             </IonToolbar>
@@ -536,7 +554,6 @@ const MedicationManagement: React.FC = () => {
             )}
           </IonContent>
         </IonModal>
-
       </IonContent>
     </IonPage>
   );

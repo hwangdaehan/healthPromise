@@ -226,17 +226,17 @@
     --width: 95%;
     --height: 95%;
   }
-  
+
   .datetime-grid ion-col {
     padding: 0 4px;
   }
-  
+
   .hospital-detail-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
   }
-  
+
   .detail-text {
     font-size: 13px;
   }
@@ -247,28 +247,28 @@
   .appointment-content {
     --background: #1a1a1a;
   }
-  
+
   .hospital-info-card,
   .appointment-form-card {
     --background: #2d2d2d;
     --color: white;
   }
-  
+
   .hospital-name,
   .form-title {
     color: white;
   }
-  
+
   .detail-text,
   .section-label {
     color: #ccc;
   }
-  
+
   .datetime-section {
     background: #333;
     border-color: #444;
   }
-  
+
   .notes-textarea {
     --background: #333;
     --color: white;

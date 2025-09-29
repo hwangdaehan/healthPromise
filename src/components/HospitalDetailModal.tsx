@@ -29,7 +29,7 @@ const HospitalDetailModal: React.FC<HospitalDetailModalProps> = ({
   onClose,
   hospital,
   onToggleFavorite,
-  isFavorite
+  isFavorite,
 }) => {
   if (!hospital) return null;
 
@@ -40,7 +40,7 @@ const HospitalDetailModal: React.FC<HospitalDetailModalProps> = ({
   const formatPhoneNumber = (phoneNumber: string) => {
     // 숫자만 추출
     const numbers = phoneNumber.replace(/\D/g, '');
-    
+
     // 02로 시작하는 서울 지역번호 (10자리)
     if (numbers.startsWith('02') && numbers.length === 10) {
       return `${numbers.slice(0, 2)}-${numbers.slice(2, 6)}-${numbers.slice(6)}`;
@@ -160,21 +160,13 @@ const HospitalDetailModal: React.FC<HospitalDetailModalProps> = ({
             </div>
 
             <div className="hospital-actions">
-              <IonButton
-                fill="outline"
-                onClick={handleToggleFavorite}
-                className="favorite-button"
-              >
+              <IonButton fill="outline" onClick={handleToggleFavorite} className="favorite-button">
                 <IonIcon icon={isFavorite ? star : starOutline} slot="start" />
                 {isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
               </IonButton>
-              
+
               {(hospital.phoneNumber || hospital.telNo) && (
-                <IonButton
-                  fill="clear"
-                  onClick={handleCall}
-                  className="call-button"
-                >
+                <IonButton fill="clear" onClick={handleCall} className="call-button">
                   <IonIcon icon={call} slot="start" />
                   전화걸기
                 </IonButton>

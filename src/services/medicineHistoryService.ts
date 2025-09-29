@@ -1,4 +1,15 @@
-import { doc, getDoc, setDoc, addDoc, deleteDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  addDoc,
+  deleteDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  orderBy,
+} from 'firebase/firestore';
 import { db } from '../config/firebase';
 
 export interface MedicineHistory {
@@ -10,10 +21,14 @@ export interface MedicineHistory {
   userId: string;
 }
 
-export const getMedicineHistory = async (userId?: string, year?: number, month?: number): Promise<MedicineHistory[]> => {
+export const getMedicineHistory = async (
+  userId?: string,
+  year?: number,
+  month?: number
+): Promise<MedicineHistory[]> => {
   try {
     let targetUserId = userId;
-    
+
     // userId가 제공되지 않은 경우 localStorage에서 가져오기
     if (!targetUserId) {
       const savedUserInfo = localStorage.getItem('userInfo');
@@ -26,7 +41,7 @@ export const getMedicineHistory = async (userId?: string, year?: number, month?:
           return [];
         }
       }
-      
+
       if (!targetUserId) {
         return [];
       }
@@ -34,14 +49,14 @@ export const getMedicineHistory = async (userId?: string, year?: number, month?:
 
     const medicineHistoryRef = collection(db, 'medicine-history');
     let q;
-    
+
     if (year !== undefined && month !== undefined) {
       // 특정 월의 시작일과 종료일 계산
       const startDate = new Date(year, month, 1);
       const endDate = new Date(year, month + 1, 0, 23, 59, 59, 999);
-      
+
       q = query(
-        medicineHistoryRef, 
+        medicineHistoryRef,
         where('userId', '==', targetUserId),
         where('eatDate', '>=', startDate),
         where('eatDate', '<=', endDate),
@@ -50,27 +65,27 @@ export const getMedicineHistory = async (userId?: string, year?: number, month?:
     } else {
       // 전체 데이터 조회
       q = query(
-        medicineHistoryRef, 
+        medicineHistoryRef,
         where('userId', '==', targetUserId),
         orderBy('eatDate', 'desc')
       );
     }
-    
+
     const querySnapshot = await getDocs(q);
-    
+
     const history = querySnapshot.docs.map(doc => {
       const data = doc.data();
-      
+
       return {
         id: doc.id,
         dataId: data.dataId || '',
         eatDate: data.eatDate?.toDate() || new Date(),
         medicineDataId: data.medicineDataId || '',
         regDate: data.regDate?.toDate() || new Date(),
-        userId: data.userId || ''
+        userId: data.userId || '',
       } as MedicineHistory;
     });
-    
+
     return history;
   } catch (error) {
     console.error('Error getting medicine history:', error);
@@ -78,12 +93,14 @@ export const getMedicineHistory = async (userId?: string, year?: number, month?:
   }
 };
 
-export const addMedicineHistory = async (historyData: Omit<MedicineHistory, 'id'>): Promise<boolean> => {
+export const addMedicineHistory = async (
+  historyData: Omit<MedicineHistory, 'id'>
+): Promise<boolean> => {
   try {
     // localStorage에서 사용자 정보 가져오기
     const savedUserInfo = localStorage.getItem('userInfo');
     let userId = null;
-    
+
     if (savedUserInfo) {
       try {
         const userInfo = JSON.parse(savedUserInfo);
@@ -93,7 +110,7 @@ export const addMedicineHistory = async (historyData: Omit<MedicineHistory, 'id'
         return false;
       }
     }
-    
+
     if (!userId) {
       return false;
     }
@@ -103,7 +120,7 @@ export const addMedicineHistory = async (historyData: Omit<MedicineHistory, 'id'
       eatDate: historyData.eatDate,
       medicineDataId: historyData.medicineDataId,
       regDate: new Date(),
-      userId: userId
+      userId: userId,
     };
 
     console.log('복약 기록 추가:', historyDataToSave);
@@ -121,7 +138,7 @@ export const removeMedicineHistory = async (historyId: string): Promise<boolean>
     // localStorage에서 사용자 정보 가져오기
     const savedUserInfo = localStorage.getItem('userInfo');
     let userId = null;
-    
+
     if (savedUserInfo) {
       try {
         const userInfo = JSON.parse(savedUserInfo);
@@ -131,7 +148,7 @@ export const removeMedicineHistory = async (historyId: string): Promise<boolean>
         return false;
       }
     }
-    
+
     if (!userId) {
       return false;
     }
@@ -140,7 +157,7 @@ export const removeMedicineHistory = async (historyId: string): Promise<boolean>
 
     const historyRef = doc(db, 'medicine-history', historyId);
     await deleteDoc(historyRef);
-    
+
     return true;
   } catch (error) {
     console.error('Error removing medicine history:', error);

@@ -4,6 +4,11 @@
 
 /* Ionic 앱 기본 설정 */
 ion-app {
-  font-family: 'Inter', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+  font-family: 'Pretendard Variable', 'Pretendard', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
   background-color: #f8fafc;
+}
+
+/* 전역 폰트 설정 */
+* {
+  font-family: 'Pretendard Variable', 'Pretendard', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
 }

@@ -19,7 +19,7 @@ export const Grid: React.FC<GridProps> = ({
     if (responsive) {
       return 'grid-responsive';
     }
-    
+
     switch (cols) {
       case 1:
         return 'grid grid-cols-1';
@@ -57,9 +57,5 @@ export const Grid: React.FC<GridProps> = ({
     ${className}
   `.trim();
 
-  return (
-    <div className={gridClasses}>
-      {children}
-    </div>
-  );
+  return <div className={gridClasses}>{children}</div>;
 };

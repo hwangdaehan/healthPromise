@@ -589,13 +589,13 @@ ion-datetime {
     gap: 0.5rem;
     justify-content: center;
   }
-  
+
   .page-numbers {
     order: 0;
     justify-content: center;
     flex-wrap: wrap;
   }
-  
+
   .pagination-btn {
     width: auto;
     justify-content: center;

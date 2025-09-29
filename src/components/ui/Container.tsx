@@ -54,9 +54,5 @@ export const Container: React.FC<ContainerProps> = ({
     ${className}
   `.trim();
 
-  return (
-    <div className={containerClasses}>
-      {children}
-    </div>
-  );
+  return <div className={containerClasses}>{children}</div>;
 };

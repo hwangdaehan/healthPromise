@@ -73,7 +73,6 @@ ion-app {
   color: white !important;
 }
 
-
 /* 롤링 공지사항 */
 .rolling-notice-section {
   margin-bottom: 20px;
@@ -108,15 +107,15 @@ ion-app {
 }
 
 .notice-1 {
-  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
 }
 
 .notice-2 {
-  background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
 }
 
 .notice-3 {
-  background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
 }
 
 .notice-content {
@@ -245,11 +244,11 @@ ion-card.service-card:hover {
 
 .favorite-hospitals-card .service-icon {
   background: transparent !important;
-  color: #FFD700 !important;
+  color: #ffd700 !important;
 }
 
 .favorite-hospitals-card .service-icon ion-icon {
-  color: #FFD700 !important;
+  color: #ffd700 !important;
 }
 
 .service-text {
@@ -305,7 +304,6 @@ ion-card.service-card:hover {
 .service-icon ion-icon {
   font-size: 20px;
 }
-
 
 /* 메인 컨테이너 - 깔끔한 화이트 배경 */
 .main-container {
@@ -579,9 +577,8 @@ ion-card.service-card:hover {
 }
 
 .medication-title {
-  color : #f97316 !important;
+  color: #f97316 !important;
 }
-
 
 .chevron-icon {
   font-size: 16px;
@@ -710,7 +707,6 @@ ion-card.service-card:hover {
   color: #94a3b8;
   flex-shrink: 0;
 }
-
 
 /* 캘린더 카드 - 깔끔한 화이트 테마 */
 .calendar-card {
@@ -901,7 +897,6 @@ ion-card.service-card:hover {
   font-weight: bold;
   color: white;
 }
-
 
 /* 예약 상세 바텀 시트 스타일 */
 .reservation-modal-content {
@@ -1296,4 +1291,3 @@ ion-tab-button ion-label {
 .hospital-arrow:hover {
   background-color: rgba(0, 0, 0, 0.05);
 }
-

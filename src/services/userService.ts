@@ -1,5 +1,14 @@
 // Firebase Auth는 사용하지 않음 - localStorage 기반으로 변경
-import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from 'firebase/firestore';
 import { db } from '../config/firebase';
 
 export interface UserProfile {
@@ -74,9 +83,9 @@ export const getCurrentUserSession = async (): Promise<UserSession | null> => {
             tenantId: null,
             delete: async () => {},
             getIdToken: async () => '',
-            getIdTokenResult: async () => ({} as any),
+            getIdTokenResult: async () => ({}) as any,
             reload: async () => {},
-            toJSON: () => ({})
+            toJSON: () => ({}),
           },
           profile: null,
           isAuthenticated: true,
@@ -84,7 +93,7 @@ export const getCurrentUserSession = async (): Promise<UserSession | null> => {
           birthDate: userInfo.birthDate,
           gender: userInfo.gender,
           sido: userInfo.sido,
-          sigungu: userInfo.sigungu
+          sigungu: userInfo.sigungu,
         };
       } catch (error) {
         console.error('localStorage 사용자 정보 파싱 실패:', error);
@@ -100,16 +109,16 @@ export const getCurrentUserSession = async (): Promise<UserSession | null> => {
 export const getUserProfile = async (uid: string): Promise<UserProfile | null> => {
   try {
     const userDoc = await getDoc(doc(db, 'user', uid));
-    
+
     if (userDoc.exists()) {
       const data = userDoc.data();
       return {
         ...data,
         createdAt: data.createdAt?.toDate() || new Date(),
-        updatedAt: data.updatedAt?.toDate() || new Date()
+        updatedAt: data.updatedAt?.toDate() || new Date(),
       } as UserProfile;
     }
-    
+
     return null;
   } catch (error) {
     console.error('Error getting user profile:', error);
@@ -117,12 +126,14 @@ export const getUserProfile = async (uid: string): Promise<UserProfile | null> =
   }
 };
 
-export const upsertUserProfile = async (profile: Partial<UserProfile>): Promise<UserProfile | null> => {
+export const upsertUserProfile = async (
+  profile: Partial<UserProfile>
+): Promise<UserProfile | null> => {
   try {
     // localStorage에서 사용자 정보 가져오기
     const savedUserInfo = localStorage.getItem('userInfo');
     let userId = null;
-    
+
     if (savedUserInfo) {
       try {
         const userInfo = JSON.parse(savedUserInfo);
@@ -132,21 +143,21 @@ export const upsertUserProfile = async (profile: Partial<UserProfile>): Promise<
         return null;
       }
     }
-    
+
     if (!userId) {
       return null;
     }
 
     const userRef = doc(db, 'user', userId);
     const existingDoc = await getDoc(userRef);
-    
+
     const now = new Date();
     const profileData = {
       ...profile,
       uid: userId,
       email: profile.email || '',
       updatedAt: now,
-      ...(existingDoc.exists() ? {} : { createdAt: now })
+      ...(existingDoc.exists() ? {} : { createdAt: now }),
     };
 
     if (existingDoc.exists()) {
@@ -174,17 +185,20 @@ export const hasUserPermission = (permission: string): boolean => {
   return !!savedUserInfo;
 };
 
-export const findUserByNameAndBirthDate = async (name: string, birthDate: string): Promise<UserProfile | null> => {
+export const findUserByNameAndBirthDate = async (
+  name: string,
+  birthDate: string
+): Promise<UserProfile | null> => {
   try {
     console.log('사용자 검색 시작:', { name, birthDate });
-    
+
     const usersRef = collection(db, 'user');
     // 이름으로만 먼저 검색 (birthDate는 Timestamp라서 직접 비교가 어려움)
     const q = query(usersRef, where('name', '==', name));
     const querySnapshot = await getDocs(q);
-    
+
     console.log('이름으로 검색한 결과 개수:', querySnapshot.size);
-    
+
     if (!querySnapshot.empty) {
       // 이름이 일치하는 사용자들 중에서 birthDate를 비교
       for (const doc of querySnapshot.docs) {
@@ -194,11 +208,11 @@ export const findUserByNameAndBirthDate = async (name: string, birthDate: string
           name: data.name,
           birthDate: data.birthDate,
           birthDateType: typeof data.birthDate,
-          birthDateConstructor: data.birthDate?.constructor?.name
+          birthDateConstructor: data.birthDate?.constructor?.name,
         });
-        
+
         const userBirthDate = data.birthDate;
-        
+
         // Firebase Timestamp를 날짜 문자열로 변환하여 비교
         let userBirthDateString = '';
         if (userBirthDate) {
@@ -217,32 +231,32 @@ export const findUserByNameAndBirthDate = async (name: string, birthDate: string
             console.log('문자열 변환:', userBirthDateString);
           }
         }
-        
+
         // 입력된 birthDate와 비교 (YYYY-MM-DD 형식)
         const inputBirthDate = birthDate.split('T')[0];
         console.log('비교:', {
           userBirthDateString,
           inputBirthDate,
-          isMatch: userBirthDateString === inputBirthDate
+          isMatch: userBirthDateString === inputBirthDate,
         });
-        
+
         if (userBirthDateString === inputBirthDate) {
           console.log('사용자 찾음:', {
             name: data.name,
             birthDate: userBirthDateString,
-            inputBirthDate: inputBirthDate
+            inputBirthDate: inputBirthDate,
           });
-          
+
           return {
             ...data,
             uid: doc.id,
             createdAt: data.createdAt?.toDate() || new Date(),
-            updatedAt: data.updatedAt?.toDate() || new Date()
+            updatedAt: data.updatedAt?.toDate() || new Date(),
           } as UserProfile;
         }
       }
     }
-    
+
     console.log('사용자를 찾지 못함:', { name, birthDate });
     return null;
   } catch (error) {

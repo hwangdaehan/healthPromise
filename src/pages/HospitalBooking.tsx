@@ -18,11 +18,25 @@ import {
   IonToolbar,
   IonTitle,
 } from '@ionic/react';
-import { arrowBack, search, location, call, chevronBack, chevronForward, star, starOutline, notificationsOutline } from 'ionicons/icons';
+import {
+  arrowBack,
+  search,
+  location,
+  call,
+  chevronBack,
+  chevronForward,
+  star,
+  starOutline,
+  notificationsOutline,
+} from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { App } from '@capacitor/app';
 import { HospitalService, HospitalInfo } from '../services/hospitalService';
-import { addFavoriteHospital, removeFavoriteHospital, isHospitalFavorite } from '../services/favoriteHospitalService';
+import {
+  addFavoriteHospital,
+  removeFavoriteHospital,
+  isHospitalFavorite,
+} from '../services/favoriteHospitalService';
 import { RegionService } from '../services/regionService';
 import { addReservation } from '../services/reservationService';
 import AppointmentModal, { AppointmentData } from '../components/AppointmentModal';
@@ -55,12 +69,12 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
     const handleAppStateChange = async () => {
       const lastCallTime = localStorage.getItem('lastCallTime');
       const lastCallHospital = localStorage.getItem('lastCallHospital');
-      
+
       if (lastCallTime && lastCallHospital) {
         const callTime = parseInt(lastCallTime);
         const now = Date.now();
         const timeDiff = now - callTime;
-        
+
         // 전화 걸기 후 5초 이내에 앱으로 돌아왔다면 예약 모달 열기
         if (timeDiff > 2000 && timeDiff < 10000) {
           const hospitalData = JSON.parse(lastCallHospital);
@@ -80,12 +94,11 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
     };
 
     window.addEventListener('focus', handleFocus);
-    
+
     return () => {
       window.removeEventListener('focus', handleFocus);
     };
   }, [hospital.yadmNm]);
-
 
   const handleCardClick = () => {
     setIsSelected(!isSelected);
@@ -93,19 +106,22 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
 
   const handleCallClick = async (e: React.MouseEvent) => {
     e.stopPropagation(); // 카드 클릭 이벤트 방지
-    
+
     if (hospital.telno) {
       // 전화번호에서 숫자만 추출
       const phoneNumber = hospital.telno.replace(/[^0-9]/g, '');
-      
+
       // 전화걸기 시간과 병원 정보 저장
       localStorage.setItem('lastCallTime', Date.now().toString());
-      localStorage.setItem('lastCallHospital', JSON.stringify({
-        name: hospital.yadmNm,
-        phone: hospital.telno,
-        address: hospital.addr
-      }));
-      
+      localStorage.setItem(
+        'lastCallHospital',
+        JSON.stringify({
+          name: hospital.yadmNm,
+          phone: hospital.telno,
+          address: hospital.addr,
+        })
+      );
+
       // 전화 앱으로 연결
       window.location.href = `tel:${phoneNumber}`;
     }
@@ -113,11 +129,11 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation(); // 카드 클릭 이벤트 방지
-    
+
     if (isLoadingFavorite) return;
-    
+
     setIsLoadingFavorite(true);
-    
+
     try {
       if (isFavorite) {
         // 즐겨찾기에서 제거 (현재는 전체 목록에서 제거하는 방식)
@@ -151,55 +167,56 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
     try {
       console.log('예약 정보 저장 시작:', appointmentData);
       console.log('병원 정보:', hospital);
-      
+
       // 날짜와 시간을 합쳐서 Date 객체 생성
       console.log('원본 날짜:', appointmentData.appointmentDate);
       console.log('원본 시간:', appointmentData.appointmentTime);
-      
+
       // IonDatetime에서 받은 ISO 문자열을 파싱
       const dateStr = appointmentData.appointmentDate.split('T')[0]; // YYYY-MM-DD 부분만 추출
       const timeStr = appointmentData.appointmentTime.split('T')[1]; // HH:MM:SS 부분만 추출
-      
+
       console.log('파싱된 날짜:', dateStr);
       console.log('파싱된 시간:', timeStr);
-      
+
       const appointmentDateTime = new Date(`${dateStr}T${timeStr}`);
       console.log('생성된 Date 객체:', appointmentDateTime);
       console.log('Date 유효성:', !isNaN(appointmentDateTime.getTime()));
-      
+
       // Date 객체 유효성 검사
       if (isNaN(appointmentDateTime.getTime())) {
         throw new Error('잘못된 날짜 형식입니다. 날짜와 시간을 다시 선택해주세요.');
       }
-      
+
       // 예약 데이터 생성
       const reservationData = {
         hospitalName: hospital.yadmNm || '',
         address: hospital.addr || '',
         telNo: hospital.telno || '',
         memo: appointmentData.notes || '',
-        reservationDate: appointmentDateTime
+        reservationDate: appointmentDateTime,
       };
-      
+
       console.log('예약 데이터:', reservationData);
-      
+
       // localStorage에서 사용자 정보 확인
       const savedUserInfo = localStorage.getItem('userInfo');
       console.log('사용자 정보:', savedUserInfo);
-      
+
       if (!savedUserInfo) {
         throw new Error('사용자 정보가 없습니다. 로그인을 다시 해주세요.');
       }
-      
+
       // Firebase에 예약 저장
       const reservationId = await addReservation(reservationData);
       console.log('예약 저장 성공, ID:', reservationId);
-      
+
       alert('예약이 등록되었습니다!');
       setShowAppointmentModal(false);
     } catch (error) {
       console.error('예약 등록 실패 상세:', error);
-      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+      const errorMessage =
+        error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
       console.error('오류 메시지:', errorMessage);
       console.error('오류 스택:', error instanceof Error ? error.stack : '스택 정보 없음');
       alert(`예약 등록에 실패했습니다: ${errorMessage}`);
@@ -220,15 +237,12 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
     return {
       name: hospital.yadmNm,
       phone: hospital.telno,
-      address: hospital.addr
+      address: hospital.addr,
     };
   };
 
   return (
-    <div 
-      className={`hospital-card ${isSelected ? 'selected' : ''}`}
-      onClick={handleCardClick}
-    >
+    <div className={`hospital-card ${isSelected ? 'selected' : ''}`} onClick={handleCardClick}>
       <div className="hospital-info">
         <h2 className="hospital-name">{hospital.yadmNm}</h2>
         <div className="hospital-details">
@@ -244,31 +258,28 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
           )}
         </div>
       </div>
-      
+
       {/* 액션 버튼들 */}
       <div className="hospital-actions">
         {/* 전화걸기 버튼 */}
         {hospital.telno && (
-          <button 
-            className="call-button"
-            onClick={handleCallClick}
-          >
+          <button className="call-button" onClick={handleCallClick}>
             <IonIcon icon={call} />
             전화걸기
           </button>
         )}
-        
+
         {/* 즐겨찾기 버튼 */}
-        <button 
+        <button
           className={`favorite-button ${isFavorite ? 'favorited' : ''}`}
           onClick={handleFavoriteClick}
           disabled={isLoadingFavorite}
         >
           <IonIcon icon={isFavorite ? star : starOutline} />
-          {isLoadingFavorite ? '처리중...' : (isFavorite ? '즐겨찾기' : '즐겨찾기')}
+          {isLoadingFavorite ? '처리중...' : isFavorite ? '즐겨찾기' : '즐겨찾기'}
         </button>
       </div>
-      
+
       {/* 예약 등록 모달 */}
       <AppointmentModal
         isOpen={showAppointmentModal}
@@ -299,17 +310,17 @@ const HospitalBooking: React.FC = () => {
   const [searchResults, setSearchResults] = useState<HospitalInfo[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [hasSearched, setHasSearched] = useState(false); // 검색을 시도했는지 추적
-  
+
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [itemsPerPage] = useState(10); // 페이지당 10개 결과
-  
+
   // 사용자 정보 및 검색 옵션
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [searchByLocation, setSearchByLocation] = useState(true); // 거주지 기준 검색 여부 (기본값: true - 내 지역 검색)
-  const [regionNames, setRegionNames] = useState<{sido: string, sigungu: string} | null>(null);
+  const [regionNames, setRegionNames] = useState<{ sido: string; sigungu: string } | null>(null);
 
   // 사용자 정보 로드
   useEffect(() => {
@@ -319,7 +330,7 @@ const HospitalBooking: React.FC = () => {
       const sessionData = JSON.parse(userSession);
       console.log('HospitalBooking - 로드된 사용자 세션:', sessionData);
       setUserInfo(sessionData);
-      
+
       // 지역명 가져오기
       if (sessionData.sido && sessionData.sigungu) {
         loadRegionNames(sessionData.sido, sessionData.sigungu);
@@ -331,7 +342,7 @@ const HospitalBooking: React.FC = () => {
         const parsedUserInfo = JSON.parse(savedUserInfo);
         console.log('HospitalBooking - 로드된 사용자 정보 (기존 방식):', parsedUserInfo);
         setUserInfo(parsedUserInfo);
-        
+
         // 지역명 가져오기
         if (parsedUserInfo.시도 && parsedUserInfo.시군구) {
           loadRegionNames(parsedUserInfo.시도, parsedUserInfo.시군구);
@@ -347,10 +358,11 @@ const HospitalBooking: React.FC = () => {
     try {
       const sidoList = await RegionService.get시도목록();
       const sigunguList = await RegionService.get시군구By시도(parseInt(sidoCode));
-      
+
       const sidoName = sidoList.find(sido => sido.코드.toString() === sidoCode)?.코드명 || sidoCode;
-      const sigunguName = sigunguList.find(sigungu => sigungu.코드.toString() === sigunguCode)?.코드명 || sigunguCode;
-      
+      const sigunguName =
+        sigunguList.find(sigungu => sigungu.코드.toString() === sigunguCode)?.코드명 || sigunguCode;
+
       setRegionNames({ sido: sidoName, sigungu: sigunguName });
     } catch (error) {
       console.error('지역명 로드 실패:', error);
@@ -369,25 +381,25 @@ const HospitalBooking: React.FC = () => {
     setSearchResults([]);
     setShowResults(false);
     setHasSearched(true); // 검색 시도했음을 표시
-    
+
     try {
       // 검색 파라미터 설정
       const searchParams: any = {
         yadmNm: hospitalName,
         pageNo: page,
-        numOfRows: itemsPerPage
+        numOfRows: itemsPerPage,
       };
 
       // 거주지 기준 검색이 활성화되고 사용자 정보가 있는 경우
       if (searchByLocation && userInfo) {
         const sido = userInfo.시도 || userInfo.sido;
         const sigungu = userInfo.시군구 || userInfo.sigungu;
-        
+
         if (sido && sigungu) {
           // 시도코드에 0000 붙이기
           const sidoCd = sido + '0000';
           const sgguCd = sigungu;
-          
+
           searchParams.sidoCd = sidoCd;
           searchParams.sgguCd = sgguCd;
         }
@@ -399,7 +411,7 @@ const HospitalBooking: React.FC = () => {
       setTotalCount(result.totalCount);
       setTotalPages(result.totalPages);
       setShowResults(true);
-      
+
       // 검색 결과 영역으로 스크롤
       setTimeout(() => {
         const resultsElement = document.querySelector('.search-results-container');
@@ -448,11 +460,7 @@ const HospitalBooking: React.FC = () => {
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
             </svg>
           </IonTitle>
-          <IonButton
-            fill="clear"
-            slot="end"
-            className="header-notification-button"
-          >
+          <IonButton fill="clear" slot="end" className="header-notification-button">
             <IonIcon icon={notificationsOutline} />
           </IonButton>
         </IonToolbar>
@@ -504,9 +512,7 @@ const HospitalBooking: React.FC = () => {
               }}
             >
               <IonIcon icon={search} className="search-icon" />
-              <span className="search-text">
-                {isLoading ? '검색 중...' : '병원 검색하기'}
-              </span>
+              <span className="search-text">{isLoading ? '검색 중...' : '병원 검색하기'}</span>
             </div>
           </IonCardContent>
         </IonCard>
@@ -517,10 +523,7 @@ const HospitalBooking: React.FC = () => {
             <div className="search-count">{totalCount}건</div>
             <div className="hospital-cards-list">
               {searchResults.map((hospital, index) => (
-                <HospitalCard
-                  key={hospital.ykiho || index}
-                  hospital={hospital}
-                />
+                <HospitalCard key={hospital.ykiho || index} hospital={hospital} />
               ))}
             </div>
 

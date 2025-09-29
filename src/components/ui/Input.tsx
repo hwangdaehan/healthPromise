@@ -32,7 +32,7 @@ export const Input: React.FC<InputProps> = ({
     const baseClasses = 'input';
     const errorClasses = error ? 'input-error' : '';
     const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed' : '';
-    
+
     return `${baseClasses} ${errorClasses} ${disabledClasses} ${className}`.trim();
   };
 
@@ -50,7 +50,7 @@ export const Input: React.FC<InputProps> = ({
           {required && <span className="text-red-500 ml-1">*</span>}
         </IonLabel>
       )}
-      
+
       <IonItem className="--background: transparent; --border-color: transparent; --padding-start: 0; --padding-end: 0;">
         {multiline ? (
           <IonTextarea
@@ -72,10 +72,8 @@ export const Input: React.FC<InputProps> = ({
           />
         )}
       </IonItem>
-      
-      {error && (
-        <p className="text-sm text-red-500 mt-1">{error}</p>
-      )}
+
+      {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
     </div>
   );
 };

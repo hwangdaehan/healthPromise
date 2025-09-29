@@ -1,4 +1,14 @@
-import { doc, getDoc, setDoc, addDoc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  addDoc,
+  deleteDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from 'firebase/firestore';
 import { db } from '../config/firebase';
 
 export interface FavoriteHospital {
@@ -17,7 +27,7 @@ export interface FavoriteHospital {
 export const getFavoriteHospitals = async (userId?: string): Promise<FavoriteHospital[]> => {
   try {
     let targetUserId = userId;
-    
+
     // userId가 제공되지 않은 경우 localStorage에서 가져오기
     if (!targetUserId) {
       const savedUserInfo = localStorage.getItem('userInfo');
@@ -30,7 +40,7 @@ export const getFavoriteHospitals = async (userId?: string): Promise<FavoriteHos
           return [];
         }
       }
-      
+
       if (!targetUserId) {
         return [];
       }
@@ -39,12 +49,12 @@ export const getFavoriteHospitals = async (userId?: string): Promise<FavoriteHos
     const favoritesRef = collection(db, 'favorite-hospital');
     const q = query(favoritesRef, where('userId', '==', targetUserId));
     const querySnapshot = await getDocs(q);
-    
+
     console.log('즐겨찾기 병원 조회 결과 개수:', querySnapshot.size);
-    
+
     const hospitals = querySnapshot.docs.map(doc => {
       const data = doc.data();
-      
+
       return {
         id: doc.id,
         hospitalId: data.dataId || doc.id,
@@ -55,10 +65,10 @@ export const getFavoriteHospitals = async (userId?: string): Promise<FavoriteHos
         addedAt: data.regDate?.toDate() || new Date(),
         dataId: data.dataId || '',
         name: data.name || '',
-        telNo: data.telNo || ''
+        telNo: data.telNo || '',
       } as FavoriteHospital;
     });
-    
+
     return hospitals;
   } catch (error) {
     console.error('Error getting favorite hospitals:', error);
@@ -66,12 +76,14 @@ export const getFavoriteHospitals = async (userId?: string): Promise<FavoriteHos
   }
 };
 
-export const addFavoriteHospital = async (hospitalData: Omit<FavoriteHospital, 'id' | 'addedAt'>): Promise<boolean> => {
+export const addFavoriteHospital = async (
+  hospitalData: Omit<FavoriteHospital, 'id' | 'addedAt'>
+): Promise<boolean> => {
   try {
     // localStorage에서 사용자 정보 가져오기
     const savedUserInfo = localStorage.getItem('userInfo');
     let userId = null;
-    
+
     if (savedUserInfo) {
       try {
         const userInfo = JSON.parse(savedUserInfo);
@@ -81,7 +93,7 @@ export const addFavoriteHospital = async (hospitalData: Omit<FavoriteHospital, '
         return false;
       }
     }
-    
+
     if (!userId) {
       return false;
     }
@@ -92,7 +104,7 @@ export const addFavoriteHospital = async (hospitalData: Omit<FavoriteHospital, '
       telNo: hospitalData.phoneNumber || hospitalData.telNo || '',
       dataId: hospitalData.hospitalId || hospitalData.dataId || '',
       userId: userId,
-      regDate: new Date()
+      regDate: new Date(),
     };
 
     console.log('즐겨찾기 병원 추가:', favoriteData);
@@ -110,7 +122,7 @@ export const removeFavoriteHospital = async (hospitalId: string): Promise<boolea
     // localStorage에서 사용자 정보 가져오기
     const savedUserInfo = localStorage.getItem('userInfo');
     let userId = null;
-    
+
     if (savedUserInfo) {
       try {
         const userInfo = JSON.parse(savedUserInfo);
@@ -120,7 +132,7 @@ export const removeFavoriteHospital = async (hospitalId: string): Promise<boolea
         return false;
       }
     }
-    
+
     if (!userId) {
       return false;
     }
@@ -130,15 +142,15 @@ export const removeFavoriteHospital = async (hospitalId: string): Promise<boolea
     const favoritesRef = collection(db, 'favorite-hospital');
     const q = query(favoritesRef, where('userId', '==', userId), where('dataId', '==', hospitalId));
     const querySnapshot = await getDocs(q);
-    
+
     console.log('제거할 즐겨찾기 병원 개수:', querySnapshot.size);
-    
+
     const deletePromises = querySnapshot.docs.map(doc => {
       console.log('즐겨찾기 병원 제거:', doc.id);
       return deleteDoc(doc.ref);
     });
     await Promise.all(deletePromises);
-    
+
     return true;
   } catch (error) {
     console.error('Error removing favorite hospital:', error);
@@ -151,7 +163,7 @@ export const isHospitalFavorite = async (hospitalId: string): Promise<boolean> =
     // localStorage에서 사용자 정보 가져오기
     const savedUserInfo = localStorage.getItem('userInfo');
     let userId = null;
-    
+
     if (savedUserInfo) {
       try {
         const userInfo = JSON.parse(savedUserInfo);
@@ -161,7 +173,7 @@ export const isHospitalFavorite = async (hospitalId: string): Promise<boolean> =
         return false;
       }
     }
-    
+
     if (!userId) {
       return false;
     }
@@ -169,7 +181,7 @@ export const isHospitalFavorite = async (hospitalId: string): Promise<boolean> =
     const favoritesRef = collection(db, 'favorite-hospital');
     const q = query(favoritesRef, where('userId', '==', userId), where('dataId', '==', hospitalId));
     const querySnapshot = await getDocs(q);
-    
+
     return !querySnapshot.empty;
   } catch (error) {
     console.error('Error checking if hospital is favorite:', error);

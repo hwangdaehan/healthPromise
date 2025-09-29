@@ -144,7 +144,7 @@ const MedicationManagement: React.FC = () => {
   ];
 
   const addMedication = async () => {
-    if (!newMedication.name || !newMedication.dosage || !newMedication.frequency || newMedication.times.length === 0) {
+    if (!newMedication.name || !newMedication.dosage || newMedication.times.length === 0) {
       alert('모든 필수 항목을 입력해주세요.');
       return;
     }

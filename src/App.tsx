@@ -39,6 +39,9 @@ import '@ionic/react/css/palettes/dark.system.css';
 /* Theme variables */
 import './theme/variables.css';
 
+/* Tailwind CSS */
+import './index.css';
+
 setupIonicReact();
 
 const AppContent: React.FC = () => {

@@ -4,7 +4,6 @@ import Home from '../pages/Home';
 import HospitalBooking from '../pages/HospitalBooking';
 import MedicationManagement from '../pages/MedicationManagement';
 import FavoriteHospitals from '../pages/FavoriteHospitals';
-import LoginOldPage from '../pages/LoginPage';
 import LoginPage from '../pages/login/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 
@@ -16,9 +15,6 @@ const AppRouter: React.FC<AppRouterProps> = ({ showTabs = true }) => {
   if (!showTabs) {
     return (
       <IonRouterOutlet>
-        <Route exact path="/login/old">
-          <LoginOldPage />
-        </Route>
         <Route exact path="/login">
           <LoginPage />
         </Route>

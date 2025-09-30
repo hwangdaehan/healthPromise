@@ -17,6 +17,7 @@ import {
   IonHeader,
   IonToolbar,
   IonTitle,
+  IonAlert,
 } from '@ionic/react';
 import {
   arrowBack,
@@ -321,6 +322,9 @@ const HospitalBooking: React.FC = () => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [searchByLocation, setSearchByLocation] = useState(true); // 거주지 기준 검색 여부 (기본값: true - 내 지역 검색)
   const [regionNames, setRegionNames] = useState<{ sido: string; sigungu: string } | null>(null);
+  
+  // 오류 팝업 상태
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
 
   // 사용자 정보 로드
   useEffect(() => {
@@ -421,6 +425,7 @@ const HospitalBooking: React.FC = () => {
       }, 100);
     } catch (error) {
       console.error('병원 검색 실패:', error);
+      setShowErrorAlert(true);
     } finally {
       setIsLoading(false);
     }
@@ -609,6 +614,15 @@ const HospitalBooking: React.FC = () => {
           </div>
         )}
       </IonContent>
+
+      {/* 오류 팝업 */}
+      <IonAlert
+        isOpen={showErrorAlert}
+        onDidDismiss={() => setShowErrorAlert(false)}
+        header="서비스 오류"
+        message="현재 병원 조회 서비스 이용이 불가합니다&#10;잠시 후 다시 조회해주세요!"
+        buttons={['확인']}
+      />
     </IonPage>
   );
 };

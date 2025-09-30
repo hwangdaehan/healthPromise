@@ -62,8 +62,8 @@ const Home: React.FC = () => {
   // 사용자 정보 가져오기
   const [userName, setUserName] = useState<string>('사용자');
 
-  // 알림 개수 상태 (예시로 15개 설정)
-  const [notificationCount, setNotificationCount] = useState<number>(15);
+  // 알림 개수 상태
+  const [notificationCount, setNotificationCount] = useState<number>(0);
 
   // 즐겨찾기 병원 관련 상태
   const [favoriteHospitals, setFavoriteHospitals] = useState<FavoriteHospital[]>([]);
@@ -93,6 +93,8 @@ const Home: React.FC = () => {
   useEffect(() => {
     // 사용자 정보 가져오기
     loadUserInfo();
+    // 알림 개수 가져오기
+    loadNotificationCount();
   }, []);
 
   const loadUserInfo = async () => {
@@ -126,6 +128,26 @@ const Home: React.FC = () => {
       } catch (error) {
         console.log('localStorage 사용자 정보 파싱 실패:', error);
       }
+    }
+  };
+
+  const loadNotificationCount = async () => {
+    try {
+      const count = await getUnreadAlarmCount();
+      setNotificationCount(count);
+    } catch (error) {
+      console.error('알림 개수 로드 실패:', error);
+      setNotificationCount(0);
+    }
+  };
+
+  const updateNotificationCount = async () => {
+    try {
+      const count = await getUnreadAlarmCount();
+      setNotificationCount(count);
+    } catch (error) {
+      console.error('알림 개수 업데이트 실패:', error);
+      setNotificationCount(0);
     }
   };
 
@@ -595,13 +617,6 @@ const Home: React.FC = () => {
     alert('FCM 토큰 기능이 비활성화되었습니다.');
   };
 
-  // 알림 개수 업데이트
-  const updateNotificationCount = async () => {
-    try {
-      const count = await getUnreadAlarmCount();
-      setNotificationCount(count);
-    } catch (error) {}
-  };
 
   // 알림 개수 표시 함수
   const getNotificationDisplay = (count: number) => {

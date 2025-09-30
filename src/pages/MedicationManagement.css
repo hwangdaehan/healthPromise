@@ -393,6 +393,17 @@ ion-card {
 /* 모달 폼 */
 .modal-form {
   padding: 20px 0;
+
+  .form-item {
+    margin-bottom: 20px;
+    border-radius: 12px;
+    --background: #f8f9fa;
+    --border-radius: 12px;
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+  }
 }
 
 /* 큰 등록 버튼 */

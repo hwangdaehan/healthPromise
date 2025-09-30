@@ -252,7 +252,13 @@ const UserInfo: React.FC<UserInfoProps> = ({ onSave }) => {
               <IonIcon icon={arrowBack} />
             </IonButton>
           </IonButtons>
-          <IonTitle>건강 약속</IonTitle>
+          <IonTitle>
+            <img 
+              src="/main_logo.svg" 
+              alt="건강 약속" 
+              style={{ height: '24px', width: 'auto' }}
+            />
+          </IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">

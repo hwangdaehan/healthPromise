@@ -757,15 +757,7 @@ const Home: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonTitle>
-            <svg
-              width="32"
-              height="32"
-              viewBox="0 0 24 24"
-              fill="#2563eb"
-              style={{ display: 'flex', alignItems: 'center' }}
-            >
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-            </svg>
+            <img src="/main_logo.svg" alt="건강 약속" style={{ height: '24px', width: 'auto' }} />
           </IonTitle>
           <IonButton
             fill="clear"
@@ -894,7 +886,7 @@ const Home: React.FC = () => {
           </IonCard>
 
           {/* 달력 밑 배너 광고 */}
-          <AdBanner />
+          {/*<AdBanner />*/}
 
           {/* 서비스 카드 섹션 */}
           <div className="service-cards-container">

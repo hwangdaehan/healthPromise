@@ -19,7 +19,7 @@ import {
   IonSpinner,
   IonAlert,
 } from '@ionic/react';
-import { medical, time, checkmarkCircle, closeCircle, arrowBack, add, trash, notifications, notificationsOff, close, notificationsOutline } from 'ionicons/icons';
+import { medical, time, person, checkmarkCircle, closeCircle, arrowBack, add, trash, notifications, notificationsOff, close, notificationsOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { FirestoreService, Medicine } from '../services/firestoreService';
 import { getCurrentUserSession } from '../services/userService';
@@ -291,15 +291,7 @@ const MedicationManagement: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonTitle>
-            <svg 
-              width="32" 
-              height="32" 
-              viewBox="0 0 24 24" 
-              fill="#2563eb"
-              style={{ display: 'flex', alignItems: 'center' }}
-            >
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
+            <img src="/main_logo.svg" alt="건강 약속" style={{ height: '24px', width: 'auto' }} />
           </IonTitle>
           <IonButton 
             fill="clear" 
@@ -415,25 +407,27 @@ const MedicationManagement: React.FC = () => {
           </IonHeader>
           <IonContent className="ion-padding">
             <div className="modal-form">
-              <div className="form-group">
-                <label className="large-label">약물 이름</label>
+              <IonItem className="form-item">
+                <IonLabel position="stacked">약물 이름</IonLabel>
                 <IonInput
-                  placeholder="예: 아스피린"
+                  type="text"
                   value={newMedication.name}
-                  onIonInput={(e) => setNewMedication(prev => ({ ...prev, name: e.detail.value! }))}
-                  className="large-input"
+                  onIonInput={e => setNewMedication(prev => ({ ...prev, name: (e.detail.value || '') }))}
+                  placeholder="예: 아스피린"
+                  clearInput={true}
                 />
-              </div>
+              </IonItem>
 
-              <div className="form-group">
-                <label className="large-label">복용량</label>
+              <IonItem className="form-item">
+                <IonLabel position="stacked">복용량 (정)</IonLabel>
                 <IonInput
-                  placeholder="예: 1정"
+                  type="text"
                   value={newMedication.dosage}
-                  onIonInput={(e) => setNewMedication(prev => ({ ...prev, dosage: e.detail.value! }))}
-                  className="large-input"
+                  onIonInput={e => setNewMedication(prev => ({ ...prev, dosage: (e.detail.value || '') }))}
+                  placeholder="예: 2"
+                  clearInput={true}
                 />
-              </div>
+              </IonItem>
 
               <div className="form-group">
                 <label className="large-label">복용 시간</label>

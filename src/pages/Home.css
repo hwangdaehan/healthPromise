@@ -785,6 +785,8 @@ ion-card.service-card:hover {
 
 .calendar-week {
   margin-bottom: 8px;
+  display: flex;
+  justify-content: flex-start;
 }
 
 .calendar-day {
@@ -794,6 +796,8 @@ ion-card.service-card:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 calc(100% / 7) !important;
+  max-width: calc(100% / 7) !important;
 }
 
 .day-number {

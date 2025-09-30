@@ -12,3 +12,21 @@ ion-app {
 * {
   font-family: 'Pretendard Variable', 'Pretendard', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
 }
+
+/* 컴팩트 헤더/툴바 설정 */
+ion-header ion-toolbar {
+  /* 기본 높이(56px) → 44px로 축소 */
+  --min-height: 44px;
+  /* 좌우 패딩 축소 */
+  --padding-start: 8px;
+  --padding-end: 8px;
+  /* 상하 패딩 최소화 */
+  --padding-top: 0px;
+  --padding-bottom: 0px;
+}
+
+/* 제목 좌우 여백 축소 */
+ion-title {
+  padding-inline-start: 0;
+  padding-inline-end: 0;
+}

@@ -2,50 +2,32 @@ import { useHistory } from 'react-router-dom';
 import { useState } from 'react';
 import { IonContent } from '@ionic/react';
 import { AlertCircle } from 'lucide-react';
-import { findUserByNameAndBirthDate } from '../../services/userService';
+import { findUserByPhoneAndName } from '../../services/userService';
 
 export default function LoginPage() {
   const history = useHistory();
 
   const [name, setName] = useState('');
-  const [birthDate, setBirthDate] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setLoading] = useState(false);
 
-  const validateBirthDate = (date: string) => {
-    // 숫자 8자리 체크
-    const numberPattern = /^\d{8}$/;
-    if (!numberPattern.test(date)) {
-      return false;
+  // 휴대폰번호 포맷팅 함수
+  const formatPhoneDisplay = (phoneNumber: string): string => {
+    const cleanNumber = phoneNumber.replace(/-/g, '');
+    if (cleanNumber.length <= 3) {
+      return cleanNumber;
+    } else if (cleanNumber.length <= 7) {
+      return `${cleanNumber.slice(0, 3)}-${cleanNumber.slice(3)}`;
+    } else {
+      return `${cleanNumber.slice(0, 3)}-${cleanNumber.slice(3, 7)}-${cleanNumber.slice(7, 11)}`;
     }
+  };
 
-    // YYYYMMDD 형식으로 파싱
-    const year = parseInt(date.substring(0, 4));
-    const month = parseInt(date.substring(4, 6));
-    const day = parseInt(date.substring(6, 8));
-
-    // 기본 범위 체크
-    const currentYear = new Date().getFullYear();
-    if (year < 1900 || year > currentYear) {
-      return false;
-    }
-    if (month < 1 || month > 12) {
-      return false;
-    }
-    if (day < 1 || day > 31) {
-      return false;
-    }
-
-    // 월별 일수 체크
-    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-
-    // 윤년 체크
-    if (month === 2 && ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0)) {
-      daysInMonth[1] = 29;
-    }
-
-    return day <= daysInMonth[month - 1];
+  // 휴대폰번호에서 - 제거하는 함수
+  const formatPhoneNumber = (phoneNumber: string): string => {
+    return phoneNumber.replace(/-/g, '');
   };
 
   const handleLogin = async () => {
@@ -54,13 +36,14 @@ export default function LoginPage() {
       return;
     }
 
-    if (!birthDate || birthDate.trim().length !== 8) {
-      setErrorMsg('생년월일을 8자리로 입력해주세요.');
+    if (!phoneNumber.trim()) {
+      setErrorMsg('휴대폰번호를 입력해주세요.');
       return;
     }
 
-    if (!validateBirthDate(birthDate.trim())) {
-      setErrorMsg('올바른 생년월일을 입력해주세요.');
+    const cleanPhoneNumber = formatPhoneNumber(phoneNumber);
+    if (cleanPhoneNumber.length < 10) {
+      setErrorMsg('올바른 휴대폰번호를 입력해주세요.');
       return;
     }
 
@@ -68,8 +51,8 @@ export default function LoginPage() {
     setErrorMsg('');
 
     try {
-      // Firebase user 컬렉션에서 이름과 생년월일로 사용자 찾기
-      const userProfile = await findUserByNameAndBirthDate(name.trim(), birthDate);
+      // Firebase user 컬렉션에서 전화번호와 이름으로 사용자 찾기
+      const userProfile = await findUserByPhoneAndName(cleanPhoneNumber, name.trim());
 
       let userData;
 
@@ -82,12 +65,13 @@ export default function LoginPage() {
             ? typeof userProfile.birthDate === 'object' && 'toDate' in userProfile.birthDate
               ? (userProfile.birthDate as { toDate: () => Date }).toDate().toISOString()
               : String(userProfile.birthDate)
-            : birthDate,
+            : '',
           gender: userProfile.gender || '',
           sido: userProfile.sido || '',
           sigungu: userProfile.sigungu || '',
           email: userProfile.email || '',
           phoneNumber: userProfile.phoneNumber || '',
+          telNo: userProfile.telNo || cleanPhoneNumber,
           address: userProfile.address || '',
           pushToken: userProfile.pushToken || '',
           emergencyContact: userProfile.emergencyContact || null,
@@ -96,40 +80,12 @@ export default function LoginPage() {
         };
 
         console.log('사용자 정보를 찾았습니다:', userProfile);
+        localStorage.setItem('userInfo', JSON.stringify(userData));
+        history.push('/home');
       } else {
-        // Firebase에서 사용자 정보를 찾지 못한 경우 (기본값으로 저장)
-        userData = {
-          name: name.trim(),
-          birthDate: birthDate,
-          gender: '',
-          sido: '',
-          sigungu: '',
-          email: '',
-          phoneNumber: '',
-          address: '',
-          pushToken: '',
-          emergencyContact: null,
-          medicalInfo: null,
-          loginTime: new Date().toISOString(),
-        };
-
-        console.log('사용자 정보를 찾지 못했습니다. 기본값으로 저장합니다.');
+        // 사용자를 찾지 못한 경우
+        setErrorMsg('존재하지 않는 계정입니다.');
       }
-
-      // 사용자 정보를 localStorage에 저장
-      localStorage.setItem(
-        'userInfo',
-        JSON.stringify({
-          name: userData.name,
-          birthDate: userData.birthDate,
-          gender: userData.gender,
-          sido: userData.sido,
-          sigungu: userData.sigungu,
-        })
-      );
-
-      // 로그인 성공 후 홈으로 리다이렉트
-      history.replace('/home');
     } catch (error) {
       console.error('사용자 정보 확인 실패:', error);
       setErrorMsg('사용자 정보를 확인하는 중 오류가 발생했습니다.');
@@ -178,24 +134,23 @@ export default function LoginPage() {
 
             <div>
               <div className="flex items-center justify-between">
-                <label htmlFor="birthday" className="block text-base font-medium text-gray-900">
-                  생년월일
+                <label htmlFor="phone" className="block text-base font-medium text-gray-900">
+                  휴대폰번호
                 </label>
               </div>
               <div className="mt-2">
                 <input
-                  id="birthday"
-                  name="birthday"
-                  type="text"
-                  value={birthDate}
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  value={phoneNumber}
                   onChange={e => {
-                    const value = e.target.value.replace(/\D/g, ''); // 숫자만 허용
-                    setBirthDate(value);
+                    const formattedValue = formatPhoneDisplay(e.target.value);
+                    setPhoneNumber(formattedValue);
                   }}
-                  maxLength={8}
-                  pattern="\d{8}"
+                  maxLength={13}
                   required
-                  placeholder="예) 19941024"
+                  placeholder="010-1234-5678"
                   className="block w-full rounded-xl bg-white border px-3 py-3 text-lg text-gray-900 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-1 focus:outline-emerald-500"
                 />
               </div>

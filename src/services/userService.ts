@@ -21,6 +21,7 @@ export interface UserProfile {
   sigungu?: string;
   address?: string;
   phoneNumber?: string;
+  telNo?: string;
   pushToken?: string;
   emergencyContact?: {
     name: string;
@@ -130,26 +131,52 @@ export const upsertUserProfile = async (
   profile: Partial<UserProfile>
 ): Promise<UserProfile | null> => {
   try {
+    console.log('upsertUserProfile 시작:', profile);
+    console.log('Firebase db 객체:', db);
+    
     // localStorage에서 사용자 정보 가져오기
     const savedUserInfo = localStorage.getItem('userInfo');
     let userId = null;
+
+    console.log('localStorage userInfo:', savedUserInfo);
 
     if (savedUserInfo) {
       try {
         const userInfo = JSON.parse(savedUserInfo);
         userId = userInfo.uid;
+        console.log('localStorage에서 가져온 userId:', userId);
       } catch (error) {
         console.log('localStorage 사용자 정보 파싱 실패:', error);
         return null;
       }
     }
 
+    // userId가 없으면 새로 생성 (회원가입 시)
     if (!userId) {
-      return null;
+      userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      console.log('새로 생성된 userId:', userId);
+      
+      // localStorage에 새 사용자 정보 저장
+      const newUserInfo = {
+        uid: userId,
+        email: profile.email || '',
+        name: profile.name || '',
+        birthDate: profile.birthDate || '',
+        gender: profile.gender || '',
+        sido: profile.sido || '',
+        sigungu: profile.sigungu || '',
+        telNo: profile.telNo || '',
+      };
+      localStorage.setItem('userInfo', JSON.stringify(newUserInfo));
+      console.log('localStorage에 새 사용자 정보 저장:', newUserInfo);
     }
+
+    console.log('최종 userId:', userId);
 
     const userRef = doc(db, 'user', userId);
     const existingDoc = await getDoc(userRef);
+
+    console.log('기존 문서 존재 여부:', existingDoc.exists());
 
     const now = new Date();
     const profileData = {
@@ -160,13 +187,21 @@ export const upsertUserProfile = async (
       ...(existingDoc.exists() ? {} : { createdAt: now }),
     };
 
+    console.log('저장할 데이터:', profileData);
+
     if (existingDoc.exists()) {
+      console.log('기존 문서 업데이트 중...');
       await updateDoc(userRef, profileData);
+      console.log('기존 문서 업데이트 완료');
     } else {
+      console.log('새 문서 생성 중...');
       await setDoc(userRef, profileData);
+      console.log('새 문서 생성 완료');
     }
 
-    return await getUserProfile(userId);
+    const result = await getUserProfile(userId);
+    console.log('저장 후 조회 결과:', result);
+    return result;
   } catch (error) {
     console.error('Error upserting user profile:', error);
     return null;
@@ -183,6 +218,72 @@ export const hasUserPermission = (permission: string): boolean => {
   // Simple permission check - can be expanded based on user roles
   const savedUserInfo = localStorage.getItem('userInfo');
   return !!savedUserInfo;
+};
+
+// 휴대폰번호 중복 체크 함수
+export const checkPhoneNumberExists = async (phoneNumber: string): Promise<boolean> => {
+  try {
+    console.log('휴대폰번호 중복 체크 시작:', phoneNumber);
+    
+    const usersRef = collection(db, 'user');
+    const q = query(usersRef, where('telNo', '==', phoneNumber));
+    const querySnapshot = await getDocs(q);
+    
+    console.log('휴대폰번호 검색 결과:', querySnapshot.size);
+    
+    return !querySnapshot.empty;
+  } catch (error) {
+    console.error('휴대폰번호 중복 체크 실패:', error);
+    throw error;
+  }
+};
+
+// 전화번호와 이름으로 사용자 찾기
+export const findUserByPhoneAndName = async (
+  phoneNumber: string,
+  name: string
+): Promise<UserProfile | null> => {
+  try {
+    console.log('전화번호/이름으로 사용자 검색 시작:', { phoneNumber, name });
+    
+    const usersRef = collection(db, 'user');
+    const q = query(usersRef, where('telNo', '==', phoneNumber));
+    const querySnapshot = await getDocs(q);
+    
+    console.log('전화번호로 검색한 결과 개수:', querySnapshot.size);
+    
+    if (!querySnapshot.empty) {
+      // 전화번호가 일치하는 사용자들 중에서 이름을 비교
+      for (const doc of querySnapshot.docs) {
+        const data = doc.data();
+        console.log('검색된 사용자 데이터:', {
+          id: doc.id,
+          name: data.name,
+          telNo: data.telNo,
+        });
+        
+        if (data.name === name) {
+          console.log('사용자 찾음:', {
+            name: data.name,
+            telNo: data.telNo,
+          });
+          
+          return {
+            ...data,
+            uid: doc.id,
+            createdAt: data.createdAt?.toDate() || new Date(),
+            updatedAt: data.updatedAt?.toDate() || new Date(),
+          } as UserProfile;
+        }
+      }
+    }
+    
+    console.log('사용자를 찾지 못함:', { phoneNumber, name });
+    return null;
+  } catch (error) {
+    console.error('Error finding user by phone and name:', error);
+    return null;
+  }
 };
 
 export const findUserByNameAndBirthDate = async (

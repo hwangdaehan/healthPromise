@@ -17,8 +17,8 @@ import {
   IonAlert,
   IonSpinner,
 } from '@ionic/react';
-import { person, calendar, checkmarkCircle } from 'ionicons/icons';
-import { findUserByNameAndBirthDate } from '../services/userService';
+import { person, call, checkmarkCircle } from 'ionicons/icons';
+import { findUserByPhoneAndName } from '../services/userService';
 import './Login.css';
 
 interface LoginProps {
@@ -34,9 +34,26 @@ interface LoginProps {
 
 const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
   const [name, setName] = useState('');
-  const [birthDate, setBirthDate] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // 휴대폰번호 포맷팅 함수
+  const formatPhoneDisplay = (phoneNumber: string): string => {
+    const cleanNumber = phoneNumber.replace(/-/g, '');
+    if (cleanNumber.length <= 3) {
+      return cleanNumber;
+    } else if (cleanNumber.length <= 7) {
+      return `${cleanNumber.slice(0, 3)}-${cleanNumber.slice(3)}`;
+    } else {
+      return `${cleanNumber.slice(0, 3)}-${cleanNumber.slice(3, 7)}-${cleanNumber.slice(7, 11)}`;
+    }
+  };
+
+  // 휴대폰번호에서 - 제거하는 함수
+  const formatPhoneNumber = (phoneNumber: string): string => {
+    return phoneNumber.replace(/-/g, '');
+  };
 
   const handleLogin = async () => {
     if (!name.trim()) {
@@ -44,8 +61,14 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
       return;
     }
 
-    if (!birthDate) {
-      setError('생년월일을 선택해주세요.');
+    if (!phoneNumber.trim()) {
+      setError('휴대폰번호를 입력해주세요.');
+      return;
+    }
+
+    const cleanPhoneNumber = formatPhoneNumber(phoneNumber);
+    if (cleanPhoneNumber.length < 10) {
+      setError('올바른 휴대폰번호를 입력해주세요.');
       return;
     }
 
@@ -53,26 +76,25 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
     setError(null);
 
     try {
-      // Firebase user 컬렉션에서 이름과 생년월일로 사용자 찾기
-      const userProfile = await findUserByNameAndBirthDate(name.trim(), birthDate);
-
-      let userData;
+      // Firebase user 컬렉션에서 전화번호와 이름으로 사용자 찾기
+      const userProfile = await findUserByPhoneAndName(cleanPhoneNumber, name.trim());
 
       if (userProfile) {
         // Firebase에서 사용자 정보를 찾은 경우 - 모든 정보를 세션에 저장
-        userData = {
-          uid: userProfile.uid, // Firebase 사용자 ID 추가
+        const userData = {
+          uid: userProfile.uid,
           name: userProfile.name || name.trim(),
           birthDate: userProfile.birthDate
             ? (userProfile.birthDate as any).toDate
               ? (userProfile.birthDate as any).toDate().toISOString()
               : String(userProfile.birthDate)
-            : birthDate,
+            : '',
           gender: userProfile.gender || '',
           sido: userProfile.sido || '',
           sigungu: userProfile.sigungu || '',
           email: userProfile.email || '',
           phoneNumber: userProfile.phoneNumber || '',
+          telNo: userProfile.telNo || cleanPhoneNumber,
           address: userProfile.address || '',
           pushToken: userProfile.pushToken || '',
           emergencyContact: userProfile.emergencyContact || null,
@@ -81,36 +103,20 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
         };
 
         console.log('사용자 정보를 찾았습니다:', userProfile);
+        localStorage.setItem('userInfo', JSON.stringify(userData));
+
+        if (onLoginSuccess) {
+          onLoginSuccess({
+            name: userData.name,
+            birthDate: userData.birthDate,
+            gender: userData.gender,
+            sido: userData.sido,
+            sigungu: userData.sigungu,
+          });
+        }
       } else {
-        // Firebase에서 사용자 정보를 찾지 못한 경우 (기본값으로 저장)
-        userData = {
-          name: name.trim(),
-          birthDate: birthDate,
-          gender: '',
-          sido: '',
-          sigungu: '',
-          email: '',
-          phoneNumber: '',
-          address: '',
-          pushToken: '',
-          emergencyContact: null,
-          medicalInfo: null,
-          loginTime: new Date().toISOString(),
-        };
-
-        console.log('사용자 정보를 찾지 못했습니다. 기본값으로 저장합니다.');
-      }
-
-      localStorage.setItem('userInfo', JSON.stringify(userData));
-
-      if (onLoginSuccess) {
-        onLoginSuccess({
-          name: userData.name,
-          birthDate: userData.birthDate,
-          gender: userData.gender,
-          sido: userData.sido,
-          sigungu: userData.sigungu,
-        });
+        // 사용자를 찾지 못한 경우
+        setError('존재하지 않는 계정입니다.');
       }
     } catch (error) {
       console.error('사용자 정보 확인 실패:', error);
@@ -151,13 +157,14 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
                 </IonItem>
 
                 <IonItem className="form-item">
-                  <IonIcon icon={calendar} slot="start" />
-                  <IonLabel position="stacked">생년월일</IonLabel>
+                  <IonIcon icon={call} slot="start" />
+                  <IonLabel position="stacked">휴대폰번호</IonLabel>
                   <IonInput
-                    type="date"
-                    value={birthDate}
-                    onIonInput={e => setBirthDate(e.detail.value!)}
-                    placeholder="생년월일을 선택하세요"
+                    type="tel"
+                    value={phoneNumber}
+                    onIonInput={e => setPhoneNumber(formatPhoneDisplay(e.detail.value!))}
+                    placeholder="010-1234-5678"
+                    clearInput={true}
                   />
                 </IonItem>
               </div>
@@ -165,7 +172,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
               <IonButton
                 expand="block"
                 onClick={handleLogin}
-                disabled={!name.trim() || !birthDate || loading}
+                disabled={!name.trim() || !phoneNumber.trim() || loading}
                 className="login-button"
               >
                 {loading ? (

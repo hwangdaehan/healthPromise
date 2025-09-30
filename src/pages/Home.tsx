@@ -801,13 +801,13 @@ const Home: React.FC = () => {
         </IonCard>
         <div className="main-container">
           {/* 롤링 공지사항 */}
-          <div className="rolling-notice-section">
+            <div className="rolling-notice-section">
             <div className="rolling-notice-container">
               <div className="rolling-notice-content">
                 <div className="notice-item notice-1">
                   <div className="notice-content">
-                    <h3>공지사항 1</h3>
-                    <p>새로운 서비스가 출시되었습니다!</p>
+                      <h3>알림</h3>
+                      <p>황대한님! 2025년 10월 10일에 숨마투스 병원 방문 예정입니다!</p>
                   </div>
                 </div>
                 <div className="notice-item notice-2">
@@ -817,8 +817,8 @@ const Home: React.FC = () => {
                 </div>
                 <div className="notice-item notice-3">
                   <div className="notice-content">
-                    <h3>공지사항 3</h3>
-                    <p>복약 알림 기능 개선</p>
+                      <h3>복약 알림</h3>
+                      <p>금일 약은 챙겨드셨나요? 00시에 복용시간입니다.</p>
                   </div>
                 </div>
               </div>

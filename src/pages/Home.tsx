@@ -90,11 +90,21 @@ const Home: React.FC = () => {
   const [showAlarmList, setShowAlarmList] = useState(false);
   const [alarmList, setAlarmList] = useState<any[]>([]);
 
+  // 가장 가까운 예약 상태
+  const [upcomingReservation, setUpcomingReservation] = useState<any>(null);
+
+  // 가장 가까운 복용 시간 상태
+  const [nextMedicineTime, setNextMedicineTime] = useState<any>(null);
+
   useEffect(() => {
     // 사용자 정보 가져오기
     loadUserInfo();
     // 알림 개수 가져오기
     loadNotificationCount();
+    // 가장 가까운 예약 가져오기
+    loadUpcomingReservation();
+    // 가장 가까운 복용 시간 가져오기
+    loadNextMedicineTime();
   }, []);
 
   const loadUserInfo = async () => {
@@ -151,12 +161,161 @@ const Home: React.FC = () => {
     }
   };
 
+  const loadUpcomingReservation = async () => {
+    try {
+      const reservations = await getReservations();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // 미래 예약만 필터링하고 날짜순으로 정렬
+      const upcomingReservations = reservations
+        .filter(reservation => {
+          const reservationDate = new Date(reservation.reservationDate);
+          reservationDate.setHours(0, 0, 0, 0);
+          return reservationDate >= today;
+        })
+        .sort((a, b) => new Date(a.reservationDate).getTime() - new Date(b.reservationDate).getTime());
+
+      if (upcomingReservations.length > 0) {
+        setUpcomingReservation(upcomingReservations[0]);
+      } else {
+        setUpcomingReservation(null);
+      }
+    } catch (error) {
+      console.error('예약 데이터 로드 실패:', error);
+      setUpcomingReservation(null);
+    }
+  };
+
+  const loadNextMedicineTime = async () => {
+    try {
+      // localStorage에서 사용자 정보 가져오기
+      const savedUserInfo = localStorage.getItem('userInfo');
+      if (!savedUserInfo) {
+        setNextMedicineTime(null);
+        return;
+      }
+
+      const userInfo = JSON.parse(savedUserInfo);
+      const userId = userInfo.uid;
+
+      if (!userId) {
+        setNextMedicineTime(null);
+        return;
+      }
+
+      // Medicine 데이터를 가져와서 복용 시간 확인
+      const medicines = await FirestoreService.getMedicinesByUserId(userId);
+      
+      if (medicines.length === 0) {
+        setNextMedicineTime(null);
+        return;
+      }
+
+      const now = new Date();
+      const currentHour = now.getHours();
+      const currentMinute = now.getMinutes();
+
+      // 모든 약물의 복용 시간을 수집
+      const allMedicineTimes: { medicine: any; time: number; timeString: string; isToday: boolean }[] = [];
+
+      medicines.forEach((medicine: any) => {
+        console.log('약물 데이터:', medicine);
+        if (medicine.times && medicine.times.length > 0) {
+          console.log('복용 시간들:', medicine.times);
+          medicine.times.forEach((timeStr: string) => {
+            console.log('시간 문자열:', timeStr);
+            // "09:00" 형식의 시간을 파싱
+            const timeParts = timeStr.split(':');
+            const hour = parseInt(timeParts[0], 10);
+            const minute = parseInt(timeParts[1] || '0', 10);
+            
+            console.log('파싱된 시간:', hour, minute);
+            
+            if (isNaN(hour) || isNaN(minute)) {
+              console.error('시간 파싱 실패:', timeStr);
+              return;
+            }
+            
+            const timeInMinutes = hour * 60 + minute;
+            const currentTimeInMinutes = currentHour * 60 + currentMinute;
+            
+            console.log('시간 비교:', timeInMinutes, 'vs', currentTimeInMinutes);
+            
+            // 오늘의 미래 시간 추가
+            if (timeInMinutes > currentTimeInMinutes) {
+              allMedicineTimes.push({
+                medicine,
+                time: timeInMinutes,
+                timeString: timeStr,
+                isToday: true
+              });
+            }
+            
+            // 내일의 모든 복용 시간도 추가 (오늘 미래 시간이 없을 경우를 위해)
+            allMedicineTimes.push({
+              medicine,
+              time: timeInMinutes + 24 * 60, // 내일 시간으로 변환
+              timeString: timeStr,
+              isToday: false
+            });
+          });
+        }
+      });
+
+      if (allMedicineTimes.length > 0) {
+        // 시간순으로 정렬하여 가장 가까운 것 선택
+        allMedicineTimes.sort((a, b) => a.time - b.time);
+        const nextTime = allMedicineTimes[0];
+        
+        // 시간 문자열을 Date 객체로 변환
+        const timeParts = nextTime.timeString.split(':');
+        const hour = parseInt(timeParts[0], 10);
+        const minute = parseInt(timeParts[1] || '0', 10);
+        
+        console.log('다음 복용 시간 설정:', nextTime.timeString, hour, minute);
+        
+        if (isNaN(hour) || isNaN(minute)) {
+          console.error('시간 파싱 실패:', nextTime.timeString);
+          setNextMedicineTime(null);
+          return;
+        }
+        
+        const nextMedicineDate = new Date();
+        
+        if (nextTime.isToday) {
+          // 오늘의 시간
+          nextMedicineDate.setHours(hour, minute, 0, 0);
+        } else {
+          // 내일의 시간
+          nextMedicineDate.setDate(nextMedicineDate.getDate() + 1);
+          nextMedicineDate.setHours(hour, minute, 0, 0);
+        }
+        
+        console.log('생성된 날짜 객체:', nextMedicineDate);
+        
+        setNextMedicineTime({
+          medicine: nextTime.medicine,
+          takeTime: nextMedicineDate,
+          timeString: nextTime.timeString
+        });
+      } else {
+        setNextMedicineTime(null);
+      }
+    } catch (error) {
+      console.error('복용 시간 데이터 로드 실패:', error);
+      setNextMedicineTime(null);
+    }
+  };
+
   // 화면 진입 시 즐겨찾기 병원 갱신
   useIonViewWillEnter(() => {
     loadFavoriteHospitals();
     loadReservations();
     loadMedicineHistory();
     updateNotificationCount();
+    loadUpcomingReservation();
+    loadNextMedicineTime();
   });
 
   // 앱 상태 변화 감지 (전화걸기 후 복귀)
@@ -293,36 +452,6 @@ const Home: React.FC = () => {
     }
   };
 
-  // 미래의 가장 가까운 예약 찾기
-  const loadUpcomingReservation = async () => {
-    try {
-      // 전체 예약 데이터 가져오기 (월별 제한 없이)
-      const allReservations = await getReservations();
-
-      const now = new Date();
-
-      // 미래 예약만 필터링
-      const upcomingReservations = allReservations.filter(reservation => {
-        const reservationDate = reservation.reservationDate;
-        return reservationDate > now;
-      });
-
-      if (upcomingReservations.length > 0) {
-        // 날짜순으로 정렬하여 가장 가까운 예약 선택
-        upcomingReservations.sort((a, b) => {
-          const dateA = a.reservationDate;
-          const dateB = b.reservationDate;
-          return dateA.getTime() - dateB.getTime();
-        });
-
-        setLatestReservation(upcomingReservations[0]);
-      } else {
-        setLatestReservation(null);
-      }
-    } catch (error) {
-      console.error('다가오는 예약 로드 실패:', error);
-    }
-  };
 
   // 복약 기록 로드 (현재 월)
   const loadMedicineHistory = async () => {
@@ -592,29 +721,28 @@ const Home: React.FC = () => {
     }
   };
 
-  const handleTestReservationNotification = async () => {
-    // await MessagingService.checkAndSendReservationNotifications();
-    // // 알림 개수 업데이트
-    // await updateNotificationCount();
-    alert('푸시 알림 발송이 비활성화되었습니다.');
+  const handleMedicineNotification = async () => {
+    try {
+      // 복약 알림 발송 로직
+      await MessagingService.checkAndSendMedicineNotifications();
+      await updateNotificationCount();
+      alert('복약 알림이 발송되었습니다.');
+    } catch (error) {
+      console.error('복약 알림 발송 실패:', error);
+      alert('복약 알림 발송에 실패했습니다.');
+    }
   };
 
-  const handleShowFCMToken = async () => {
-    // try {
-    //   const messaging = getMessaging();
-    //   const currentToken = await getToken(messaging, {
-    //     vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
-    //   });
-
-    //   if (currentToken) {
-    //     alert(`FCM 토큰: ${currentToken.substring(0, 50)}...`);
-    //   } else {
-    //     alert('FCM 토큰을 가져올 수 없습니다.');
-    //   }
-    // } catch (error) {
-    //   alert('FCM 토큰 가져오기 실패');
-    // }
-    alert('FCM 토큰 기능이 비활성화되었습니다.');
+  const handleHospitalNotification = async () => {
+    try {
+      // 병원 예약 알림 발송 로직
+      await MessagingService.checkAndSendReservationNotifications();
+      await updateNotificationCount();
+      alert('병원 예약 알림이 발송되었습니다.');
+    } catch (error) {
+      console.error('병원 예약 알림 발송 실패:', error);
+      alert('병원 예약 알림 발송에 실패했습니다.');
+    }
   };
 
 
@@ -623,6 +751,29 @@ const Home: React.FC = () => {
     if (count === 0) return '';
     if (count > 10) return '10+';
     return count.toString();
+  };
+
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${year}년 ${month}월 ${day}일`;
+  };
+
+  // 시간 포맷팅 함수
+  const formatTime = (date: Date) => {
+    if (!date || isNaN(date.getTime())) {
+      console.error('잘못된 날짜 객체:', date);
+      return '시간 오류';
+    }
+    const hour = date.getHours();
+    if (isNaN(hour)) {
+      console.error('잘못된 시간:', hour);
+      return '시간 오류';
+    }
+    return `${hour}시`;
   };
 
   // 즐겨찾기 병원 카드 클릭 핸들러
@@ -804,12 +955,20 @@ const Home: React.FC = () => {
           <div className="rolling-notice-section">
             <div className="rolling-notice-container">
               <div className="rolling-notice-content">
-                <div className="notice-item notice-1">
-                  <div className="notice-content">
-                    <h3>공지사항 1</h3>
-                    <p>새로운 서비스가 출시되었습니다!</p>
+                  <div className="notice-item notice-1">
+                    <div className="notice-content">
+                      <p>
+                        {upcomingReservation 
+                          ? (
+                            <>
+                              <span className="highlight-gold">{formatDate(upcomingReservation.reservationDate.toISOString())}</span>에 <span className="highlight-gold">{upcomingReservation.hospitalName}</span> 방문 예정입니다!
+                            </>
+                          )
+                          : '방문할 병원을 예약해주세요!'
+                        }
+                      </p>
+                    </div>
                   </div>
-                </div>
                 <div className="notice-item notice-2">
                   <div className="notice-content">
                     <AdBanner />
@@ -817,8 +976,17 @@ const Home: React.FC = () => {
                 </div>
                 <div className="notice-item notice-3">
                   <div className="notice-content">
-                    <h3>공지사항 3</h3>
-                    <p>복약 알림 기능 개선</p>
+                      <p>
+                        {nextMedicineTime 
+                          ? (
+                            <>
+                              금일 약은 챙겨드셨나요?<br />
+                              <span className="highlight-gold">{nextMedicineTime.timeString.includes(':') ? nextMedicineTime.timeString.replace(':', '시') : `${nextMedicineTime.timeString}시`}</span>에 복용시간입니다.
+                            </>
+                          )
+                          : '복용할 약물을 등록해주세요!'
+                        }
+                      </p>
                   </div>
                 </div>
               </div>
@@ -946,18 +1114,18 @@ const Home: React.FC = () => {
                 <IonButton
                   expand="block"
                   fill="outline"
-                  onClick={handleTestReservationNotification}
+                  onClick={handleMedicineNotification}
                   className="service-button"
                 >
-                  예약 알림 발송
+                  복약
                 </IonButton>
                 <IonButton
                   expand="block"
                   fill="outline"
-                  onClick={handleShowFCMToken}
+                  onClick={handleHospitalNotification}
                   className="service-button"
                 >
-                  FCM 토큰 확인
+                  병원
                 </IonButton>
               </div>
             </IonCardContent>

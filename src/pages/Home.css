@@ -92,7 +92,7 @@ ion-app {
   flex-direction: column;
   width: 100%;
   height: 300%;
-  animation: rolling-vertical 18s infinite linear;
+  animation: rolling-vertical 24s infinite linear;
 }
 
 .notice-item {
@@ -133,19 +133,24 @@ ion-app {
 }
 
 .notice-content p {
-  font-size: 14px;
+  font-size: 28px; /* 14px * 2 */
   margin: 0;
   opacity: 0.9;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
+.highlight-gold {
+  color: #000000;
+  font-weight: 600;
+}
+
 @keyframes rolling-vertical {
   0% { transform: translateY(0); }
-  44% { transform: translateY(0); }       /* 첫 카드 오래 유지 */
-  47% { transform: translateY(-33.333%); }/* 매우 짧은 이동 */
-  91% { transform: translateY(-33.333%); }/* 두 번째 카드 오래 유지 */
-  94% { transform: translateY(-66.666%); }/* 매우 짧은 이동 */
-  100% { transform: translateY(-66.666%); }/* 세 번째 카드 유지 */
+  29.17% { transform: translateY(0); }       /* 첫 카드 7초 유지 (7/24 = 29.17%) */
+  33.33% { transform: translateY(-33.333%); }   /* 1초 이동 (1/24 = 4.17%) */
+  62.5% { transform: translateY(-33.333%); } /* 둘 카드 7초 유지 (7/24 = 29.17%) */
+  66.67% { transform: translateY(-66.666%); }/* 1초 이동 (1/24 = 4.17%) */
+  100% { transform: translateY(-66.666%); }  /* 셋 카드 7초 유지 (7/24 = 29.17%) */
 }
 
 /* 서비스 카드 컨테이너 */

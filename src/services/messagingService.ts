@@ -9,6 +9,17 @@ export class MessagingService {
 
   static async getFCMToken(): Promise<string | null> {
     try {
+      // 브라우저 지원 여부 확인
+      if (typeof window === 'undefined') {
+        console.log('Window object not available');
+        return null;
+      }
+
+      if (!('serviceWorker' in navigator)) {
+        console.log('Service Worker not supported');
+        return null;
+      }
+
       if (!messaging) {
         console.log('Firebase Messaging not available');
         return null;
@@ -137,29 +148,35 @@ export class MessagingService {
       }
 
       // 프로덕션 환경에서는 Cloud Functions 사용
-      const response = await fetch(
-        'https://us-central1-healthpromise-36111.cloudfunctions.net/sendPushToUser',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userId: targetUserId,
-            title: title,
-            body: body,
-            data: {
-              type: 'manual',
-              timestamp: new Date().toISOString(),
+      try {
+        const response = await fetch(
+          'https://us-central1-healthpromise-36111.cloudfunctions.net/sendPushToUser',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
             },
-          }),
-        }
-      );
+            body: JSON.stringify({
+              userId: targetUserId,
+              title: title,
+              body: body,
+              data: {
+                type: 'manual',
+                timestamp: new Date().toISOString(),
+              },
+            }),
+          }
+        );
 
-      if (response.ok) {
-        const result = await response.json();
-        return true;
-      } else {
+        if (response.ok) {
+          const result = await response.json();
+          return result.success === true;
+        } else {
+          console.error('푸시 알림 발송 실패:', response.status, response.statusText);
+          return false;
+        }
+      } catch (fetchError) {
+        console.error('푸시 알림 요청 실패:', fetchError);
         return false;
       }
     } catch (error) {
@@ -274,6 +291,75 @@ export class MessagingService {
       return token;
     } catch (error) {
       return null;
+    }
+  }
+
+  // 복약 알림 체크 및 발송
+  static async checkAndSendMedicineNotifications(): Promise<void> {
+    try {
+      // localStorage에서 사용자 정보 가져오기
+      const savedUserInfo = localStorage.getItem('userInfo');
+
+      if (!savedUserInfo) {
+        return;
+      }
+
+      const userInfo = JSON.parse(savedUserInfo);
+      const userId = userInfo.uid;
+
+      if (!userId) {
+        return;
+      }
+
+      // 약물 데이터 가져오기
+      const { FirestoreService } = await import('./firestoreService');
+      const medicines = await FirestoreService.getMedicinesByUserId(userId);
+
+      if (medicines.length === 0) {
+        return;
+      }
+
+      const now = new Date();
+      const currentHour = now.getHours();
+      const currentMinute = now.getMinutes();
+
+      // 복용 시간이 현재 시간과 일치하는 약물 찾기
+      const medicinesToNotify = medicines.filter(medicine => {
+        if (!medicine.times || medicine.times.length === 0) {
+          return false;
+        }
+
+        return medicine.times.some(timeStr => {
+          const [hour, minute] = timeStr.split(':').map(Number);
+          return hour === currentHour && minute === currentMinute;
+        });
+      });
+
+      if (medicinesToNotify.length > 0) {
+        // 복약 알림을 직접 알림 컬렉션에 저장
+        const { collection, addDoc } = await import('firebase/firestore');
+        const { db } = await import('../config/firebase');
+        
+        for (const medicine of medicinesToNotify) {
+          const alarmId = await addDoc(collection(db, 'alarms'), {
+            title: '복약 알림',
+            content: `${medicine.name} 복용 시간입니다.`,
+            userId: userId,
+            isRead: false,
+            createdAt: new Date(),
+            type: 'medicine'
+          });
+
+          // FCM 푸시 알림 발송
+          const pushSuccess = await this.sendPushNotification(
+            '복약 알림',
+            `${medicine.name} 복용 시간입니다.`,
+            userId
+          );
+        }
+      }
+    } catch (error) {
+      console.error('복약 알림 발송 실패:', error);
     }
   }
 

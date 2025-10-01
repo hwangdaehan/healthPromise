@@ -82,45 +82,45 @@ ion-app {
   width: 100%;
   height: 150px;
   overflow: hidden;
-  border-radius: 16px;
   position: relative;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: rgb(248, 250, 252);
 }
 
 .rolling-notice-content {
   display: flex;
-  width: 300%;
-  height: 100%;
-  animation: rolling 6s infinite linear;
+  flex-direction: column;
+  width: 100%;
+  height: 300%;
+  animation: rolling-vertical 18s infinite linear;
 }
 
 .notice-item {
-  width: 33.333%;
-  height: 100%;
+  width: 100%;
+  height: 33.333%;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 16px;
   position: relative;
   overflow: hidden;
 }
 
 .notice-1 {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, rgb(226, 241, 255) 0%, rgb(210, 230, 255) 100%);
 }
 
 .notice-2 {
-  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  background: linear-gradient(135deg, rgb(230, 248, 241) 0%, rgb(214, 243, 232) 100%);
 }
 
 .notice-3 {
-  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  background: linear-gradient(135deg, rgb(236, 244, 255) 0%, rgb(224, 239, 255) 100%);
 }
 
 .notice-content {
   text-align: center;
-  color: white;
+  color: #1e293b;
   padding: 20px;
   z-index: 2;
 }
@@ -139,25 +139,13 @@ ion-app {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-@keyframes rolling {
-  0% {
-    transform: translateX(0);
-  }
-  33.333% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(-33.333%);
-  }
-  66.666% {
-    transform: translateX(-33.333%);
-  }
-  83.333% {
-    transform: translateX(-66.666%);
-  }
-  100% {
-    transform: translateX(-66.666%);
-  }
+@keyframes rolling-vertical {
+  0% { transform: translateY(0); }
+  44% { transform: translateY(0); }       /* 첫 카드 오래 유지 */
+  47% { transform: translateY(-33.333%); }/* 매우 짧은 이동 */
+  91% { transform: translateY(-33.333%); }/* 두 번째 카드 오래 유지 */
+  94% { transform: translateY(-66.666%); }/* 매우 짧은 이동 */
+  100% { transform: translateY(-66.666%); }/* 세 번째 카드 유지 */
 }
 
 /* 서비스 카드 컨테이너 */
@@ -785,6 +773,8 @@ ion-card.service-card:hover {
 
 .calendar-week {
   margin-bottom: 8px;
+  display: flex;
+  justify-content: flex-start;
 }
 
 .calendar-day {
@@ -794,6 +784,8 @@ ion-card.service-card:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 calc(100% / 7) !important;
+  max-width: calc(100% / 7) !important;
 }
 
 .day-number {

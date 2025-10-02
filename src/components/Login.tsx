@@ -19,6 +19,7 @@ import {
 } from '@ionic/react';
 import { person, call, checkmarkCircle } from 'ionicons/icons';
 import { findUserByPhoneAndName } from '../services/userService';
+import { MessagingService } from '../services/messagingService';
 import './Login.css';
 
 interface LoginProps {

@@ -105,6 +105,14 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
         console.log('사용자 정보를 찾았습니다:', userProfile);
         localStorage.setItem('userInfo', JSON.stringify(userData));
 
+        // FCM 토큰 초기화 및 저장
+        try {
+          await MessagingService.initializeAndSaveToken();
+          console.log('FCM 토큰 초기화 완료');
+        } catch (error) {
+          console.log('FCM 토큰 초기화 실패:', error);
+        }
+
         if (onLoginSuccess) {
           onLoginSuccess({
             name: userData.name,

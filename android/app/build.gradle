@@ -18,7 +18,7 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file('../../android-release-key.keystore')
+            storeFile file('/Users/daehan.h/Documents/work/healthPromise/android-release-key.keystore')
             storePassword 'healthpromise123'
             keyAlias 'android-release-key'
             keyPassword 'healthpromise123'

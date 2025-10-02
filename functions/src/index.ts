@@ -3,8 +3,8 @@ import * as admin from 'firebase-admin';
 
 admin.initializeApp();
 
-// FCM 서버 키 설정
-const FCM_SERVER_KEY = 'BGfYloguVQqwLcjxrwUT5aG7EKwQtafy-YUnrQDTiKksLwOZX642HnBl1jxH5yNKljjd0y-Jn8XtgIqunx0RsjQ';
+// FCM 서버 키 설정 (현재 사용하지 않음)
+// const FCM_SERVER_KEY = 'BGfYloguVQqwLcjxrwUT5aG7EKwQtafy-YUnrQDTiKksLwOZX642HnBl1jxH5yNKljjd0y-Jn8XtgIqunx0RsjQ';
 
 // CORS 설정
 const cors = require('cors')({ 
@@ -225,7 +225,7 @@ export const scheduledReservationNotifications = functions.pubsub
             };
 
             // 푸시 알림 발송
-            const response = await admin.messaging().send(message);
+            await admin.messaging().send(message);
             console.log(`푸시 알림 발송 성공 - 사용자: ${userId}, 예약: ${reservation.id}`);
 
             // alarm 컬렉션에 알림 기록 저장

@@ -8,16 +8,6 @@ ion-app {
 
 /* 헤더 스타일은 전역 variables.css에서 관리 */
 
-/* 내 활동 제목 */
-.activity-title {
-  font-size: 18px !important;
-  font-weight: 600 !important;
-  color: #1f2937 !important;
-  margin: 0 0 20px 0 !important;
-  padding: 0 !important;
-  text-align: left !important;
-  display: block !important;
-}
 
 .header-notification-button {
   --color: #000000;
@@ -751,7 +741,7 @@ ion-card.service-card:hover {
 }
 
 .month-year {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   color: #1e293b;
   margin: 0;
@@ -768,7 +758,7 @@ ion-card.service-card:hover {
 
 .day-name {
   text-align: center;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   color: #64748b;
   padding: 12px 0;
@@ -784,8 +774,8 @@ ion-card.service-card:hover {
 
 .calendar-day {
   text-align: center;
-  padding: 8px 0;
-  min-height: 48px;
+  padding: 12px 0;
+  min-height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -794,13 +784,13 @@ ion-card.service-card:hover {
 }
 
 .day-number {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 600;
   color: #64748b;
   transition: all 0.3s ease;

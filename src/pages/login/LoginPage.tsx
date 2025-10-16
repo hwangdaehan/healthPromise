@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { IonContent } from '@ionic/react';
 import { AlertCircle } from 'lucide-react';
 import { findUserByPhoneAndName } from '../../services/userService';
-import { MessagingService } from '../../services/messagingService';
 
 export default function LoginPage() {
   const history = useHistory();
@@ -82,15 +81,6 @@ export default function LoginPage() {
 
         console.log('사용자 정보를 찾았습니다:', userProfile);
         localStorage.setItem('userInfo', JSON.stringify(userData));
-        
-        // FCM 토큰 초기화 및 저장
-        try {
-          await MessagingService.initializeAndSaveToken();
-          console.log('FCM 토큰 초기화 완료');
-        } catch (error) {
-          console.log('FCM 토큰 초기화 실패:', error);
-        }
-        
         history.push('/home');
       } else {
         // 사용자를 찾지 못한 경우

@@ -464,9 +464,6 @@ const HospitalBooking: React.FC = () => {
       </IonHeader>
       <IonContent className="ion-padding">
         <IonCard>
-          <IonCardHeader>
-            <IonCardTitle>병원 찾기</IonCardTitle>
-          </IonCardHeader>
           <IonCardContent>
             <IonItem>
               <IonInput
@@ -529,6 +526,8 @@ const HospitalBooking: React.FC = () => {
               <div className="pagination-container">
                 <div className="pagination-buttons">
                   <div className="pagination-info">총 {totalPages} 페이지</div>
+                  
+                  {/* 페이지 번호들 */}
                   <div className="page-numbers">
                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                       let pageNum;
@@ -554,6 +553,7 @@ const HospitalBooking: React.FC = () => {
                     })}
                   </div>
 
+                  {/* 이전/다음 버튼들 */}
                   <div className="nav-buttons">
                     <button
                       className="pagination-btn prev-btn"

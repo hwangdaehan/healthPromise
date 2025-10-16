@@ -117,23 +117,21 @@ const FavoriteHospitals: React.FC = () => {
                             )}
                           </div>
                           <div className="hospital-actions">
-                            <IonButton
-                              fill="clear"
+                            <button
                               onClick={() => handleRemoveFavorite(hospital.id!)}
                               className="favorite-button"
                             >
-                              <IonIcon icon={star} color="warning" />
-                            </IonButton>
+                              <IonIcon icon={star} />
+                              즐겨찾기
+                            </button>
                             {hospital.phoneNumber && (
-                              <IonButton
-                                fill="solid"
-                                color="primary"
+                              <button
                                 onClick={() => handleCallHospital(hospital.phoneNumber!)}
                                 className="call-button"
                               >
-                                <IonIcon icon={call} slot="start" />
+                                <IonIcon icon={call} />
                                 전화
-                              </IonButton>
+                              </button>
                             )}
                           </div>
                         </div>

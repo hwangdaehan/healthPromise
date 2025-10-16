@@ -213,6 +213,11 @@ export class MessagingService {
       // 먼저 문서가 존재하는지 확인
       const userDoc = await getDoc(userRef);
 
+      console.log('뭔디진짜');
+      console.log(token);
+
+      // eNtj7aSrJIEhN5AUldVH_x:APA91bEY2foGcgKE3DbARPnuI3KXnVpeeU4UnUbzSaNAk8whFyNcW3uEXZqx0WN12lmqP_ktA2PLU3uiziviGUg7L-Td2ro7w1bAGCxeLpsWIYPEGXj3hic
+
       if (userDoc.exists()) {
         // 문서가 존재하면 업데이트
         await updateDoc(userRef, {

@@ -721,29 +721,6 @@ const Home: React.FC = () => {
     }
   };
 
-  const handleMedicineNotification = async () => {
-    try {
-      // 복약 알림 발송 로직
-      await MessagingService.checkAndSendMedicineNotifications();
-      await updateNotificationCount();
-      alert('복약 알림이 발송되었습니다.');
-    } catch (error) {
-      console.error('복약 알림 발송 실패:', error);
-      alert('복약 알림 발송에 실패했습니다.');
-    }
-  };
-
-  const handleHospitalNotification = async () => {
-    try {
-      // 병원 예약 알림 발송 로직
-      await MessagingService.checkAndSendReservationNotifications();
-      await updateNotificationCount();
-      alert('병원 예약 알림이 발송되었습니다.');
-    } catch (error) {
-      console.error('병원 예약 알림 발송 실패:', error);
-      alert('병원 예약 알림 발송에 실패했습니다.');
-    }
-  };
 
 
   // 알림 개수 표시 함수
@@ -944,9 +921,6 @@ const Home: React.FC = () => {
                   <p className="banner-subtitle">건강 관리를 시작해보세요!</p>
                 )}
               </div>
-              <div className="banner-icon">
-                <IonIcon icon={business} />
-              </div>
             </div>
           </IonCardContent>
         </IonCard>
@@ -996,8 +970,6 @@ const Home: React.FC = () => {
           {/* 건강 캘린더 카드 */}
           <IonCard className="calendar-card">
             <IonCardContent>
-              {/* 내 활동 제목 */}
-              <h2 className="activity-title">내 활동</h2>
               <div className="calendar-header">
                 <IonButton fill="clear" onClick={goToPreviousMonth} className="nav-button">
                   <IonIcon icon={chevronBack} />
@@ -1107,29 +1079,6 @@ const Home: React.FC = () => {
             </IonCard>
           </div>
 
-          {/* 병원 예약 푸시 알림 테스트 */}
-          <IonCard className="service-card">
-            <IonCardContent>
-              <div className="service-actions">
-                <IonButton
-                  expand="block"
-                  fill="outline"
-                  onClick={handleMedicineNotification}
-                  className="service-button"
-                >
-                  복약
-                </IonButton>
-                <IonButton
-                  expand="block"
-                  fill="outline"
-                  onClick={handleHospitalNotification}
-                  className="service-button"
-                >
-                  병원
-                </IonButton>
-              </div>
-            </IonCardContent>
-          </IonCard>
           <IonButton
             expand="block"
             fill="outline"

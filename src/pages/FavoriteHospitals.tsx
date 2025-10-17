@@ -13,7 +13,7 @@ import {
   IonRow,
   IonCol,
 } from '@ionic/react';
-import { arrowBack, business, call, location, star, starOutline } from 'ionicons/icons';
+import { arrowBack, business, call, location, star } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {
   getFavoriteHospitals,
@@ -78,15 +78,15 @@ const FavoriteHospitals: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>즐겨찾는 병원</IonTitle>
           <IonButton
             fill="clear"
             onClick={() => history.goBack()}
             className="back-button"
-            slot="end"
+            slot="start"
           >
             <IonIcon icon={arrowBack} />
           </IonButton>
+          <IonTitle>내가 등록한 병원</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
@@ -122,7 +122,7 @@ const FavoriteHospitals: React.FC = () => {
                               className="favorite-button"
                             >
                               <IonIcon icon={star} />
-                              즐겨찾기
+                              병원 삭제
                             </button>
                             {hospital.phoneNumber && (
                               <button

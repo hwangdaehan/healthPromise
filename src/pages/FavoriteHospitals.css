@@ -6,6 +6,11 @@
   padding: 20px 0;
 }
 
+/* 제목 스타일 */
+ion-title {
+  margin: 0 20px !important;
+}
+
 .loading-container {
   text-align: center;
   padding: 40px 20px;
@@ -48,17 +53,34 @@
 .hospital-address,
 .hospital-phone {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
-  font-size: 14px;
+  font-size: 16px !important;
   color: #6b7280;
-  margin: 4px 0;
+  margin: 8px 0;
+  min-height: 24px;
+  line-height: 1.4;
+  word-wrap: break-word !important;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+.hospital-address p,
+.hospital-phone p {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+  line-height: 1.4 !important;
 }
 
 .hospital-address ion-icon,
 .hospital-phone ion-icon {
-  font-size: 16px;
+  font-size: 20px;
   color: #9ca3af;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .hospital-actions {

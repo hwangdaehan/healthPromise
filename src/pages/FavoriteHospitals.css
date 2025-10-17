@@ -6,6 +6,11 @@
   padding: 20px 0;
 }
 
+/* 제목 스타일 */
+ion-title {
+  margin: 0 20px !important;
+}
+
 .loading-container {
   text-align: center;
   padding: 40px 20px;
@@ -48,47 +53,126 @@
 .hospital-address,
 .hospital-phone {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
-  font-size: 14px;
+  font-size: 16px !important;
   color: #6b7280;
-  margin: 4px 0;
+  margin: 8px 0;
+  min-height: 24px;
+  line-height: 1.4;
+  word-wrap: break-word !important;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+.hospital-address p,
+.hospital-phone p {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+  line-height: 1.4 !important;
 }
 
 .hospital-address ion-icon,
 .hospital-phone ion-icon {
-  font-size: 16px;
+  font-size: 20px;
   color: #9ca3af;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .hospital-actions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 8px;
-  align-items: flex-end;
+  align-items: center;
+  justify-content: center;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+  position: relative;
+  z-index: 10;
 }
 
 .favorite-button {
-  --color: #f59e0b;
-  --background: transparent;
-  --border-radius: 8px;
-  --padding-start: 8px;
-  --padding-end: 8px;
-  --padding-top: 8px;
-  --padding-bottom: 8px;
-  height: 40px;
-  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #fbbf24;
+  color: #ffffff;
+  border: 1px solid #f59e0b;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+  text-align: center;
+  min-height: 50px;
+}
+
+.favorite-button ion-icon {
+  font-size: 18px;
+  color: #ffffff;
+}
+
+.favorite-button:hover:not([disabled]) {
+  background: #f59e0b;
+  border-color: #d97706;
+}
+
+.favorite-button.favorited {
+  background: #fbbf24;
+  color: #ffffff;
+  border-color: #f59e0b;
+}
+
+.favorite-button.favorited:hover:not([disabled]) {
+  background: #f59e0b;
+  border-color: #d97706;
+}
+
+.favorite-button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .call-button {
-  --border-radius: 8px;
-  --padding-start: 12px;
-  --padding-end: 12px;
-  --padding-top: 8px;
-  --padding-bottom: 8px;
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 18px;
   font-weight: 600;
-  height: 40px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  flex: 1;
+  text-align: center;
+  min-height: 50px;
+}
+
+.call-button:hover {
+  background: #059669;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.call-button:active {
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+.call-button ion-icon {
+  font-size: 18px;
+  color: white;
 }
 
 .empty-state {
@@ -136,11 +220,14 @@
 
   .hospital-actions {
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    gap: 8px;
   }
 
-  .favorite-button {
-    width: auto;
+  .favorite-button,
+  .call-button {
+    flex: 1;
+    min-height: 50px;
   }
 }

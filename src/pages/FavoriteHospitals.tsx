@@ -13,7 +13,7 @@ import {
   IonRow,
   IonCol,
 } from '@ionic/react';
-import { arrowBack, business, call, location, star, starOutline } from 'ionicons/icons';
+import { arrowBack, business, call, location, star } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {
   getFavoriteHospitals,
@@ -78,15 +78,15 @@ const FavoriteHospitals: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>즐겨찾는 병원</IonTitle>
           <IonButton
             fill="clear"
             onClick={() => history.goBack()}
             className="back-button"
-            slot="end"
+            slot="start"
           >
             <IonIcon icon={arrowBack} />
           </IonButton>
+          <IonTitle>내가 등록한 병원</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
@@ -117,23 +117,21 @@ const FavoriteHospitals: React.FC = () => {
                             )}
                           </div>
                           <div className="hospital-actions">
-                            <IonButton
-                              fill="clear"
+                            <button
                               onClick={() => handleRemoveFavorite(hospital.id!)}
                               className="favorite-button"
                             >
-                              <IonIcon icon={star} color="warning" />
-                            </IonButton>
+                              <IonIcon icon={star} />
+                              병원 삭제
+                            </button>
                             {hospital.phoneNumber && (
-                              <IonButton
-                                fill="solid"
-                                color="primary"
+                              <button
                                 onClick={() => handleCallHospital(hospital.phoneNumber!)}
                                 className="call-button"
                               >
-                                <IonIcon icon={call} slot="start" />
+                                <IonIcon icon={call} />
                                 전화
-                              </IonButton>
+                              </button>
                             )}
                           </div>
                         </div>

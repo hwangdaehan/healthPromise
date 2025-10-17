@@ -11,6 +11,9 @@ const config: CapacitorConfig = {
     },
     SafeArea: {
       enabled: true
+    },
+    PushNotifications: {
+      presentationOptions: ["badge", "sound", "alert"]
     }
   }
 };

@@ -501,7 +501,7 @@ ion-datetime {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .nav-buttons {
@@ -549,6 +549,7 @@ ion-datetime {
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  margin-bottom: 1rem;
 }
 
 .page-btn {
@@ -585,8 +586,9 @@ ion-datetime {
 /* 모바일 반응형 */
 @media (max-width: 768px) {
   .pagination-buttons {
-    flex-direction: row;
-    gap: 0.5rem;
+    /* 유지: 세로 정렬 (이전/다음 버튼을 아래로) */
+    flex-direction: column;
+    gap: 1rem;
     justify-content: center;
   }
 

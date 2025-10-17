@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "506246950736",
+    "project_id": "healthpromise-36111",
+    "storage_bucket": "healthpromise-36111.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:506246950736:android:a3d8ab5260470726954655",
+        "android_client_info": {
+          "package_name": "io.ionic.starter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGHtoUa4oXCWk10irigLeCKVEfuViLSXw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

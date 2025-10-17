@@ -105,14 +105,29 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
 
         console.log('사용자 정보를 찾았습니다:', userProfile);
         localStorage.setItem('userInfo', JSON.stringify(userData));
-
-        // FCM 토큰 초기화 및 저장
-        try {
-          await MessagingService.initializeAndSaveToken();
-          console.log('FCM 토큰 초기화 완료');
-        } catch (error) {
-          console.log('FCM 토큰 초기화 실패:', error);
-        }
+        
+        // FCM 토큰 갱신 (더 긴 지연으로 안전하게)
+        setTimeout(async () => {
+          try {
+            console.log('=== 로그인 후 FCM 토큰 갱신 시작 ===');
+            console.log('userProfile.uid:', userProfile.uid);
+            console.log('Capacitor 환경:', (window as any).Capacitor ? '있음' : '없음');
+            console.log('네이티브 플랫폼:', (window as any).Capacitor?.isNativePlatform() ? '네이티브' : '웹');
+            
+            const fcmToken = await MessagingService.getFCMToken();
+            console.log('getFCMToken 결과:', fcmToken ? fcmToken.substring(0, 20) + '...' : 'null');
+            
+            if (fcmToken && userProfile.uid) {
+              console.log('FCM 토큰과 userId 모두 있음, 저장 시작');
+              await MessagingService.saveUserFCMToken(userProfile.uid, fcmToken);
+              console.log('FCM 토큰 갱신 완료:', fcmToken.substring(0, 20) + '...');
+            } else {
+              console.log('FCM 토큰을 가져올 수 없음 - fcmToken:', !!fcmToken, 'userProfile.uid:', !!userProfile.uid);
+            }
+          } catch (error) {
+            console.error('FCM 토큰 갱신 실패:', error);
+          }
+        }, 5000); // 5초 지연으로 증가
 
         if (onLoginSuccess) {
           onLoginSuccess({

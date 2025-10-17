@@ -261,9 +261,8 @@ export const scheduledMedicineNotifications = functions.pubsub
       console.log('복약 알림 스케줄러 시작');
 
       // 현재 시간
-      const now = new Date();
-      const currentHour = now.getHours();
-      const currentMinute = now.getMinutes();
+      const seoulNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
+      const currentHour = seoulNow.getHours();
 
       // 현재 시간에 복용해야 할 약물들 조회
       const medicinesSnapshot = await admin
@@ -278,15 +277,15 @@ export const scheduledMedicineNotifications = functions.pubsub
 
       // 사용자별로 그룹화 (현재 시간에 복용해야 할 약물만)
       const userMedicines: { [key: string]: any[] } = {};
-      const currentTimeString = `${currentHour.toString().padStart(2, '0')}:00`;
+      const currentHourString = currentHour.toString().padStart(2, '0');
       
       medicinesSnapshot.forEach(doc => {
         const medicine = doc.data();
         const userId = medicine.userId;
         const times = medicine.times || [];
 
-        // times 배열에 현재 시간이 포함되어 있는지 확인
-        if (times.includes(currentTimeString)) {
+        // times 배열에 현재 시간이 포함되어 있는지 확인 (시간만 비교)
+        if (times.includes(currentHourString)) {
           if (!userMedicines[userId]) {
             userMedicines[userId] = [];
           }

@@ -6,6 +6,9 @@ import { httpsCallable } from 'firebase/functions';
 
 export class MessagingService {
   private static readonly VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY;
+  private static nativeInitInProgress: boolean = false;
+  private static nativeInitialized: boolean = false;
+  private static cachedToken: string | null = null;
 
   static async getFCMToken(): Promise<string | null> {
     try {
@@ -15,6 +18,142 @@ export class MessagingService {
         return null;
       }
 
+      // Capacitor 환경 확인 (안드로이드/iOS 앱)
+      if ((window as any).Capacitor && (window as any).Capacitor.isNativePlatform()) {
+        console.log('네이티브 플랫폼에서 FCM 토큰 요청');
+        
+        // 이미 메모리에 있으면 반환
+        if (this.cachedToken) {
+          console.log('캐시된 토큰 반환:', this.cachedToken.substring(0, 20) + '...');
+          return this.cachedToken;
+        }
+        
+        // 저장된 토큰이 있으면 메모리에 적재 후 반환
+        const stored = localStorage.getItem('fcmToken');
+        if (stored) {
+          this.cachedToken = stored;
+          console.log('저장된 토큰 반환:', stored.substring(0, 20) + '...');
+          return stored;
+        }
+        
+        // 네이티브 앱에서는 Capacitor PushNotifications 사용
+        try {
+          const { PushNotifications } = await import('@capacitor/push-notifications');
+          
+          // 이미 초기화 진행 중이면 중복 등록 방지
+          if (this.nativeInitInProgress) {
+            console.log('이미 초기화 진행 중');
+            return null;
+          }
+          
+          this.nativeInitInProgress = true;
+          console.log('네이티브 FCM 초기화 시작');
+          
+          // 기존 리스너들 정리
+          try {
+            await PushNotifications.removeAllListeners();
+            console.log('기존 리스너들 정리 완료');
+          } catch (e) {
+            console.log('기존 리스너 정리 중 에러:', e);
+          }
+          
+          // 권한 요청
+          const permStatus = await PushNotifications.requestPermissions();
+          console.log('권한 요청 결과:', permStatus);
+          
+          if (permStatus.receive !== 'granted') {
+            console.log('푸시 알림 권한이 거부됨');
+            this.nativeInitInProgress = false;
+            return null;
+          }
+
+          // 토큰을 Promise로 받기 (등록 전에 리스너 먼저 설정)
+          return new Promise((resolve) => {
+            let tokenReceived = false;
+            let timeoutId: NodeJS.Timeout;
+            
+            const cleanup = () => {
+              if (timeoutId) {
+                clearTimeout(timeoutId);
+              }
+              this.nativeInitInProgress = false;
+              this.nativeInitialized = true;
+            };
+            
+            // registration 이벤트 리스너 (먼저 설정)
+            const registrationListener = PushNotifications.addListener('registration', (token) => {
+              if (!tokenReceived) {
+                tokenReceived = true;
+                console.log('네이티브 FCM 토큰 받음:', token.value);
+                localStorage.setItem('fcmToken', token.value);
+                this.cachedToken = token.value;
+                cleanup();
+                resolve(token.value);
+              }
+            });
+            
+            // registrationError 이벤트 리스너
+            const errorListener = PushNotifications.addListener('registrationError', (error) => {
+              if (!tokenReceived) {
+                tokenReceived = true;
+                console.error('네이티브 FCM 등록 에러:', error);
+                cleanup();
+                resolve(null);
+              }
+            });
+            
+            // FCM 등록 (리스너 설정 후)
+            console.log('FCM 등록 시작...');
+            PushNotifications.register()
+              .then(() => {
+                console.log('네이티브 FCM 등록 완료');
+                
+                // 등록 후 상태 확인
+                PushNotifications.checkPermissions().then((permissions) => {
+                  console.log('등록 후 권한 상태:', permissions);
+                });
+              })
+              .catch((error) => {
+                console.error('FCM 등록 실패:', error);
+                if (!tokenReceived) {
+                  tokenReceived = true;
+                  cleanup();
+                  resolve(null);
+                }
+              });
+            
+            // 타임아웃 설정 (10초)
+            timeoutId = setTimeout(() => {
+              if (!tokenReceived) {
+                tokenReceived = true;
+                console.log('네이티브 FCM 토큰 타임아웃');
+                console.log('이미 저장된 토큰이 있는지 확인...');
+                
+                // 저장된 토큰이 있으면 반환
+                const existingToken = localStorage.getItem('fcmToken');
+                if (existingToken) {
+                  console.log('기존 저장된 토큰 사용:', existingToken.substring(0, 20) + '...');
+                  this.cachedToken = existingToken;
+                  cleanup();
+                  resolve(existingToken);
+                } else {
+                  console.log('저장된 토큰도 없음');
+                  cleanup();
+                  resolve(null);
+                }
+              }
+            }, 10000);
+          });
+          
+        } catch (error) {
+          console.error('네이티브 FCM 설정 중 에러:', error);
+          this.nativeInitInProgress = false;
+          this.nativeInitialized = false;
+          return null;
+        }
+      }
+
+      // 웹 환경에서의 FCM 토큰 처리
       if (!('serviceWorker' in navigator)) {
         console.log('Service Worker not supported');
         return null;
@@ -208,27 +347,23 @@ export class MessagingService {
   // 사용자별 FCM 토큰 저장 (user 컬렉션의 pushToken 필드에 저장)
   static async saveUserFCMToken(userId: string, token: string): Promise<void> {
     try {
+      console.log('saveUserFCMToken 시작:', { userId, token: token.substring(0, 20) + '...' });
       const userRef = doc(db, 'user', userId);
 
-      // 먼저 문서가 존재하는지 확인
-      const userDoc = await getDoc(userRef);
-
-      console.log('뭔디진짜');
-      console.log(token);
-
-      // eNtj7aSrJIEhN5AUldVH_x:APA91bEY2foGcgKE3DbARPnuI3KXnVpeeU4UnUbzSaNAk8whFyNcW3uEXZqx0WN12lmqP_ktA2PLU3uiziviGUg7L-Td2ro7w1bAGCxeLpsWIYPEGXj3hic
-
-      if (userDoc.exists()) {
-        // 문서가 존재하면 업데이트
-        await updateDoc(userRef, {
+      // upsert 저장: 문서가 없어도 생성하며 pushToken 저장
+      await setDoc(
+        userRef,
+        {
           pushToken: token,
           updatedAt: new Date(),
-        });
-      } else {
-        // 문서가 없으면 FCM 토큰 저장하지 않음
-        return;
-      }
-    } catch (error) {}
+        },
+        { merge: true }
+      );
+      
+      console.log('pushToken 저장 완료:', userId);
+    } catch (error) {
+      console.error('saveUserFCMToken 실패:', error);
+    }
   }
 
   // 사용자별 FCM 토큰 가져오기 (user 컬렉션에서 조회)
@@ -251,17 +386,16 @@ export class MessagingService {
   // FCM 토큰 초기화 및 저장
   static async initializeAndSaveToken(): Promise<string | null> {
     try {
-      // 권한 요청
-      const hasPermission = await this.requestPermission();
-      if (!hasPermission) {
+      console.log('FCM 토큰 초기화 시작');
+      
+      // FCM 토큰 가져오기 (권한 요청 포함)
+      const token = await this.getFCMToken();
+      if (!token) {
+        console.log('FCM 토큰 획득 실패');
         return null;
       }
 
-      // FCM 토큰 가져오기
-      const token = await this.getFCMToken();
-      if (!token) {
-        return null;
-      }
+      console.log('FCM 토큰 획득 성공:', token.substring(0, 20) + '...');
 
       // localStorage에서 사용자 정보 가져오기
       const savedUserInfo = localStorage.getItem('userInfo');
@@ -271,30 +405,25 @@ export class MessagingService {
         const userId = userInfo.uid;
 
         if (userId) {
-          // user 컬렉션에 사용자가 존재하는지 확인 후 pushToken 저장
-          const userRef = doc(db, 'user', userId);
+          console.log('사용자 ID로 토큰 저장:', userId);
+          
+          // user 컬렉션에 pushToken 저장
+          await this.saveUserFCMToken(userId, token);
 
-          const userDoc = await getDoc(userRef);
-
-          if (userDoc.exists()) {
-            // user 컬렉션에 pushToken 저장
-            await this.saveUserFCMToken(userId, token);
-
-            // 세션에도 pushToken 저장
-            const updatedUserInfo = { ...userInfo, pushToken: token };
-            localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
-          } else {
-          }
-        } else {
+          // 세션에도 pushToken 저장
+          const updatedUserInfo = { ...userInfo, pushToken: token };
+          localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
         }
-      } else {
       }
 
       // localStorage에도 저장
       localStorage.setItem('fcmToken', token);
+      this.cachedToken = token;
 
+      console.log('FCM 토큰 초기화 완료');
       return token;
     } catch (error) {
+      console.error('FCM 토큰 초기화 실패:', error);
       return null;
     }
   }

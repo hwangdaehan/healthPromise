@@ -19,6 +19,7 @@ import {
 } from '@ionic/react';
 import { person, call, checkmarkCircle } from 'ionicons/icons';
 import { findUserByPhoneAndName } from '../services/userService';
+import { MessagingService } from '../services/messagingService';
 import './Login.css';
 
 interface LoginProps {
@@ -104,6 +105,17 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoToRegister }) => {
 
         console.log('사용자 정보를 찾았습니다:', userProfile);
         localStorage.setItem('userInfo', JSON.stringify(userData));
+        
+        // FCM 토큰 갱신
+        try {
+          const fcmToken = await MessagingService.getFCMToken();
+          if (fcmToken && userProfile.uid) {
+            await MessagingService.saveUserFCMToken(userProfile.uid, fcmToken);
+            console.log('FCM 토큰 갱신 완료:', fcmToken);
+          }
+        } catch (error) {
+          console.error('FCM 토큰 갱신 실패:', error);
+        }
 
         if (onLoginSuccess) {
           onLoginSuccess({

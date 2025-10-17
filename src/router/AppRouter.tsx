@@ -5,7 +5,7 @@ import HospitalBooking from '../pages/HospitalBooking';
 import MedicationManagement from '../pages/MedicationManagement';
 import FavoriteHospitals from '../pages/FavoriteHospitals';
 import LoginPage from '../pages/login/LoginPage';
-import RegisterPage from '../pages/RegisterPage';
+import RegisterPage from '../pages/register/RegisterPage';
 
 interface AppRouterProps {
   showTabs?: boolean;

@@ -365,3 +365,75 @@ export const findUserByNameAndBirthDate = async (
     return null;
   }
 };
+
+// 알림 설정 업데이트 함수
+export const updateNotificationSetting = async (isNoti: boolean): Promise<boolean> => {
+  try {
+    console.log('알림 설정 업데이트 시작:', isNoti);
+    console.log('Firebase db 객체:', db);
+    
+    // localStorage에서 사용자 정보 가져오기
+    const savedUserInfo = localStorage.getItem('userInfo');
+    if (!savedUserInfo) {
+      console.error('사용자 정보를 찾을 수 없습니다.');
+      return false;
+    }
+
+    const userInfo = JSON.parse(savedUserInfo);
+    const userId = userInfo.uid;
+
+    if (!userId) {
+      console.error('사용자 ID를 찾을 수 없습니다.');
+      return false;
+    }
+
+    // Firebase user 컬렉션 업데이트
+    const userRef = doc(db, 'user', userId);
+    console.log('Firebase 업데이트 시도:', { userId, isNoti });
+    
+    // 업데이트 전 문서 상태 확인
+    const beforeDoc = await getDoc(userRef);
+    console.log('업데이트 전 문서:', beforeDoc.exists() ? beforeDoc.data() : '문서 없음');
+    
+    await updateDoc(userRef, {
+      isNoti: isNoti,
+      updatedAt: new Date()
+    });
+    
+    console.log('Firebase 업데이트 성공');
+    
+    // 업데이트 후 문서 상태 확인
+    const afterDoc = await getDoc(userRef);
+    console.log('업데이트 후 문서:', afterDoc.exists() ? afterDoc.data() : '문서 없음');
+
+    // localStorage의 사용자 정보도 업데이트
+    const updatedUserInfo = {
+      ...userInfo,
+      isNoti: isNoti
+    };
+    localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
+
+    console.log('알림 설정 업데이트 완료:', isNoti);
+    return true;
+  } catch (error) {
+    console.error('알림 설정 업데이트 실패:', error);
+    return false;
+  }
+};
+
+// 사용자의 알림 설정 조회 함수
+export const getNotificationSetting = async (): Promise<boolean> => {
+  try {
+    // localStorage에서 사용자 정보 가져오기
+    const savedUserInfo = localStorage.getItem('userInfo');
+    if (!savedUserInfo) {
+      return true; // 기본값: 알림 허용
+    }
+
+    const userInfo = JSON.parse(savedUserInfo);
+    return userInfo.isNoti !== false; // undefined나 null인 경우 true 반환
+  } catch (error) {
+    console.error('알림 설정 조회 실패:', error);
+    return true; // 기본값: 알림 허용
+  }
+};

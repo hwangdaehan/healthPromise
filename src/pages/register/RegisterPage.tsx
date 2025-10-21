@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { IonContent, IonPage, IonAlert } from '@ionic/react';
+import { IonContent, IonPage, IonAlert, IonToggle, IonIcon } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { Check } from 'lucide-react';
+import { notifications } from 'ionicons/icons';
 import SubHeader from '../../components/SubHeader';
 import { RegionService, RegionCode } from '../../services/regionService';
 import { upsertUserProfile, checkPhoneNumberExists } from '../../services/userService';
@@ -13,6 +14,7 @@ interface UserInfo {
   시도: string;
   시군구: string;
   telNo: string;
+  isNoti?: boolean;
 }
 
 export default function RegisterPage() {
@@ -24,6 +26,7 @@ export default function RegisterPage() {
     시도: '',
     시군구: '',
     telNo: '',
+    isNoti: true, // 기본값: 알림 허용
   });
 
   // 지역 데이터 상태
@@ -115,22 +118,22 @@ export default function RegisterPage() {
     }
   };
 
-  const updateUserInfo = (field: keyof UserInfo, value: string) => {
+  const updateUserInfo = (field: keyof UserInfo, value: string | boolean) => {
     if (field === '시도') {
       // 시도 변경 시 시군구 초기화
       setUserInfo(prev => ({
         ...prev,
-        [field]: value,
+        [field]: value as string,
         시군구: '',
       }));
       // 시군구 목록 즉시 로드
-      load시군구목록(parseInt(value));
+      load시군구목록(parseInt(value as string));
     } else if (field === 'telNo') {
       // 휴대폰번호 입력 시 에러/성공 메시지 초기화
       setPhoneError('');
       setPhoneSuccess('');
       // 입력값을 자동으로 포맷팅하여 표시
-      const formattedValue = formatPhoneDisplay(value);
+      const formattedValue = formatPhoneDisplay(value as string);
       setUserInfo(prev => ({
         ...prev,
         [field]: formattedValue,
@@ -141,6 +144,11 @@ export default function RegisterPage() {
         [field]: value,
       }));
     }
+  };
+
+  const handleNotificationToggle = (event: CustomEvent) => {
+    const isEnabled = event.detail.checked;
+    updateUserInfo('isNoti', isEnabled);
   };
 
   const handleSave = async () => {
@@ -173,6 +181,7 @@ export default function RegisterPage() {
           sido: userInfo.시도,
           sigungu: userInfo.시군구,
           telNo: formatPhoneNumber(userInfo.telNo),
+          isNoti: userInfo.isNoti,
         });
 
         if (result) {
@@ -187,6 +196,7 @@ export default function RegisterPage() {
               sido: userInfo.시도,
               sigungu: userInfo.시군구,
               telNo: formatPhoneNumber(userInfo.telNo),
+              isNoti: userInfo.isNoti,
               loginTime: new Date().toISOString(),
             })
           );
@@ -368,6 +378,33 @@ export default function RegisterPage() {
                     ))}
                   </select>
                 </div>
+              </div>
+            </div>
+
+            {/* 알림 설정 */}
+            <div>
+              <label className="block text-base font-medium text-gray-900 mb-2">알림 설정</label>
+              <div className="bg-white rounded-xl border p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <IonIcon icon={notifications} className="text-emerald-500 mr-3" style={{ fontSize: '20px' }} />
+                    <span className="text-base font-medium text-gray-900">알림 수신</span>
+                  </div>
+                  <IonToggle
+                    checked={userInfo.isNoti}
+                    onIonChange={handleNotificationToggle}
+                    className="notification-toggle"
+                    style={{
+                      '--background': '#e0e0e0',
+                      '--background-checked': '#10b981',
+                      '--handle-background': '#ffffff',
+                      '--handle-background-checked': '#ffffff'
+                    }}
+                  />
+                </div>
+                <p className="text-sm text-gray-500 mt-2">
+                  약물 복용 알림, 병원 예약 알림 등을 받을 수 있습니다.
+                </p>
               </div>
             </div>
 

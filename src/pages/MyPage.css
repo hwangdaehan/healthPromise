@@ -1,0 +1,304 @@
+.mypage-content {
+  --background: #f8f9fa;
+}
+
+/* 프로필 섹션 */
+.profile-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem 1.5rem;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile-avatar {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-name {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.profile-subtitle {
+  margin: 0;
+  opacity: 0.8;
+  font-size: 0.9rem;
+}
+
+.edit-button {
+  --color: white;
+  --background: rgba(255, 255, 255, 0.1);
+  --border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+
+/* 정보 섹션 */
+.info-section {
+  margin-bottom: 1.5rem;
+  padding: 0 1rem;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 0.75rem 0;
+  padding-left: 0.5rem;
+}
+
+.info-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: 500;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.info-value {
+  color: #333;
+  font-weight: 500;
+  text-align: right;
+  max-width: 60%;
+  word-break: break-word;
+}
+
+/* 성별 색상 */
+.gender-value.male {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.gender-value.female {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* 메뉴 섹션 */
+.menu-section {
+  background: white;
+  border-radius: 12px;
+  margin: 0 1rem 1.5rem 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-item:hover {
+  background-color: #f8f9fa;
+}
+
+/* 알림 설정 토글 스타일 */
+.notification-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: white;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: default;
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.notification-toggle {
+  --background: #e0e0e0;
+  --background-checked: #4caf50;
+  --handle-background: #ffffff;
+  --handle-background-checked: #ffffff;
+}
+
+.menu-icon {
+  font-size: 1.25rem;
+  color: #667eea;
+  margin-right: 1rem;
+  width: 24px;
+}
+
+.menu-text {
+  flex: 1;
+  font-weight: 500;
+  color: #333;
+}
+
+.menu-arrow {
+  color: #ccc;
+  font-size: 1rem;
+}
+
+/* 로그아웃 섹션 */
+.logout-section {
+  padding: 0 1rem 2rem 1rem;
+}
+
+.logout-button {
+  --border-color: #dc3545;
+  --color: #dc3545;
+  font-weight: 500;
+  height: 48px;
+}
+
+/* 로딩 및 에러 상태 */
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-container p {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 480px) {
+  .profile-section {
+    padding: 1.5rem 1rem;
+  }
+  
+  .profile-avatar {
+    width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
+  }
+  
+  .profile-name {
+    font-size: 1.1rem;
+  }
+  
+  .info-section {
+    padding: 0 0.75rem;
+  }
+  
+  .info-card {
+    padding: 0.75rem;
+  }
+  
+  .info-item {
+    padding: 0.5rem 0;
+  }
+  
+  .menu-section {
+    margin: 0 0.75rem 1.5rem 0.75rem;
+  }
+  
+  .menu-item {
+    padding: 0.75rem 1rem;
+  }
+  
+  .logout-section {
+    padding: 0 0.75rem 2rem 0.75rem;
+  }
+}
+
+/* 다크모드 지원 */
+@media (prefers-color-scheme: dark) {
+  .mypage-content {
+    --background: #1a1a1a;
+  }
+  
+  .info-card,
+  .menu-section {
+    background: #2d2d2d;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .section-title {
+    color: #fff;
+  }
+  
+  .info-label {
+    color: #ccc;
+  }
+  
+  .info-value {
+    color: #fff;
+  }
+  
+  .menu-text {
+    color: #fff;
+  }
+  
+  .menu-item:hover {
+    background-color: #3d3d3d;
+  }
+  
+  /* 다크모드 성별 색상 */
+  .gender-value.male {
+    color: #60a5fa;
+  }
+  
+  .gender-value.female {
+    color: #f87171;
+  }
+}

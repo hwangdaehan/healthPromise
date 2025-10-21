@@ -32,7 +32,6 @@ import {
   location,
   call,
   star,
-  logOut,
 } from 'ionicons/icons';
 import { getCurrentUserSession, hasUserPermission } from '../services/userService';
 import {
@@ -875,13 +874,6 @@ const Home: React.FC = () => {
     return `${year}년 ${month}월 ${day}일`;
   };
 
-  // 로그아웃 핸들러
-  const handleLogout = () => {
-    // localStorage 클리어
-    localStorage.removeItem('userInfo');
-    // 로그인 페이지로 이동
-    history.push('/login');
-  };
 
   return (
     <IonPage>
@@ -932,38 +924,24 @@ const Home: React.FC = () => {
           <div className="rolling-notice-section">
             <div className="rolling-notice-container">
               <div className="rolling-notice-content">
-                  <div className="notice-item notice-1">
-                    <div className="notice-content">
-                      <p>
-                        {upcomingReservation 
-                          ? (
-                            <>
-                              <span className="highlight-gold">{formatDate(upcomingReservation.reservationDate.toISOString())}</span>에 <span className="highlight-gold">{upcomingReservation.hospitalName}</span> 방문 예정입니다!
-                            </>
-                          )
-                          : '방문할 병원을 예약해주세요!'
-                        }
-                      </p>
-                    </div>
-                  </div>
                 <div className="notice-item notice-2">
+                  <div className="notice-content banner-image-container">
+                    <img src="/banner/banner1.png" alt="배너1" className="banner-image" />
+                  </div>
+                </div>
+                <div className="notice-item notice-4">
+                  <div className="notice-content banner-image-container">
+                    <img src="/banner/banner2.png" alt="배너2" className="banner-image" />
+                  </div>
+                </div>
+                <div className="notice-item notice-ad">
                   <div className="notice-content">
                     <AdBanner />
                   </div>
                 </div>
-                <div className="notice-item notice-3">
-                  <div className="notice-content">
-                      <p>
-                        {nextMedicineTime 
-                          ? (
-                            <>
-                              금일 약은 챙겨드셨나요?<br />
-                              <span className="highlight-gold">{nextMedicineTime.timeString.includes(':') ? nextMedicineTime.timeString.replace(':', '시') : `${nextMedicineTime.timeString}시`}</span>에 복용시간입니다.
-                            </>
-                          )
-                          : '복용할 약물을 등록해주세요!'
-                        }
-                      </p>
+                <div className="notice-item notice-5">
+                  <div className="notice-content banner-image-container">
+                    <img src="/banner/banner3.png" alt="배너3" className="banner-image" />
                   </div>
                 </div>
               </div>
@@ -1082,16 +1060,6 @@ const Home: React.FC = () => {
             </IonCard>
           </div>
 
-          <IonButton
-            expand="block"
-            fill="outline"
-            color="danger"
-            onClick={handleLogout}
-            className="service-button"
-          >
-            <IonIcon icon={logOut} slot="start" />
-            로그아웃
-          </IonButton>
         </div>
       </IonContent>
 

@@ -192,9 +192,16 @@ export const scheduledReservationNotifications = functions.pubsub
 
           const userData = userDoc.data();
           const pushToken = userData?.pushToken;
+          const isNoti = userData?.isNoti;
 
           if (!pushToken) {
             console.log(`사용자 ${userId}의 푸시 토큰이 없습니다.`);
+            continue;
+          }
+
+          // isNoti가 false인 경우 푸시 발송하지 않음
+          if (isNoti === false) {
+            console.log(`사용자 ${userId}의 알림 설정이 비활성화되어 있습니다.`);
             continue;
           }
 
@@ -303,9 +310,16 @@ export const scheduledMedicineNotifications = functions.pubsub
 
           const userData = userDoc.data();
           const pushToken = userData?.pushToken;
+          const isNoti = userData?.isNoti;
 
           if (!pushToken) {
             console.log(`사용자 ${userId}의 푸시 토큰이 없습니다.`);
+            continue;
+          }
+
+          // isNoti가 false인 경우 푸시 발송하지 않음
+          if (isNoti === false) {
+            console.log(`사용자 ${userId}의 알림 설정이 비활성화되어 있습니다.`);
             continue;
           }
 

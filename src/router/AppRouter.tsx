@@ -4,6 +4,7 @@ import Home from '../pages/Home';
 import HospitalBooking from '../pages/HospitalBooking';
 import MedicationManagement from '../pages/MedicationManagement';
 import FavoriteHospitals from '../pages/FavoriteHospitals';
+import MyPage from '../pages/MyPage';
 import LoginPage from '../pages/login/LoginPage';
 import RegisterPage from '../pages/register/RegisterPage';
 
@@ -33,6 +34,9 @@ const AppRouter: React.FC<AppRouterProps> = ({ showTabs = true }) => {
         <Route exact path="/favorite-hospitals">
           <FavoriteHospitals />
         </Route>
+        <Route exact path="/mypage">
+          <MyPage />
+        </Route>
         <Route exact path="/">
           <Redirect to="/home" />
         </Route>
@@ -60,6 +64,9 @@ const AppRouter: React.FC<AppRouterProps> = ({ showTabs = true }) => {
         </Route>
         <Route exact path="/favorite-hospitals">
           <FavoriteHospitals />
+        </Route>
+        <Route exact path="/mypage">
+          <MyPage />
         </Route>
         <Route exact path="/">
           <Redirect to="/home" />
@@ -107,6 +114,20 @@ const AppRouter: React.FC<AppRouterProps> = ({ showTabs = true }) => {
             }}
           >
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+          </svg>
+        </IonTabButton>
+        <IonTabButton tab="mypage" href="/mypage">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="#ffffff"
+            style={{
+              display: 'block',
+              marginBottom: '0px',
+            }}
+          >
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
           </svg>
         </IonTabButton>
       </IonTabBar>

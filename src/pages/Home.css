@@ -70,24 +70,24 @@ ion-app {
 
 .rolling-notice-container {
   width: 100%;
-  height: 150px;
+  height: 100px;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  background: rgb(248, 250, 252);
+  box-shadow: none;
+  background: transparent;
 }
 
 .rolling-notice-content {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 300%;
-  animation: rolling-vertical 24s infinite linear;
+  height: 500%;
+  animation: rolling-vertical 40s infinite linear;
 }
 
 .notice-item {
   width: 100%;
-  height: 33.333%;
+  height: 20%;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -101,18 +101,51 @@ ion-app {
 }
 
 .notice-2 {
-  background: linear-gradient(135deg, rgb(230, 248, 241) 0%, rgb(214, 243, 232) 100%);
+  background: transparent;
 }
 
 .notice-3 {
-  background: linear-gradient(135deg, rgb(236, 244, 255) 0%, rgb(224, 239, 255) 100%);
+  background: transparent;
+}
+
+.notice-4 {
+  background: transparent;
+}
+
+.notice-5 {
+  background: transparent;
+}
+
+.notice-ad {
+  background: transparent;
+  border: none;
+}
+
+/* 배너 이미지 스타일 */
+.banner-image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .notice-content {
   text-align: center;
   color: #1e293b;
-  padding: 20px;
+  padding: 0;
   z-index: 2;
+  width: 100%;
+  height: 100%;
 }
 
 .notice-content h3 {
@@ -136,11 +169,16 @@ ion-app {
 
 @keyframes rolling-vertical {
   0% { transform: translateY(0); }
-  29.17% { transform: translateY(0); }       /* 첫 카드 7초 유지 (7/24 = 29.17%) */
-  33.33% { transform: translateY(-33.333%); }   /* 1초 이동 (1/24 = 4.17%) */
-  62.5% { transform: translateY(-33.333%); } /* 둘 카드 7초 유지 (7/24 = 29.17%) */
-  66.67% { transform: translateY(-66.666%); }/* 1초 이동 (1/24 = 4.17%) */
-  100% { transform: translateY(-66.666%); }  /* 셋 카드 7초 유지 (7/24 = 29.17%) */
+  18% { transform: translateY(0); }           /* 첫 번째 7.2초 유지 */
+  20% { transform: translateY(-20%); }        /* 1초 이동 */
+  38% { transform: translateY(-20%); }        /* 두 번째 7.2초 유지 */
+  40% { transform: translateY(-40%); }        /* 1초 이동 */
+  58% { transform: translateY(-40%); }        /* 세 번째 7.2초 유지 */
+  60% { transform: translateY(-60%); }        /* 1초 이동 */
+  78% { transform: translateY(-60%); }        /* 네 번째 7.2초 유지 */
+  80% { transform: translateY(-80%); }        /* 1초 이동 */
+  98% { transform: translateY(-80%); }        /* 다섯 번째 7.2초 유지 */
+  100% { transform: translateY(0); }          /* 첫 번째로 자연스럽게 이동 */
 }
 
 /* 서비스 카드 컨테이너 */

@@ -23,6 +23,7 @@ export interface UserProfile {
   phoneNumber?: string;
   telNo?: string;
   pushToken?: string;
+  isNoti?: boolean;
   emergencyContact?: {
     name: string;
     phone: string;

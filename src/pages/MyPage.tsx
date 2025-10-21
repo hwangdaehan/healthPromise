@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonIcon, IonToggle } from '@ionic/react';
-import { person, notifications, logOut, create } from 'ionicons/icons';
+import { person, notifications, logOut } from 'ionicons/icons';
 import { updateNotificationSetting, getNotificationSetting } from '../services/userService';
 import { RegionService } from '../services/regionService';
 import './MyPage.css';
@@ -167,9 +167,6 @@ const MyPage: React.FC = () => {
               <h2 className="profile-name">{userData.name}</h2>
               <p className="profile-subtitle">건강약속 회원</p>
             </div>
-            <IonButton fill="clear" className="edit-button">
-              <IonIcon icon={create} />
-            </IonButton>
           </div>
         </div>
 

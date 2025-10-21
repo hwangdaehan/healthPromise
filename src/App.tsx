@@ -5,6 +5,7 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { IonReactRouter } from '@ionic/react-router';
 import AppRouter from './router/AppRouter';
 import AuthGuard from './components/AuthGuard';
+import SplashScreen from './components/SplashScreen';
 import { MessagingService } from './services/messagingService';
 
 /* Core CSS required for Ionic components to work properly */
@@ -45,6 +46,7 @@ setupIonicReact();
 const AppContent: React.FC = () => {
   const location = useLocation();
   const [backgroundColor, setBackgroundColor] = useState('transparent');
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
     // StatusBar 설정
@@ -86,6 +88,10 @@ const AppContent: React.FC = () => {
     initializeFCM();
   }, []);
 
+  const handleSplashFinish = () => {
+    setShowSplash(false);
+  };
+
   useEffect(() => {
     const path = location.pathname;
 
@@ -102,6 +108,10 @@ const AppContent: React.FC = () => {
         break;
     }
   }, [location.pathname]);
+
+  if (showSplash) {
+    return <SplashScreen onFinish={handleSplashFinish} />;
+  }
 
   return (
     <AuthGuard>

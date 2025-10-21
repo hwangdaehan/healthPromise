@@ -43,13 +43,6 @@
   font-size: 0.9rem;
 }
 
-.edit-button {
-  --color: white;
-  --background: rgba(255, 255, 255, 0.1);
-  --border-radius: 50%;
-  width: 40px;
-  height: 40px;
-}
 
 /* 정보 섹션 */
 .info-section {

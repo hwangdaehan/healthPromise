@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:506246950736:android:a3d8ab5260470726954655",
+        "mobilesdk_app_id": "1:506246950736:android:7fc831f8cdd13e61954655",
         "android_client_info": {
-          "package_name": "io.ionic.starter"
+          "package_name": "app.health.promise"
         }
       },
       "oauth_client": [],

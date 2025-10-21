@@ -162,8 +162,14 @@ exports.scheduledReservationNotifications = functions.pubsub
                     continue;
                 const userData = userDoc.data();
                 const pushToken = userData === null || userData === void 0 ? void 0 : userData.pushToken;
+                const isNoti = userData === null || userData === void 0 ? void 0 : userData.isNoti;
                 if (!pushToken) {
                     console.log(`사용자 ${userId}의 푸시 토큰이 없습니다.`);
+                    continue;
+                }
+                // isNoti가 false인 경우 푸시 발송하지 않음
+                if (isNoti === false) {
+                    console.log(`사용자 ${userId}의 알림 설정이 비활성화되어 있습니다.`);
                     continue;
                 }
                 // 예약 정보로 알림 메시지 구성
@@ -259,8 +265,14 @@ exports.scheduledMedicineNotifications = functions.pubsub
                     continue;
                 const userData = userDoc.data();
                 const pushToken = userData === null || userData === void 0 ? void 0 : userData.pushToken;
+                const isNoti = userData === null || userData === void 0 ? void 0 : userData.isNoti;
                 if (!pushToken) {
                     console.log(`사용자 ${userId}의 푸시 토큰이 없습니다.`);
+                    continue;
+                }
+                // isNoti가 false인 경우 푸시 발송하지 않음
+                if (isNoti === false) {
+                    console.log(`사용자 ${userId}의 알림 설정이 비활성화되어 있습니다.`);
                     continue;
                 }
                 // 약물 정보로 알림 메시지 구성

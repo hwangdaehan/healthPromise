@@ -15,7 +15,14 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+let app;
+try {
+  app = initializeApp(firebaseConfig);
+  console.log('Firebase 초기화 성공');
+} catch (error) {
+  console.error('Firebase 초기화 실패:', error);
+  throw error;
+}
 
 // Initialize Firebase services
 export const auth = getAuth(app);

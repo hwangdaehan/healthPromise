@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'app.health.promise',
-  appName: 'healthPromise',
+  appName: '건강약속',
   webDir: 'dist',
   plugins: {
     StatusBar: {

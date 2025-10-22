@@ -54,8 +54,10 @@ const AppContent: React.FC = () => {
       try {
         await StatusBar.setStyle({ style: Style.Default });
         await StatusBar.setBackgroundColor({ color: '#ffffff' });
+        console.log('StatusBar 설정 성공');
       } catch (error) {
-        console.log('StatusBar 설정 실패:', error);
+        console.error('StatusBar 설정 실패:', error);
+        // StatusBar 실패해도 앱은 계속 실행
       }
     };
 
@@ -76,11 +78,13 @@ const AppContent: React.FC = () => {
               }
             } catch (fcmError) {
               console.error('FCM 토큰 갱신 중 에러:', fcmError);
+              // FCM 실패해도 앱은 계속 실행
             }
           }
         }
       } catch (error) {
         console.error('FCM 토큰 초기화 실패:', error);
+        // FCM 실패해도 앱은 계속 실행
       }
     };
 

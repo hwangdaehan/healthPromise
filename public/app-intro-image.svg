@@ -1,0 +1,173 @@
+<svg width="1024" height="500" viewBox="0 0 1024 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 배경 그라데이션 -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00BD7C;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00A86B;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- 로고 그림자 -->
+    <filter id="logoShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="rgba(0,0,0,0.2)"/>
+    </filter>
+    
+    <!-- 카드 그림자 -->
+    <filter id="cardShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="rgba(0,0,0,0.1)"/>
+    </filter>
+  </defs>
+  
+  <!-- 배경 -->
+  <rect width="1024" height="500" fill="url(#bgGradient)"/>
+  
+  <!-- 상단 로고 영역 -->
+  <g transform="translate(50, 50)">
+    <!-- 흰색 원 배경 -->
+    <circle cx="60" cy="60" r="80" fill="#FFFFFF" filter="url(#logoShadow)"/>
+    <!-- main_logo.svg 내용 직접 삽입 -->
+    <g transform="translate(20, 20) scale(0.9)">
+      <path d="M45.5 7.69452C55.9087 -2.56482 72.7848 -2.56486 83.1935 7.69452C93.6022 17.9539 93.6022 34.5878 83.1935 44.8473L46.904 80.6162C46.1253 81.3837 44.8747 81.3837 44.096 80.6162L7.80651 44.8473C-2.60215 34.5878 -2.60219 17.9539 7.80651 7.69452C18.2152 -2.56486 35.0913 -2.56482 45.5 7.69452ZM76.4084 14.3823C69.7468 7.81634 58.9467 7.81632 52.2851 14.3823L46.9039 19.6856C46.1252 20.4529 44.8748 20.4529 44.0962 19.6856L38.7149 14.3823C32.0533 7.81632 21.2532 7.81634 14.5916 14.3823C7.9301 20.9483 7.93008 31.5934 14.5916 38.1595L44.096 67.2406C44.8747 68.0081 46.1253 68.0081 46.904 67.2406L76.4084 38.1595C83.0699 31.5934 83.0699 20.9483 76.4084 14.3823Z" fill="#00BD7C"/>
+      <path d="M62.9863 23.3014C64.7436 21.5441 67.5932 21.5441 69.3505 23.3014C71.1075 25.0587 71.1075 27.9074 69.3505 29.6647L47.0889 51.9263C46.3098 52.7054 45.0473 52.7077 44.2654 51.9313L28.6513 36.4264C26.8879 34.6752 26.8778 31.8256 28.6289 30.0622C30.38 28.2987 33.2296 28.2886 34.9931 30.0397L44.243 39.2252C45.0248 40.0016 46.2873 39.9994 47.0665 39.2203L62.9863 23.3014Z" fill="#00B8DB"/>
+    </g>
+  </g>
+  
+  <!-- 앱 제목 -->
+  <text x="200" y="100" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#FFFFFF">
+    건강약속
+  </text>
+  
+  <!-- 부제목 -->
+  <text x="200" y="140" font-family="Arial, sans-serif" font-size="20" fill="#FFFFFF" opacity="0.9">
+    당신의 건강을 위한 스마트 헬스케어 앱
+  </text>
+  
+  <!-- 주요 기능 카드들 -->
+  <!-- 병원 예약 카드 -->
+  <g transform="translate(50, 200)">
+    <rect x="0" y="0" width="220" height="120" rx="12" fill="#FFFFFF" filter="url(#cardShadow)"/>
+    <g transform="translate(20, 20)">
+      <!-- 병원 아이콘 (+) -->
+      <g fill="#00BD7C">
+        <rect x="8" y="13" width="14" height="4" rx="2"/>
+        <rect x="13" y="8" width="4" height="14" rx="2"/>
+      </g>
+      <text x="45" y="25" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333333">
+        병원 예약
+      </text>
+      <text x="45" y="45" font-family="Arial, sans-serif" font-size="12" fill="#666666">
+        가까운 병원을 찾고
+      </text>
+      <text x="45" y="60" font-family="Arial, sans-serif" font-size="12" fill="#666666">
+        쉽게 예약하세요
+      </text>
+    </g>
+  </g>
+  
+  <!-- 복약 관리 카드 -->
+  <g transform="translate(290, 200)">
+    <rect x="0" y="0" width="220" height="120" rx="12" fill="#FFFFFF" filter="url(#cardShadow)"/>
+    <g transform="translate(20, 20)">
+      <!-- 약 아이콘 -->
+      <g fill="#00BD7C">
+        <circle cx="15" cy="15" r="12" stroke="#00BD7C" stroke-width="2" fill="none"/>
+        <rect x="8" y="8" width="14" height="2" rx="1"/>
+        <rect x="8" y="12" width="14" height="2" rx="1"/>
+        <rect x="8" y="16" width="14" height="2" rx="1"/>
+        <rect x="8" y="20" width="14" height="2" rx="1"/>
+      </g>
+      <text x="45" y="25" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333333">
+        복약 관리
+      </text>
+      <text x="45" y="45" font-family="Arial, sans-serif" font-size="12" fill="#666666">
+        복용한 약을 기록하고
+      </text>
+      <text x="45" y="60" font-family="Arial, sans-serif" font-size="12" fill="#666666">
+        건강을 관리하세요
+      </text>
+    </g>
+  </g>
+  
+  <!-- 즐겨찾기 병원 카드 -->
+  <g transform="translate(530, 200)">
+    <rect x="0" y="0" width="220" height="120" rx="12" fill="#FFFFFF" filter="url(#cardShadow)"/>
+    <g transform="translate(20, 20)">
+      <!-- 별 아이콘 -->
+      <g fill="#00BD7C">
+        <path d="M15 2l4 8h8l-6 6 2 8-8-4-8 4 2-8-6-6h8l4-8z"/>
+      </g>
+      <text x="45" y="25" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333333">
+        즐겨찾기 병원
+      </text>
+      <text x="45" y="45" font-family="Arial, sans-serif" font-size="12" fill="#666666">
+        자주 가는 병원을
+      </text>
+      <text x="45" y="60" font-family="Arial, sans-serif" font-size="12" fill="#666666">
+        빠르게 찾아보세요
+      </text>
+    </g>
+  </g>
+  
+  <!-- 하단 특징들 -->
+  <g transform="translate(50, 350)">
+    <!-- 푸시 알림 -->
+    <g transform="translate(0, 0)">
+      <circle cx="15" cy="15" r="12" fill="#FFFFFF" opacity="0.9"/>
+      <g fill="#00BD7C">
+        <rect x="8" y="8" width="14" height="2" rx="1"/>
+        <rect x="8" y="12" width="10" height="2" rx="1"/>
+        <rect x="8" y="16" width="12" height="2" rx="1"/>
+      </g>
+      <text x="35" y="20" font-family="Arial, sans-serif" font-size="14" fill="#FFFFFF">
+        푸시 알림으로 복용 시간을 알려드려요
+      </text>
+    </g>
+    
+    <!-- Firebase 연동 -->
+    <g transform="translate(0, 40)">
+      <circle cx="15" cy="15" r="12" fill="#FFFFFF" opacity="0.9"/>
+      <g fill="#00BD7C">
+        <rect x="8" y="8" width="14" height="14" rx="2"/>
+        <rect x="10" y="10" width="10" height="2" rx="1"/>
+        <rect x="10" y="13" width="8" height="2" rx="1"/>
+        <rect x="10" y="16" width="10" height="2" rx="1"/>
+      </g>
+      <text x="35" y="20" font-family="Arial, sans-serif" font-size="14" fill="#FFFFFF">
+        Firebase로 안전하게 데이터를 저장해요
+      </text>
+    </g>
+    
+    <!-- 크로스 플랫폼 -->
+    <g transform="translate(0, 80)">
+      <circle cx="15" cy="15" r="12" fill="#FFFFFF" opacity="0.9"/>
+      <g fill="#00BD7C">
+        <rect x="8" y="8" width="14" height="14" rx="2"/>
+        <rect x="10" y="10" width="10" height="2" rx="1"/>
+        <rect x="10" y="13" width="8" height="2" rx="1"/>
+        <rect x="10" y="16" width="10" height="2" rx="1"/>
+      </g>
+      <text x="35" y="20" font-family="Arial, sans-serif" font-size="14" fill="#FFFFFF">
+        iOS와 Android 모두 지원해요
+      </text>
+    </g>
+  </g>
+  
+  <!-- 우측 하단 앱 아이콘들 -->
+  <g transform="translate(750, 350)">
+    <!-- iOS 스타일 아이콘 -->
+    <rect x="0" y="0" width="60" height="60" rx="12" fill="#FFFFFF" opacity="0.9"/>
+    <text x="30" y="35" font-family="Arial, sans-serif" font-size="10" fill="#00BD7C" text-anchor="middle">
+      iOS
+    </text>
+    
+    <!-- Android 스타일 아이콘 -->
+    <rect x="80" y="0" width="60" height="60" rx="12" fill="#FFFFFF" opacity="0.9"/>
+    <text x="110" y="35" font-family="Arial, sans-serif" font-size="10" fill="#00BD7C" text-anchor="middle">
+      Android
+    </text>
+  </g>
+  
+  <!-- 하단 텍스트 -->
+  <text x="512" y="480" font-family="Arial, sans-serif" font-size="16" fill="#FFFFFF" text-anchor="middle" opacity="0.8">
+    Ionic React + Firebase + Capacitor로 제작된 모바일 헬스케어 앱
+  </text>
+</svg>

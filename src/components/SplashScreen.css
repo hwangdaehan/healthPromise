@@ -1,0 +1,93 @@
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 9999;
+  background: linear-gradient(135deg, #00BD7C 0%, #00A86B 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.splash-screen.visible {
+  opacity: 1;
+}
+
+.splash-screen.fade-out {
+  opacity: 0;
+}
+
+.splash-content {
+  --background: transparent;
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.splash-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  animation: fadeInUp 1s ease-out;
+}
+
+.logo-image {
+  width: 200px;
+  height: 200px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  animation: logoPulse 2s ease-in-out infinite;
+  background: #FFFFFF;
+  border-radius: 50%;
+  padding: 40px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  object-fit: contain;
+  transform: scale(1.3);
+}
+
+/* 애니메이션 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes logoPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* 다크모드 지원 */
+@media (prefers-color-scheme: dark) {
+  .splash-screen {
+    background: linear-gradient(135deg, #00BD7C 0%, #00A86B 100%);
+  }
+}
+
+/* 모바일 최적화 */
+@media (max-width: 480px) {
+  .logo-image {
+    width: 120px;
+    height: 120px;
+    padding: 30px;
+    transform: scale(1.2);
+  }
+}

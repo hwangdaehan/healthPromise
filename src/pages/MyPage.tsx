@@ -97,6 +97,19 @@ const MyPage: React.FC = () => {
     return gender;
   };
 
+  const formatPhoneNumber = (phoneNumber: string) => {
+    if (!phoneNumber) return '';
+    // 숫자만 추출
+    const numbers = phoneNumber.replace(/\D/g, '');
+    // 010-XXXX-XXXX 형식으로 포맷팅
+    if (numbers.length === 11) {
+      return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7)}`;
+    } else if (numbers.length === 10) {
+      return `${numbers.slice(0, 3)}-${numbers.slice(3, 6)}-${numbers.slice(6)}`;
+    }
+    return phoneNumber; // 포맷팅할 수 없으면 원본 반환
+  };
+
   const getGenderColor = (gender: string) => {
     if (gender === 'male' || gender === '남성' || gender === '남' || gender === 'M') return 'male';
     if (gender === 'female' || gender === '여성' || gender === '여' || gender === 'F') return 'female';
@@ -151,11 +164,6 @@ const MyPage: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>마이페이지</IonTitle>
-        </IonToolbar>
-      </IonHeader>
       <IonContent className="mypage-content">
         {/* 프로필 섹션 */}
         <div className="profile-section">
@@ -183,6 +191,10 @@ const MyPage: React.FC = () => {
               <span className="info-value">{formatDate(userData.birthDate)}</span>
             </div>
             <div className="info-item">
+              <span className="info-label">전화번호</span>
+              <span className="info-value">{formatPhoneNumber(userData.telNo)}</span>
+            </div>
+            <div className="info-item">
               <span className="info-label">성별</span>
               <span className={`info-value gender-value ${getGenderColor(userData.gender)}`}>
                 {formatGender(userData.gender)}
@@ -196,12 +208,6 @@ const MyPage: React.FC = () => {
               <div className="info-item">
                 <span className="info-label">이메일</span>
                 <span className="info-value">{userData.email}</span>
-              </div>
-            )}
-            {userData.phoneNumber && (
-              <div className="info-item">
-                <span className="info-label">휴대폰번호</span>
-                <span className="info-value">{userData.phoneNumber}</span>
               </div>
             )}
             {userData.address && (

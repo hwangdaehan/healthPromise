@@ -61,36 +61,41 @@ const AppContent: React.FC = () => {
       }
     };
 
-    // FCM 토큰 초기화 (웹과 네이티브 모두)
+    // FCM 토큰 초기화 (안전한 방법)
     const initializeFCM = async () => {
       try {
-        console.log('🔄 FCM 초기화 시작');
+        console.log('🔄 FCM 초기화 시작 (지연 실행)');
         
         // 로그인된 사용자가 있는지 확인
         const savedUserInfo = localStorage.getItem('userInfo');
         
         if (savedUserInfo) {
-          const userInfo = JSON.parse(savedUserInfo);
-          
-          if (userInfo.uid) {
-            console.log('🔄 FCM 토큰 강제 갱신 시작');
-            try {
-              // 캐시된 토큰 무시하고 새로 생성
-              MessagingService.clearCachedToken();
-              const fcmToken = await MessagingService.getFCMToken(true);
+          try {
+            const userInfo = JSON.parse(savedUserInfo);
+            
+            if (userInfo.uid) {
+              console.log('🔄 FCM 토큰 갱신 시작');
               
-              if (fcmToken) {
-                await MessagingService.saveUserFCMToken(userInfo.uid, fcmToken);
-                console.log('✅ FCM 토큰 갱신 완료');
-              } else {
-                console.log('⚠️ FCM 토큰 생성 실패');
+              // 안전한 FCM 토큰 생성
+              try {
+                const fcmToken = await MessagingService.getFCMToken(false); // 강제 새 토큰 비활성화
+                
+                if (fcmToken) {
+                  await MessagingService.saveUserFCMToken(userInfo.uid, fcmToken);
+                  console.log('✅ FCM 토큰 저장 완료');
+                } else {
+                  console.log('⚠️ FCM 토큰 생성 실패');
+                }
+              } catch (fcmError) {
+                console.error('❌ FCM 토큰 갱신 실패:', fcmError);
+                // FCM 실패해도 앱은 계속 실행
               }
-            } catch (fcmError) {
-              console.error('❌ FCM 토큰 갱신 실패:', fcmError);
-              // FCM 실패해도 앱은 계속 실행
+            } else {
+              console.log('⚠️ 사용자 ID가 없음');
             }
-          } else {
-            console.log('⚠️ 사용자 ID가 없음');
+          } catch (parseError) {
+            console.error('❌ userInfo 파싱 실패:', parseError);
+            // 파싱 실패해도 앱은 계속 실행
           }
         } else {
           console.log('⚠️ 로그인된 사용자가 없음');
@@ -102,7 +107,11 @@ const AppContent: React.FC = () => {
     };
 
     setupStatusBar();
-    initializeFCM();
+    
+    // FCM을 지연 실행 (앱이 완전히 로드된 후)
+    setTimeout(() => {
+      initializeFCM();
+    }, 2000); // 2초 후 실행
   }, []);
 
   const handleSplashFinish = () => {

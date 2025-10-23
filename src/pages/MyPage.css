@@ -5,10 +5,15 @@
 /* 프로필 섹션 */
 .profile-section {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 2rem 0;
+  padding: 1.5rem 0;
   color: white;
-  margin: -1rem -1rem 1rem -1rem; /* ion-padding 상쇄 */
+  margin: 0 -1rem 1rem -1rem; /* 상단 마진 제거, 좌우만 상쇄 */
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 120px;
 }
 
 .profile-header {

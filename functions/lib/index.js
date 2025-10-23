@@ -3,7 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.scheduledMedicineNotifications = exports.scheduledReservationNotifications = exports.sendTestPush = exports.sendPushToUser = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-admin.initializeApp();
+// Firebase Admin SDK 초기화
+admin.initializeApp({
+    credential: admin.credential.cert(require('../healthpromise-36111-firebase-adminsdk-fbsvc-c20cc8d034.json')),
+    projectId: 'healthpromise-36111'
+});
 // FCM 서버 키 설정 (현재 사용하지 않음)
 // const FCM_SERVER_KEY = 'BGfYloguVQqwLcjxrwUT5aG7EKwQtafy-YUnrQDTiKksLwOZX642HnBl1jxH5yNKljjd0y-Jn8XtgIqunx0RsjQ';
 // CORS 설정
@@ -54,7 +58,14 @@ exports.sendPushToUser = functions.https.onRequest((req, res) => {
                     return res.status(400).json({ error: 'No push token found for user' });
                 }
             }
+            console.log('=== 푸시 알림 발송 시작 ===');
             console.log('사용할 pushToken:', pushToken);
+            console.log('pushToken 길이:', pushToken === null || pushToken === void 0 ? void 0 : pushToken.length);
+            console.log('pushToken 앞 20자:', pushToken === null || pushToken === void 0 ? void 0 : pushToken.substring(0, 20));
+            console.log('pushToken 뒤 20자:', pushToken === null || pushToken === void 0 ? void 0 : pushToken.substring(pushToken.length - 20));
+            console.log('알림 제목:', title);
+            console.log('알림 내용:', body);
+            console.log('추가 데이터:', JSON.stringify(additionalData || {}));
             // FCM 메시지 생성
             const message = {
                 token: pushToken,
@@ -63,20 +74,55 @@ exports.sendPushToUser = functions.https.onRequest((req, res) => {
                     body: body,
                 },
                 data: additionalData || {},
+                android: {
+                    notification: {
+                        channelId: '1:506246950736:android:7fc831f8cdd13e61954655',
+                        icon: 'ic_launcher',
+                        color: '#10b981',
+                        sound: 'default',
+                        priority: 'high',
+                        visibility: 'public',
+                        defaultSound: true,
+                        defaultVibrateTimings: true,
+                        defaultLightSettings: true,
+                    },
+                    priority: 'high',
+                    restrictedPackageName: 'app.health.promise',
+                },
+                apns: {
+                    payload: {
+                        aps: {
+                            sound: 'default',
+                            badge: 1,
+                            alert: {
+                                title: title,
+                                body: body,
+                            },
+                        },
+                    },
+                },
             };
             try {
+                console.log('=== FCM 메시지 구성 완료 ===');
+                console.log('메시지 구성:', JSON.stringify(message, null, 2));
                 // FCM으로 푸시 발송
+                console.log('🔄 FCM 서버로 메시지 전송 중...');
                 const response = await admin.messaging().send(message);
-                console.log('푸시 알림 발송 성공:', response);
+                console.log('✅ 푸시 알림 발송 성공!');
+                console.log('응답 메시지 ID:', response);
+                console.log('=== 푸시 알림 발송 완료 ===');
                 return res.status(200).json({
                     success: true,
                     messageId: response,
                 });
             }
             catch (err) {
+                console.log('❌ 푸시 알림 발송 실패!');
                 const errMsg = ((err === null || err === void 0 ? void 0 : err.message) || '').toLowerCase();
                 const errCode = (err === null || err === void 0 ? void 0 : err.code) || ((_a = err === null || err === void 0 ? void 0 : err.errorInfo) === null || _a === void 0 ? void 0 : _a.code);
-                console.error('푸시 발송 실패:', { code: errCode, message: err === null || err === void 0 ? void 0 : err.message });
+                console.error('에러 코드:', errCode);
+                console.error('에러 메시지:', err === null || err === void 0 ? void 0 : err.message);
+                console.error('전체 에러:', JSON.stringify(err, null, 2));
                 // 토큰이 유효하지 않거나 존재하지 않는 경우 정리
                 if (errCode === 'messaging/registration-token-not-registered' ||
                     errCode === 'messaging/invalid-argument' ||
@@ -219,6 +265,32 @@ exports.scheduledReservationNotifications = functions.pubsub
                             hospitalName: hospitalName,
                             reservationDate: reservationDate.toISOString(),
                         },
+                        android: {
+                            notification: {
+                                channelId: '1:506246950736:android:7fc831f8cdd13e61954655',
+                                icon: 'ic_launcher',
+                                color: '#10b981',
+                                sound: 'default',
+                                priority: 'high',
+                                visibility: 'public',
+                                defaultSound: true,
+                                defaultVibrateTimings: true,
+                                defaultLightSettings: true,
+                            },
+                            priority: 'high',
+                        },
+                        apns: {
+                            payload: {
+                                aps: {
+                                    sound: 'default',
+                                    badge: 1,
+                                    alert: {
+                                        title: title,
+                                        body: body,
+                                    },
+                                },
+                            },
+                        },
                     };
                     try {
                         // 푸시 알림 발송
@@ -339,6 +411,32 @@ exports.scheduledMedicineNotifications = functions.pubsub
                             medicineId: medicine.id,
                             medicineName: medicineName,
                             times: times.join(','),
+                        },
+                        android: {
+                            notification: {
+                                channelId: '1:506246950736:android:7fc831f8cdd13e61954655',
+                                icon: 'ic_launcher',
+                                color: '#10b981',
+                                sound: 'default',
+                                priority: 'high',
+                                visibility: 'public',
+                                defaultSound: true,
+                                defaultVibrateTimings: true,
+                                defaultLightSettings: true,
+                            },
+                            priority: 'high',
+                        },
+                        apns: {
+                            payload: {
+                                aps: {
+                                    sound: 'default',
+                                    badge: 1,
+                                    alert: {
+                                        title: title,
+                                        body: body,
+                                    },
+                                },
+                            },
                         },
                     };
                     try {

@@ -75,16 +75,41 @@ export const sendPushToUser = functions.https.onRequest((req, res) => {
           body: body,
         },
         data: additionalData || {},
-      };
+      } as admin.messaging.Message;
 
-      // FCM으로 푸시 발송
-      const response = await admin.messaging().send(message);
-      console.log('푸시 알림 발송 성공:', response);
+      try {
+        // FCM으로 푸시 발송
+        const response = await admin.messaging().send(message);
+        console.log('푸시 알림 발송 성공:', response);
 
-      return res.status(200).json({
-        success: true,
-        messageId: response,
-      });
+        return res.status(200).json({
+          success: true,
+          messageId: response,
+        });
+      } catch (err: any) {
+        const errMsg = (err?.message || '').toLowerCase();
+        const errCode = err?.code || err?.errorInfo?.code;
+        console.error('푸시 발송 실패:', { code: errCode, message: err?.message });
+
+        // 토큰이 유효하지 않거나 존재하지 않는 경우 정리
+        if (
+          errCode === 'messaging/registration-token-not-registered' ||
+          errCode === 'messaging/invalid-argument' ||
+          errMsg.includes('requested entity was not found')
+        ) {
+          try {
+            await admin.firestore().collection('user').doc(userId).update({
+              pushToken: admin.firestore.FieldValue.delete(),
+            });
+            console.log(`무효 토큰 삭제 완료 (userId=${userId})`);
+          } catch (cleanupErr) {
+            console.error('무효 토큰 삭제 실패:', cleanupErr);
+          }
+          return res.status(410).json({ error: 'Push token invalid, removed' });
+        }
+
+        return res.status(500).json({ error: 'Failed to send push notification' });
+      }
     } catch (error) {
       console.error('Error sending push notification:', error);
       return res.status(500).json({ error: 'Failed to send push notification' });
@@ -124,7 +149,7 @@ export const sendTestPush = functions.https.onRequest((req, res) => {
           title: title,
           body: body,
         },
-      };
+      } as admin.messaging.MulticastMessage;
 
       // FCM으로 푸시 발송
       const response = await admin.messaging().sendMulticast(message);
@@ -229,22 +254,42 @@ export const scheduledReservationNotifications = functions.pubsub
                 hospitalName: hospitalName,
                 reservationDate: reservationDate.toISOString(),
               },
-            };
+            } as admin.messaging.Message;
 
-            // 푸시 알림 발송
-            await admin.messaging().send(message);
-            console.log(`푸시 알림 발송 성공 - 사용자: ${userId}, 예약: ${reservation.id}`);
+            try {
+              // 푸시 알림 발송
+              await admin.messaging().send(message);
+              console.log(`푸시 알림 발송 성공 - 사용자: ${userId}, 예약: ${reservation.id}`);
 
-            // alarm 컬렉션에 알림 기록 저장
-            await admin.firestore().collection('alarm').add({
-              userId: userId,
-              title: title,
-              content: body,
-              dataId: reservation.id,
-              isRead: false,
-              isSuccess: true,
-              regDate: admin.firestore.FieldValue.serverTimestamp(),
-            });
+              // alarm 컬렉션에 알림 기록 저장
+              await admin.firestore().collection('alarm').add({
+                userId: userId,
+                title: title,
+                content: body,
+                dataId: reservation.id,
+                isRead: false,
+                isSuccess: true,
+                regDate: admin.firestore.FieldValue.serverTimestamp(),
+              });
+            } catch (err: any) {
+              const errMsg = (err?.message || '').toLowerCase();
+              const errCode = err?.code || err?.errorInfo?.code;
+              console.error(`사용자 ${userId} 알림 발송 실패:`, { code: errCode, message: err?.message });
+              if (
+                errCode === 'messaging/registration-token-not-registered' ||
+                errCode === 'messaging/invalid-argument' ||
+                errMsg.includes('requested entity was not found')
+              ) {
+                try {
+                  await admin.firestore().collection('user').doc(userId).update({
+                    pushToken: admin.firestore.FieldValue.delete(),
+                  });
+                  console.log(`무효 토큰 삭제 완료 (userId=${userId})`);
+                } catch (cleanupErr) {
+                  console.error('무효 토큰 삭제 실패:', cleanupErr);
+                }
+              }
+            }
           }
         } catch (userError) {
           console.error(`사용자 ${userId} 알림 발송 실패:`, userError);
@@ -344,22 +389,42 @@ export const scheduledMedicineNotifications = functions.pubsub
                 medicineName: medicineName,
                 times: times.join(','),
               },
-            };
+            } as admin.messaging.Message;
 
-            // 푸시 알림 발송
-            await admin.messaging().send(message);
-            console.log(`푸시 알림 발송 성공 - 사용자: ${userId}, 약물: ${medicine.id}`);
+            try {
+              // 푸시 알림 발송
+              await admin.messaging().send(message);
+              console.log(`푸시 알림 발송 성공 - 사용자: ${userId}, 약물: ${medicine.id}`);
 
-            // alarm 컬렉션에 알림 기록 저장
-            await admin.firestore().collection('alarm').add({
-              userId: userId,
-              title: title,
-              content: body,
-              dataId: medicine.id,
-              isRead: false,
-              isSuccess: true,
-              regDate: admin.firestore.FieldValue.serverTimestamp(),
-            });
+              // alarm 컬렉션에 알림 기록 저장
+              await admin.firestore().collection('alarm').add({
+                userId: userId,
+                title: title,
+                content: body,
+                dataId: medicine.id,
+                isRead: false,
+                isSuccess: true,
+                regDate: admin.firestore.FieldValue.serverTimestamp(),
+              });
+            } catch (err: any) {
+              const errMsg = (err?.message || '').toLowerCase();
+              const errCode = err?.code || err?.errorInfo?.code;
+              console.error(`사용자 ${userId} 알림 발송 실패:`, { code: errCode, message: err?.message });
+              if (
+                errCode === 'messaging/registration-token-not-registered' ||
+                errCode === 'messaging/invalid-argument' ||
+                errMsg.includes('requested entity was not found')
+              ) {
+                try {
+                  await admin.firestore().collection('user').doc(userId).update({
+                    pushToken: admin.firestore.FieldValue.delete(),
+                  });
+                  console.log(`무효 토큰 삭제 완료 (userId=${userId})`);
+                } catch (cleanupErr) {
+                  console.error('무효 토큰 삭제 실패:', cleanupErr);
+                }
+              }
+            }
           }
         } catch (userError) {
           console.error(`사용자 ${userId} 알림 발송 실패:`, userError);

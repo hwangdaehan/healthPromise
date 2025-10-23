@@ -5,15 +5,19 @@
 /* 프로필 섹션 */
 .profile-section {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 2rem 1.5rem;
+  padding: 2rem 0;
   color: white;
-  margin-bottom: 1rem;
+  margin: -1rem -1rem 1rem -1rem; /* ion-padding 상쇄 */
+  box-sizing: border-box;
 }
 
 .profile-header {
   display: flex;
   align-items: center;
   gap: 1rem;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .profile-avatar {

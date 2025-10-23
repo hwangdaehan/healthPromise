@@ -164,7 +164,7 @@ const MyPage: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent className="mypage-content">
+      <IonContent className="mypage-content ion-padding">
         {/* 프로필 섹션 */}
         <div className="profile-section">
           <div className="profile-header">
@@ -192,7 +192,7 @@ const MyPage: React.FC = () => {
             </div>
             <div className="info-item">
               <span className="info-label">전화번호</span>
-              <span className="info-value">{formatPhoneNumber(userData.telNo)}</span>
+              <span className="info-value">{formatPhoneNumber(userData.telNo || '')}</span>
             </div>
             <div className="info-item">
               <span className="info-label">성별</span>

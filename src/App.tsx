@@ -64,26 +64,39 @@ const AppContent: React.FC = () => {
     // FCM 토큰 초기화 (웹과 네이티브 모두)
     const initializeFCM = async () => {
       try {
+        console.log('🔄 FCM 초기화 시작');
+        
         // 로그인된 사용자가 있는지 확인
         const savedUserInfo = localStorage.getItem('userInfo');
+        
         if (savedUserInfo) {
           const userInfo = JSON.parse(savedUserInfo);
+          
           if (userInfo.uid) {
-            console.log('FCM 토큰 초기화 시작');
+            console.log('🔄 FCM 토큰 강제 갱신 시작');
             try {
-              const fcmToken = await MessagingService.getFCMToken();
+              // 캐시된 토큰 무시하고 새로 생성
+              MessagingService.clearCachedToken();
+              const fcmToken = await MessagingService.getFCMToken(true);
+              
               if (fcmToken) {
                 await MessagingService.saveUserFCMToken(userInfo.uid, fcmToken);
-                console.log('FCM 토큰 갱신 완료:', fcmToken.substring(0, 20) + '...');
+                console.log('✅ FCM 토큰 갱신 완료');
+              } else {
+                console.log('⚠️ FCM 토큰 생성 실패');
               }
             } catch (fcmError) {
-              console.error('FCM 토큰 갱신 중 에러:', fcmError);
+              console.error('❌ FCM 토큰 갱신 실패:', fcmError);
               // FCM 실패해도 앱은 계속 실행
             }
+          } else {
+            console.log('⚠️ 사용자 ID가 없음');
           }
+        } else {
+          console.log('⚠️ 로그인된 사용자가 없음');
         }
       } catch (error) {
-        console.error('FCM 토큰 초기화 실패:', error);
+        console.error('❌ FCM 초기화 실패:', error);
         // FCM 실패해도 앱은 계속 실행
       }
     };

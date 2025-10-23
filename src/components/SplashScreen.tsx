@@ -7,27 +7,33 @@ interface SplashScreenProps {
 }
 
 const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isFading, setIsFading] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(false);
-      // 애니메이션 완료 후 콜백 호출
-      setTimeout(() => {
-        onFinish();
-      }, 500); // 페이드아웃 애니메이션 시간
-    }, 2000); // 2초 후 시작
+    const showDurationMs = 1500; // static show
+    const fadeDurationMs = 500;  // fade-out
 
-    return () => clearTimeout(timer);
+    const fadeTimer = setTimeout(() => {
+      setIsFading(true);
+    }, showDurationMs);
+
+    const finishTimer = setTimeout(() => {
+      onFinish();
+    }, showDurationMs + fadeDurationMs);
+
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(finishTimer);
+    };
   }, [onFinish]);
 
   return (
-    <IonPage className={`splash-screen ${isVisible ? 'visible' : 'fade-out'}`}>
+    <IonPage className={`splash-screen ${isFading ? 'fade-out' : ''}`}>
       <IonContent className="splash-content">
         <div className="splash-container">
           <img 
-            src="/main_logo.svg" 
-            alt="건강약속 로고" 
+            src="/splash.svg" 
+            alt="건강약속 스플래시" 
             className="logo-image"
           />
         </div>

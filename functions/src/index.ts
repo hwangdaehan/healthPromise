@@ -82,34 +82,24 @@ export const sendPushToUser = functions.https.onRequest((req, res) => {
       const message = {
         token: pushToken,
         notification: {
-          title: title,
-          body: body,
+          title,
+          body,
         },
         data: additionalData || {},
         android: {
           notification: {
-            channelId: '1:506246950736:android:7fc831f8cdd13e61954655',
-            icon: 'ic_launcher',
-            color: '#10b981',
+            channelId: 'default_channel',
+            icon: 'ic_notification',
             sound: 'default',
-            priority: 'high',
-            visibility: 'public',
-            defaultSound: true,
-            defaultVibrateTimings: true,
-            defaultLightSettings: true,
           },
           priority: 'high',
-          restrictedPackageName: 'app.health.promise',
         },
         apns: {
           payload: {
             aps: {
               sound: 'default',
               badge: 1,
-              alert: {
-                title: title,
-                body: body,
-              },
+              alert: { title, body },
             },
           },
         },
@@ -292,8 +282,8 @@ export const scheduledReservationNotifications = functions.pubsub
             const message = {
               token: pushToken,
               notification: {
-                title: title,
-                body: body,
+                title,
+                body,
               },
               data: {
                 type: 'reservation',
@@ -303,15 +293,9 @@ export const scheduledReservationNotifications = functions.pubsub
               },
               android: {
                 notification: {
-                  channelId: '1:506246950736:android:7fc831f8cdd13e61954655',
-                  icon: 'ic_launcher',
-                  color: '#10b981',
+                  channelId: 'default_channel',
+                  icon: 'ic_notification',
                   sound: 'default',
-                  priority: 'high',
-                  visibility: 'public',
-                  defaultSound: true,
-                  defaultVibrateTimings: true,
-                  defaultLightSettings: true,
                 },
                 priority: 'high',
               },
@@ -453,8 +437,8 @@ export const scheduledMedicineNotifications = functions.pubsub
             const message = {
               token: pushToken,
               notification: {
-                title: title,
-                body: body,
+                title,
+                body,
               },
               data: {
                 type: 'medicine',
@@ -464,15 +448,9 @@ export const scheduledMedicineNotifications = functions.pubsub
               },
               android: {
                 notification: {
-                  channelId: '1:506246950736:android:7fc831f8cdd13e61954655',
-                  icon: 'ic_launcher',
-                  color: '#10b981',
+                  channelId: 'default_channel',
+                  icon: 'ic_notification',
                   sound: 'default',
-                  priority: 'high',
-                  visibility: 'public',
-                  defaultSound: true,
-                  defaultVibrateTimings: true,
-                  defaultLightSettings: true,
                 },
                 priority: 'high',
               },

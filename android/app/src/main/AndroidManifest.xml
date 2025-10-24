@@ -42,13 +42,13 @@
         </provider>
 
         <!-- Firebase Cloud Messaging Service -->
-        <service
-            android:name="io.capacitorjs.plugins.pushnotifications.FCMService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
+<!--        <service-->
+<!--            android:name="io.capacitorjs.plugins.pushnotifications.FCMService"-->
+<!--            android:exported="false">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="com.google.firebase.MESSAGING_EVENT" />-->
+<!--            </intent-filter>-->
+<!--        </service>-->
 
         <!-- Firebase Messaging Default Channel -->
         <meta-data

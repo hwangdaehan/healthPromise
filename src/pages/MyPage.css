@@ -1,5 +1,5 @@
 .mypage-content {
-  --background: #f8f9fa;
+  --background: #f8fafc;
 }
 
 /* 프로필 섹션 */
@@ -68,7 +68,7 @@
 }
 
 .info-card {
-  background: white;
+  background: #ffffff;
   border-radius: 12px;
   padding: 1rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -113,7 +113,7 @@
 
 /* 메뉴 섹션 */
 .menu-section {
-  background: white;
+  background: #ffffff;
   border-radius: 12px;
   margin: 0 1rem 1.5rem 1rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -143,7 +143,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.5rem;
-  background: white;
+  background: #ffffff;
   border-bottom: 1px solid #f0f0f0;
   cursor: default;
 }
@@ -152,6 +152,13 @@
   display: flex;
   align-items: center;
   flex: 1;
+  gap: 0.5rem;
+}
+
+.notification-label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
 }
 
 .notification-toggle {
@@ -266,33 +273,33 @@
 /* 다크모드 지원 */
 @media (prefers-color-scheme: dark) {
   .mypage-content {
-    --background: #1a1a1a;
+    --background: #f8fafc;
   }
   
   .info-card,
   .menu-section {
-    background: #2d2d2d;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
   
   .section-title {
-    color: #fff;
+    color: #333;
   }
   
   .info-label {
-    color: #ccc;
+    color: #666;
   }
   
   .info-value {
-    color: #fff;
+    color: #333;
   }
   
   .menu-text {
-    color: #fff;
+    color: #333;
   }
   
   .menu-item:hover {
-    background-color: #3d3d3d;
+    background-color: #f8f9fa;
   }
   
   /* 다크모드 성별 색상 */

@@ -755,6 +755,19 @@ const Home: React.FC = () => {
     return `${hour}시`;
   };
 
+  // 알림 발송 날짜 포맷팅 함수
+  const formatAlarmDate = (date: Date) => {
+    if (!date || isNaN(date.getTime())) {
+      return '날짜 오류';
+    }
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hour = date.getHours().toString().padStart(2, '0');
+    const minute = date.getMinutes().toString().padStart(2, '0');
+    return `${year}.${month}.${day} ${hour}:${minute}`;
+  };
+
   // 즐겨찾기 병원 카드 클릭 핸들러
   const handleFavoriteHospitalClick = (hospital: FavoriteHospital) => {
     setSelectedHospital(hospital);
@@ -1259,6 +1272,7 @@ const Home: React.FC = () => {
                 <div key={index} className="alarm-item">
                   <div className="alarm-title">[{alarm.title}]</div>
                   <div className="alarm-content">{alarm.content}</div>
+                  <div className="alarm-date">{formatAlarmDate(alarm.regDate)}</div>
                 </div>
               ))
             ) : (

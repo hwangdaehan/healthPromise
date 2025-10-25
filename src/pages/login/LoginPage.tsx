@@ -83,7 +83,7 @@ export default function LoginPage() {
         console.log('사용자 정보를 찾았습니다:', userProfile);
         localStorage.setItem('userInfo', JSON.stringify(userData));
 
-        // FCM 토큰 갱신 (웹과 네이티브 모두)
+        // FCM 토큰 갱신 (유효성 검사 포함)
         try {
           console.log('=== 로그인 후 FCM 토큰 갱신 시작 ===');
           console.log('userProfile.uid:', userProfile.uid);
@@ -93,20 +93,12 @@ export default function LoginPage() {
             (window as any).Capacitor?.isNativePlatform() ? '네이티브' : '웹'
           );
 
-          const fcmToken = await MessagingService.getFCMToken();
-          console.log('getFCMToken 결과:', fcmToken ? fcmToken.substring(0, 20) + '...' : 'null');
-
-          if (fcmToken && userProfile.uid) {
-            console.log('FCM 토큰과 userId 모두 있음, 저장 시작');
-            await MessagingService.saveUserFCMToken(userProfile.uid, fcmToken);
-            console.log('FCM 토큰 갱신 완료:', fcmToken.substring(0, 20) + '...');
+          // 토큰 유효성 검사 후 필요시에만 갱신
+          const token = await MessagingService.initializeAndSaveToken();
+          if (token) {
+            console.log('FCM 토큰 갱신 완료:', token.substring(0, 20) + '...');
           } else {
-            console.log(
-              'FCM 토큰을 가져올 수 없음 - fcmToken:',
-              !!fcmToken,
-              'userProfile.uid:',
-              !!userProfile.uid
-            );
+            console.log('FCM 토큰 갱신 실패 또는 불필요');
           }
         } catch (error) {
           console.error('FCM 토큰 갱신 실패:', error);

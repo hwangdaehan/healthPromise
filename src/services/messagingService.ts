@@ -401,13 +401,75 @@ export class MessagingService {
     }
   }
 
-  // FCM 토큰 초기화 및 저장
-  static async initializeAndSaveToken(): Promise<string | null> {
+  // FCM 토큰 유효성 검사
+  static async isTokenValid(userId: string): Promise<boolean> {
+    try {
+      // localStorage에서 현재 토큰 확인
+      const savedToken = localStorage.getItem('fcmToken');
+      if (!savedToken) {
+        console.log('저장된 FCM 토큰이 없음');
+        return false;
+      }
+
+      // Firestore에서 사용자의 저장된 토큰 확인
+      const userToken = await this.getUserFCMToken(userId);
+      if (!userToken) {
+        console.log('Firestore에 저장된 토큰이 없음');
+        return false;
+      }
+
+      // 토큰이 일치하는지 확인
+      if (savedToken !== userToken) {
+        console.log('저장된 토큰과 Firestore 토큰이 다름');
+        return false;
+      }
+
+      // 토큰 형식 검증 (FCM 토큰은 보통 163자 이상)
+      if (savedToken.length < 100) {
+        console.log('토큰 길이가 너무 짧음');
+        return false;
+      }
+
+      console.log('FCM 토큰이 유효함');
+      return true;
+    } catch (error) {
+      console.error('토큰 유효성 검사 실패:', error);
+      return false;
+    }
+  }
+
+  // FCM 토큰 초기화 및 저장 (유효성 검사 포함)
+  static async initializeAndSaveToken(forceRefresh: boolean = false): Promise<string | null> {
     try {
       console.log('FCM 토큰 초기화 시작');
       
+      // localStorage에서 사용자 정보 가져오기
+      const savedUserInfo = localStorage.getItem('userInfo');
+      if (!savedUserInfo) {
+        console.log('사용자 정보가 없음');
+        return null;
+      }
+
+      const userInfo = JSON.parse(savedUserInfo);
+      const userId = userInfo.uid;
+
+      if (!userId) {
+        console.log('사용자 ID가 없음');
+        return null;
+      }
+
+      // 강제 갱신이 아닌 경우 토큰 유효성 검사
+      if (!forceRefresh) {
+        const isValid = await this.isTokenValid(userId);
+        if (isValid) {
+          console.log('기존 FCM 토큰이 유효함, 갱신 생략');
+          return localStorage.getItem('fcmToken');
+        }
+        console.log('FCM 토큰이 유효하지 않음, 갱신 필요');
+      }
+      
       // FCM 토큰 가져오기 (권한 요청 포함)
-      const token = await this.getFCMToken();
+      const token = await this.getFCMToken(forceRefresh);
       if (!token) {
         console.log('FCM 토큰 획득 실패');
         return null;
@@ -415,24 +477,14 @@ export class MessagingService {
 
       console.log('FCM 토큰 획득 성공:', token.substring(0, 20) + '...');
 
-      // localStorage에서 사용자 정보 가져오기
-      const savedUserInfo = localStorage.getItem('userInfo');
+      console.log('사용자 ID로 토큰 저장:', userId);
+      
+      // user 컬렉션에 pushToken 저장
+      await this.saveUserFCMToken(userId, token);
 
-      if (savedUserInfo) {
-        const userInfo = JSON.parse(savedUserInfo);
-        const userId = userInfo.uid;
-
-        if (userId) {
-          console.log('사용자 ID로 토큰 저장:', userId);
-          
-          // user 컬렉션에 pushToken 저장
-          await this.saveUserFCMToken(userId, token);
-
-          // 세션에도 pushToken 저장
-          const updatedUserInfo = { ...userInfo, pushToken: token };
-          localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
-        }
-      }
+      // 세션에도 pushToken 저장
+      const updatedUserInfo = { ...userInfo, pushToken: token };
+      localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
 
       // localStorage에도 저장
       localStorage.setItem('fcmToken', token);

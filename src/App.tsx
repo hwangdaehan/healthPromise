@@ -61,7 +61,7 @@ const AppContent: React.FC = () => {
       }
     };
 
-    // FCM 토큰 초기화 (안전한 방법)
+    // FCM 토큰 초기화 (유효성 검사 포함)
     const initializeFCM = async () => {
       try {
         console.log('🔄 FCM 초기화 시작 (지연 실행)');
@@ -74,17 +74,15 @@ const AppContent: React.FC = () => {
             const userInfo = JSON.parse(savedUserInfo);
             
             if (userInfo.uid) {
-              console.log('🔄 FCM 토큰 갱신 시작');
+              console.log('🔄 FCM 토큰 유효성 검사 및 갱신 시작');
               
-              // 안전한 FCM 토큰 생성
+              // 토큰 유효성 검사 후 필요시에만 갱신
               try {
-                const fcmToken = await MessagingService.getFCMToken(false); // 강제 새 토큰 비활성화
-                
-                if (fcmToken) {
-                  await MessagingService.saveUserFCMToken(userInfo.uid, fcmToken);
-                  console.log('✅ FCM 토큰 저장 완료');
+                const token = await MessagingService.initializeAndSaveToken();
+                if (token) {
+                  console.log('✅ FCM 토큰 갱신 완료');
                 } else {
-                  console.log('⚠️ FCM 토큰 생성 실패');
+                  console.log('⚠️ FCM 토큰 갱신 불필요 또는 실패');
                 }
               } catch (fcmError) {
                 console.error('❌ FCM 토큰 갱신 실패:', fcmError);

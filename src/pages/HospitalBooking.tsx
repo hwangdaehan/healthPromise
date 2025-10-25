@@ -257,15 +257,48 @@ const HospitalCard: React.FC<HospitalCardProps> = ({ hospital }) => {
   };
 
   // 예약 일정 저장 핸들러
-  const handleSaveScheduleAppointment = () => {
-    console.log('예약 일정 저장:', appointmentData);
-    alert('예약 일정이 등록되었습니다!');
-    setShowScheduleModal(false);
-    setAppointmentData({
-      date: '',
-      time: '',
-      notes: ''
-    });
+  const handleSaveScheduleAppointment = async () => {
+    try {
+      // IonDatetime에서 받은 ISO 문자열을 파싱
+      const dateStr = appointmentData.date.split('T')[0]; // YYYY-MM-DD 부분만 추출
+      const timeStr = appointmentData.time.split('T')[1]; // HH:MM:SS 부분만 추출
+      
+      const combined = new Date(`${dateStr}T${timeStr}`);
+      
+      // Date 객체 유효성 검사
+      if (isNaN(combined.getTime())) {
+        throw new Error('잘못된 날짜 형식입니다. 날짜와 시간을 다시 선택해주세요.');
+      }
+
+      const id = await addReservation({
+        address: hospital.addr || '',
+        hospitalName: hospital.yadmNm || '',
+        memo: appointmentData.notes || '',
+        reservationDate: combined,
+        telNo: hospital.telno || '',
+        // 기존 필드들 (호환성을 위해 유지)
+        hospitalId: 'temp-hospital-id',
+        department: '일반진료',
+        doctorName: '의사',
+        appointmentDate: combined,
+        appointmentTime: appointmentData.time,
+        patientName: '환자',
+        patientPhone: hospital.telno || '',
+        symptoms: appointmentData.notes || '',
+        status: 'pending' as const,
+      });
+      console.log('예약 저장 완료 ID:', id);
+      alert('예약이 등록되었습니다!');
+      setShowScheduleModal(false);
+      setAppointmentData({
+        date: '',
+        time: '',
+        notes: ''
+      });
+    } catch (err) {
+      console.error('예약 저장 실패:', err);
+      alert('예약 저장에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   // 저장된 병원 정보 가져오기

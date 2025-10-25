@@ -27,6 +27,7 @@ import {
   FavoriteHospital,
 } from '../services/favoriteHospitalService';
 import { getCurrentUserSession } from '../services/userService';
+import { addReservation } from '../services/reservationService';
 import './FavoriteHospitals.css';
 
 const FavoriteHospitals: React.FC = () => {
@@ -92,16 +93,52 @@ const FavoriteHospitals: React.FC = () => {
     setShowAppointmentModal(true);
   };
 
-  const handleSaveAppointment = () => {
-    // 예약 데이터 저장 로직 (추후 구현)
-    console.log('예약 저장:', appointmentData);
-    alert('예약이 등록되었습니다!');
-    setShowAppointmentModal(false);
-    setAppointmentData({
-      date: '',
-      time: '',
-      notes: ''
-    });
+  const handleSaveAppointment = async () => {
+    try {
+      // IonDatetime에서 받은 ISO 문자열을 파싱
+      const dateStr = appointmentData.date.split('T')[0]; // YYYY-MM-DD 부분만 추출
+      const timeStr = appointmentData.time.split('T')[1]; // HH:MM:SS 부분만 추출
+      
+      const combined = new Date(`${dateStr}T${timeStr}`);
+      
+      // Date 객체 유효성 검사
+      if (isNaN(combined.getTime())) {
+        throw new Error('잘못된 날짜 형식입니다. 날짜와 시간을 다시 선택해주세요.');
+      }
+
+      if (!selectedHospital) {
+        throw new Error('병원 정보가 없습니다.');
+      }
+
+      const id = await addReservation({
+        address: selectedHospital.address || '',
+        hospitalName: selectedHospital.name || '',
+        memo: appointmentData.notes || '',
+        reservationDate: combined,
+        telNo: selectedHospital.phoneNumber || '',
+        // 기존 필드들 (호환성을 위해 유지)
+        hospitalId: 'temp-hospital-id',
+        department: '일반진료',
+        doctorName: '의사',
+        appointmentDate: combined,
+        appointmentTime: appointmentData.time,
+        patientName: '환자',
+        patientPhone: selectedHospital.phoneNumber || '',
+        symptoms: appointmentData.notes || '',
+        status: 'pending' as const,
+      });
+      console.log('예약 저장 완료 ID:', id);
+      alert('예약이 등록되었습니다!');
+      setShowAppointmentModal(false);
+      setAppointmentData({
+        date: '',
+        time: '',
+        notes: ''
+      });
+    } catch (err) {
+      console.error('예약 저장 실패:', err);
+      alert('예약 저장에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   const handleCloseModal = () => {

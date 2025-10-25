@@ -723,6 +723,12 @@ const Home: React.FC = () => {
     }
   };
 
+  // 복약 알림 클릭 시 복용 기록 등록 페이지로 이동
+  const handleMedicineNotificationClick = () => {
+    console.log('복약 알림 클릭 - 복용 기록 등록 페이지로 이동');
+    history.push('/medication?action=record');
+  };
+
 
 
   // 알림 개수 표시 함수

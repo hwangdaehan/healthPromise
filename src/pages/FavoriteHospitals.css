@@ -86,36 +86,39 @@ ion-title {
 .hospital-actions {
   display: flex;
   flex-direction: row;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
   justify-content: center;
   padding-top: 16px;
   border-top: 1px solid #e5e7eb;
   position: relative;
   z-index: 10;
+  flex-wrap: nowrap;
 }
 
 .favorite-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
+  gap: 4px;
+  padding: 8px 6px;
   background: #fbbf24;
   color: #ffffff;
   border: 1px solid #f59e0b;
-  border-radius: 12px;
-  font-size: 18px;
+  border-radius: 10px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   flex: 1;
   text-align: center;
-  min-height: 50px;
+  min-height: 44px;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .favorite-button ion-icon {
-  font-size: 18px;
+  font-size: 14px;
   color: #ffffff;
 }
 
@@ -145,20 +148,22 @@ ion-title {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
+  gap: 4px;
+  padding: 8px 6px;
   background: #10b981;
   color: white;
   border: none;
-  border-radius: 12px;
-  font-size: 18px;
+  border-radius: 10px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
   flex: 1;
   text-align: center;
-  min-height: 50px;
+  min-height: 44px;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .call-button:hover {
@@ -171,7 +176,43 @@ ion-title {
 }
 
 .call-button ion-icon {
-  font-size: 18px;
+  font-size: 14px;
+  color: white;
+}
+
+.schedule-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 6px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  flex: 1;
+  text-align: center;
+  min-height: 44px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.schedule-button:hover {
+  background: #2563eb;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.schedule-button:active {
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+}
+
+.schedule-button ion-icon {
+  font-size: 14px;
   color: white;
 }
 
@@ -226,8 +267,123 @@ ion-title {
   }
 
   .favorite-button,
-  .call-button {
+  .call-button,
+  .schedule-button {
     flex: 1;
-    min-height: 50px;
+    min-height: 44px;
+    font-size: 16px;
+    padding: 6px 4px;
+  }
+}
+
+/* 예약 모달 스타일 */
+.appointment-form {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.hospital-info-header {
+  text-align: center;
+  margin-bottom: 24px;
+  padding: 20px 10px;
+  background: #f8fafc;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.hospital-info-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.hospital-info-header p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.appointment-actions {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 10px;
+  background: #f8fafc;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.appointment-actions ion-button {
+  --border-radius: 12px;
+  --padding-start: 24px;
+  --padding-end: 24px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  height: 48px;
+  border-radius: 12px;
+}
+
+/* 모달 아이템 스타일 */
+.appointment-form ion-item {
+  --border-radius: 12px;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  margin-bottom: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 10px;
+}
+
+.appointment-form ion-item:first-of-type {
+  margin-top: 20px;
+}
+
+.appointment-form ion-item ion-label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.appointment-form ion-item ion-input,
+.appointment-form ion-item ion-textarea,
+.appointment-form ion-item ion-datetime {
+  --padding-start: 0;
+  --padding-end: 0;
+  border-radius: 8px;
+}
+
+.appointment-form ion-item ion-datetime {
+  margin-top: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 1.3em;
+  font-weight: 500;
+}
+
+/* 반응형 모달 */
+@media (max-width: 768px) {
+  .appointment-form {
+    padding: 16px 0;
+  }
+  
+  .hospital-info-header {
+    padding: 12px;
+  }
+  
+  .hospital-info-header h3 {
+    font-size: 18px;
   }
 }

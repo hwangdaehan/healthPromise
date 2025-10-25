@@ -12,8 +12,14 @@ import {
   IonGrid,
   IonRow,
   IonCol,
+  IonModal,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonDatetime,
+  IonTextarea,
 } from '@ionic/react';
-import { arrowBack, business, call, location, star } from 'ionicons/icons';
+import { arrowBack, business, call, location, star, calendar, close } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {
   getFavoriteHospitals,
@@ -27,6 +33,13 @@ const FavoriteHospitals: React.FC = () => {
   const history = useHistory();
   const [favoriteHospitals, setFavoriteHospitals] = useState<FavoriteHospital[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
+  const [selectedHospital, setSelectedHospital] = useState<FavoriteHospital | null>(null);
+  const [appointmentData, setAppointmentData] = useState({
+    date: '',
+    time: '',
+    notes: ''
+  });
 
   useEffect(() => {
     loadFavoriteHospitals();
@@ -72,6 +85,33 @@ const FavoriteHospitals: React.FC = () => {
 
   const handleCallHospital = (phone: string) => {
     window.open(`tel:${phone}`, '_self');
+  };
+
+  const handleScheduleAppointment = (hospital: FavoriteHospital) => {
+    setSelectedHospital(hospital);
+    setShowAppointmentModal(true);
+  };
+
+  const handleSaveAppointment = () => {
+    // 예약 데이터 저장 로직 (추후 구현)
+    console.log('예약 저장:', appointmentData);
+    alert('예약이 등록되었습니다!');
+    setShowAppointmentModal(false);
+    setAppointmentData({
+      date: '',
+      time: '',
+      notes: ''
+    });
+  };
+
+  const handleCloseModal = () => {
+    setShowAppointmentModal(false);
+    setSelectedHospital(null);
+    setAppointmentData({
+      date: '',
+      time: '',
+      notes: ''
+    });
   };
 
   return (
@@ -133,6 +173,13 @@ const FavoriteHospitals: React.FC = () => {
                                 전화
                               </button>
                             )}
+                            <button
+                              onClick={() => handleScheduleAppointment(hospital)}
+                              className="schedule-button"
+                            >
+                              <IonIcon icon={calendar} />
+                              일정등록
+                            </button>
                           </div>
                         </div>
                       </IonCardContent>
@@ -157,6 +204,78 @@ const FavoriteHospitals: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* 예약 모달 */}
+        <IonModal isOpen={showAppointmentModal} onDidDismiss={handleCloseModal}>
+          <IonHeader>
+            <IonToolbar>
+              <IonTitle>병원 예약 등록</IonTitle>
+              <IonButton
+                fill="clear"
+                onClick={handleCloseModal}
+                slot="end"
+              >
+                <IonIcon icon={close} />
+              </IonButton>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent className="ion-padding">
+            {selectedHospital && (
+              <div className="appointment-form">
+                <div className="hospital-info-header">
+                  <h3>{selectedHospital.name}</h3>
+                  <p>{selectedHospital.address}</p>
+                </div>
+
+                <IonItem>
+                  <IonLabel position="stacked">예약 날짜</IonLabel>
+                  <IonDatetime
+                    presentation="date"
+                    value={appointmentData.date}
+                    onIonChange={e => setAppointmentData(prev => ({ ...prev, date: e.detail.value as string }))}
+                  />
+                </IonItem>
+
+                <IonItem>
+                  <IonLabel position="stacked">예약 시간</IonLabel>
+                  <IonDatetime
+                    presentation="time"
+                    value={appointmentData.time}
+                    onIonChange={e => setAppointmentData(prev => ({ ...prev, time: e.detail.value as string }))}
+                  />
+                </IonItem>
+
+
+                <IonItem>
+                  <IonLabel position="stacked">메모</IonLabel>
+                  <IonTextarea
+                    value={appointmentData.notes}
+                    onIonInput={e => setAppointmentData(prev => ({ ...prev, notes: e.detail.value! }))}
+                    placeholder="추가 메모 (선택사항)"
+                    rows={2}
+                  />
+                </IonItem>
+
+                <div className="appointment-actions">
+                  <IonButton
+                    expand="block"
+                    onClick={handleSaveAppointment}
+                    disabled={!appointmentData.date || !appointmentData.time}
+                  >
+                    예약 등록하기
+                  </IonButton>
+                  <IonButton
+                    expand="block"
+                    fill="outline"
+                    onClick={handleCloseModal}
+                  >
+                    취소
+                  </IonButton>
+                </div>
+              </div>
+            )}
+          </IonContent>
+        </IonModal>
       </IonContent>
     </IonPage>
   );

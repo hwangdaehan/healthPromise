@@ -110,6 +110,37 @@ const AppContent: React.FC = () => {
     setTimeout(() => {
       initializeFCM();
     }, 2000); // 2초 후 실행
+
+    // 푸시 알림 메시지 처리
+    const setupPushNotificationHandler = () => {
+      try {
+        const unsubscribe = MessagingService.onMessage((payload) => {
+          console.log('📱 푸시 알림 메시지 수신:', payload);
+          
+          // 복약 알림인 경우 복용 기록 등록 페이지로 이동
+          if (payload.data?.type === 'medicine') {
+            console.log('💊 복약 알림 감지 - 복용 기록 등록 페이지로 이동');
+            // URL 파라미터와 함께 복약 관리 페이지로 이동
+            window.location.href = '/medication?action=record';
+          }
+        });
+
+        // 컴포넌트 언마운트 시 구독 해제
+        return unsubscribe;
+      } catch (error) {
+        console.error('푸시 알림 핸들러 설정 실패:', error);
+        return () => {};
+      }
+    };
+
+    const unsubscribe = setupPushNotificationHandler();
+    
+    // 컴포넌트 언마운트 시 정리
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
 
   const handleSplashFinish = () => {

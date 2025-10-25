@@ -20,7 +20,7 @@ import {
   IonAlert,
 } from '@ionic/react';
 import { medical, time, person, checkmarkCircle, closeCircle, arrowBack, add, trash, notifications, notificationsOff, close, notificationsOutline } from 'ionicons/icons';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { FirestoreService, Medicine } from '../services/firestoreService';
 import { getCurrentUserSession } from '../services/userService';
 import { getMedicineHistory, addMedicineHistory } from '../services/medicineHistoryService';
@@ -50,6 +50,7 @@ interface MedicationRecord {
 
 const MedicationManagement: React.FC = () => {
   const history = useHistory();
+  const location = useLocation();
   const [medications, setMedications] = useState<Medication[]>([]);
   const [records, setRecords] = useState<MedicationRecord[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -110,6 +111,18 @@ const MedicationManagement: React.FC = () => {
         }));
         
         setMedications(convertedMedications);
+        
+        // URL 파라미터 확인 - 알림에서 온 경우 복용 기록 모달 자동 열기
+        const urlParams = new URLSearchParams(location.search);
+        const action = urlParams.get('action');
+        
+        if (action === 'record' && convertedMedications.length > 0) {
+          console.log('알림에서 온 경우 - 복용 기록 모달 자동 열기');
+          // 첫 번째 약물로 복용 기록 모달 열기
+          setTimeout(() => {
+            openRecordBottomSheet(convertedMedications[0]);
+          }, 1000); // 약물 데이터 로드 후 1초 뒤에 모달 열기
+        }
       } catch (error) {
         console.error('약물 데이터 불러오기 중 오류 발생:', error);
         alert('약물 데이터를 불러오는 중 오류가 발생했습니다: ' + error);
@@ -129,7 +142,7 @@ const MedicationManagement: React.FC = () => {
     };
     
     initializeAdMob();
-  }, []);
+  }, [location.search]);
 
   const frequencies = [
     { value: 'once', label: '하루 1회' },
